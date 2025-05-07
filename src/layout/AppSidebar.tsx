@@ -111,29 +111,34 @@ const studentNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Student Overview", path: "/dashboard/student", pro: false }],
+    path: "/dashboard/agent",
   },
-  ...commonNavItems,
   {
-    name: "My Courses",
+    name: "My Listings",
     icon: <ListIcon />,
-    path: "/dashboard/student/courses",
-  },
-  {
-    name: "Assignments",
-    icon: <TableIcon />,
-    path: "/dashboard/student/assignments",
-  },
-  {
-    name: "Grades",
-    icon: <PageIcon />,
-    path: "/dashboard/student/grades",
-  },
-  {
-    name: "Attendance",
-    icon: <ListIcon />,
-    path: "/dashboard/student/attendance",
-  },
+    path: "/dashboard/agent/listings",
+  }
+  // ...commonNavItems,
+  // {
+  //   name: "My Courses",
+  //   icon: <ListIcon />,
+  //   path: "/dashboard/student/courses",
+  // },
+  // {
+  //   name: "Assignments",
+  //   icon: <TableIcon />,
+  //   path: "/dashboard/student/assignments",
+  // },
+  // {
+  //   name: "Grades",
+  //   icon: <PageIcon />,
+  //   path: "/dashboard/student/grades",
+  // },
+  // {
+  //   name: "Attendance",
+  //   icon: <ListIcon />,
+  //   path: "/dashboard/student/attendance",
+  // },
 ];
 
 const AppSidebar: React.FC = () => {
