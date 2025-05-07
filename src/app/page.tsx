@@ -1,7 +1,9 @@
 import React from 'react'
-import SplashScreen from '@/components/splashScreen/SplashScreen'
+
 export default function page() {
   return (
-    <div><SplashScreen/></div>
+    <div>
+      <h1>Welcome to Lemara</h1>
+</div>
   )
 }
