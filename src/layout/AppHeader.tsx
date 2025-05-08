@@ -41,7 +41,7 @@ const AppHeader: React.FC = () => {
           </Link>
           
           {/* Add Listing Button */}
-          <Link href="/add-listing" className="flex items-center justify-center px-4 py-2 font-medium text-white rounded-md bg-[#9A2236] hover:bg-[#851c2e] dark:bg-[#b02e45] dark:hover:bg-[#9A2236]">
+          <Link href="/dashboard/agent/add" className="flex items-center justify-center px-4 py-2 font-medium text-white rounded-md bg-[#9A2236] hover:bg-[#851c2e] dark:bg-[#b02e45] dark:hover:bg-[#9A2236]">
             Add Listing
           </Link>
           

@@ -27,6 +27,14 @@ type NavItem = {
 
 // Common navigation items for all roles
 const commonNavItems: NavItem[] = [
+  // {
+  //   icon: <ListIcon />,
+  //   name: "Listings",
+  //   subItems: [
+  //     { name: "All Listings", path: "/dashboard/listings", pro: false },
+  //     { name: "Add Listing", path: "/dashboard/listings/add", pro: false },
+  //   ],
+  // },
   {
     icon: <CalenderIcon />,
     name: "Calendar",
@@ -116,7 +124,7 @@ const studentNavItems: NavItem[] = [
   {
     name: "My Listings",
     icon: <ListIcon />,
-    path: "/dashboard/agent/listings",
+    path: "/dashboard/agent/add",
   }
   // ...commonNavItems,
   // {
