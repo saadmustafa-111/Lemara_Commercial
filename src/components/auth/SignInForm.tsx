@@ -184,7 +184,7 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full bg-[#06AED7]">
+    <div className="flex items-center justify-center min-h-screen w-full bg-[#366084]">
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -261,9 +261,9 @@ export default function SignInForm() {
           </div>
 
           <div className="flex items-center justify-between">
-            <Checkbox id="remember" label="Remember me" checked={isChecked} onChange={() => setIsChecked(!isChecked)} />
+          <Checkbox id="remember" label="Remember me" checked={isChecked} onChange={() => setIsChecked(!isChecked)} className="text-gray-900" />
 
-            <Link href="/forgot-password" className="text-sm text-gray-600 transition-colors hover:text-gray-900">
+            <Link href="/forgot-password" className="text-sm text-[#022340] transition-colors hover:text-gray-900">
               Forgot password?
             </Link>
           </div>
@@ -299,14 +299,14 @@ export default function SignInForm() {
 </div>
 
           <p className="text-sm text-center text-gray-500">
-            Don&apos;t have an account?{" "}
+           Are you new to Lemara Commercial?{" "}
             <Link
               href="/roles"
               className="font-medium text-gray-700 transition-colors hover:text-gray-900"
               prefetch={true}
               onClick={(e) => {
                 e.preventDefault()
-                router.push("/roles")
+                router.push("/signup")
               }}
             >
               Sign up
