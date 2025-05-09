@@ -1,7 +1,6 @@
 // File: c:\Users\CUI\OneDrive\Desktop\ZaraSchool_Nextjs\src\app\(full-width-pages)\(auth)\layout.tsx
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../src/app/(full-width-pages)/(auth)/layout.js')
 
 type SegmentParams<T extends Object = any> = T extends Record<string, any>
   ? { [K in keyof T]: T[K] extends string ? string | string[] | undefined : never }
