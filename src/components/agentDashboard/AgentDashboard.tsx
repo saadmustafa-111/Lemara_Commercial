@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import Badge from '@/components/ui/badge/Badge';
+import Link from 'next/link'; 
 import LoadingOverlay from '@/components/common/LoadingOverlay';
 import useLoading from '@/hooks/useLoading';
 
