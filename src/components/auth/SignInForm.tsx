@@ -1,14 +1,14 @@
 "use client"
 import { useState, useEffect } from "react"
 import type React from "react"
-
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import Checkbox from "@/components/form/input/Checkbox"
 import Input from "@/components/form/input/InputField"
 import Label from "@/components/form/Label"
 import { EyeCloseIcon, EyeIcon } from "@/icons"
 import Link from "next/link"
-import { useAuth } from "@/context/AuthContext" // Import the auth context
+import { useAuth } from "@/context/AuthContext"
 import { toast, ToastContainer, type ToastOptions } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
@@ -184,7 +184,7 @@ export default function SignInForm() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full bg-[#366084]">
+    <div className="flex min-h-screen w-full">
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -199,123 +199,174 @@ export default function SignInForm() {
         className="toast-container-custom"
       />
 
-      <div className="w-full max-w-md mx-auto px-6 py-12 bg-white rounded-2xl shadow-lg border border-cyan-200">
-        <div className="mb-8">
-          <h1
-            className={`mb-2 font-semibold text-gray-800 text-2xl sm:text-3xl relative ${typingComplete ? "text-animation-complete" : ""}`}
-          >
-            <span className="inline-block">{titleText}</span>
-            <span
-              className="inline-block w-1 h-8 bg-gray-800 ml-1 absolute"
-              style={{
-                animation: "blink 1s step-end infinite",
-                display: titleText.length === fullTitle.length ? "none" : "inline-block",
-              }}
-            ></span>
-          </h1>
-          <p className="text-sm text-gray-500 mt-2">Enter your credentials to continue your journey</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <Label htmlFor="email" className="mb-1.5 text-gray-700">
-              Email
-            </Label>
-            <Input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              error={!!errors.email}
-              hint={errors.email}
-              className="bg-white text-gray-800 !rounded-full border-gray-300 focus:border-gray-500 focus:ring-gray-500"
-            />
+      {/* Left Section - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white">
+        <div className="w-full max-w-md px-8 py-12 mx-6 bg-white rounded-xl border border-gray-100 shadow-lg">
+          <div className="mb-10">
+            <h1
+              className={`mb-3 font-bold text-gray-800 text-3xl sm:text-4xl relative ${
+                typingComplete ? "text-animation-complete" : ""
+              }`}
+            >
+              <span className="inline-block">{titleText}</span>
+              <span
+                className="inline-block w-1 h-8 bg-gray-800 ml-1 absolute"
+                style={{
+                  animation: "blink 1s step-end infinite",
+                  display: titleText.length === fullTitle.length ? "none" : "inline-block",
+                }}
+              ></span>
+            </h1>
+            <p className="text-base text-gray-600 mt-2">Enter your credentials to continue your journey</p>
+            <div className="mt-6 mb-8 border-b border-gray-200"></div>
           </div>
 
-          <div>
-            <Label htmlFor="password" className="mb-1.5 text-gray-700">
-              Password
-            </Label>
-            <div className="relative">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <Label htmlFor="email" className="mb-2 text-gray-700 font-medium">
+                Email Address
+              </Label>
               <Input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
                 onChange={handleChange}
-                error={!!errors.password}
-                hint={errors.password}
-                className="bg-white text-gray-800 !rounded-full border-gray-300 focus:border-gray-500 focus:ring-gray-500"
+                error={!!errors.email}
+                hint={errors.email}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => setShowPassword(!showPassword)}
+            </div>
+
+            <div>
+              <Label htmlFor="password" className="mb-2 text-gray-700 font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  error={!!errors.password}
+                  hint={errors.password}
+                  className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeCloseIcon /> : <EyeIcon />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Checkbox
+                id="remember"
+                label="Remember me"
+                checked={isChecked}
+                onChange={() => setIsChecked(!isChecked)}
+                className="text-gray-900"
+              />
+
+              <Link
+                href="/forgot-password"
+                className="text-sm text-[#366084] font-medium transition-colors hover:text-[#022340]"
               >
-                {showPassword ? <EyeCloseIcon /> : <EyeIcon />}
+                Forgot password?
+              </Link>
+            </div>
+
+            {authError && <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{authError}</div>}
+
+            <div className="pt-4">
+              <button
+                type="submit"
+                className="w-full py-3 font-medium text-white transition-all duration-300 rounded-lg bg-[#366084] hover:bg-[#022340] focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
+                disabled={isLoading || isSubmitting}
+              >
+                {isLoading || isSubmitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Signing In...</span>
+                  </>
+                ) : (
+                  "Sign In"
+                )}
               </button>
             </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-          <Checkbox id="remember" label="Remember me" checked={isChecked} onChange={() => setIsChecked(!isChecked)} className="text-gray-900" />
-
-            <Link href="/forgot-password" className="text-sm text-[#022340] transition-colors hover:text-gray-900">
-              Forgot password?
-            </Link>
-          </div>
-
-          {authError && <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{authError}</div>}
-<div className="flex justify-center mt-6">
-  <button
-    type="submit"
-    className="w-32 py-2 font-medium text-white transition-all duration-300 rounded-full bg-[#022340] hover:bg-cyan-500 hover:scale-105 focus:ring-2 focus:ring-cyan-400 shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-2"
-    disabled={isLoading || isSubmitting}
-  >
-    {isLoading || isSubmitting ? (
-      <>
-        <svg
-          className="animate-spin h-4 w-4 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        <span>Loading...</span>
-      </>
-    ) : (
-      "Sign In"
-    )}
-  </button>
-</div>
-
-          <p className="text-sm text-center text-gray-500">
-           Are you new to Lemara Commercial?{" "}
-            <Link
-              href="/roles"
-              className="font-medium text-gray-700 transition-colors hover:text-gray-900"
-              prefetch={true}
-              onClick={(e) => {
-                e.preventDefault()
-                router.push("/signup")
-              }}
-            >
-              Sign up
-            </Link>
-          </p>
-        </form>
+            <p className="text-sm text-center text-gray-600 mt-6">
+              Are you new to Lemara Commercial?{" "}
+              <Link
+                href="/roles"
+                className="font-medium text-[#366084] transition-colors hover:text-[#022340]"
+                prefetch={true}
+                onClick={(e) => {
+                  e.preventDefault()
+                  router.push("/signup")
+                }}
+              >
+                Sign up
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
 
-      {/* Add global styles for toast customization and input field styles */}
+      {/* Right Section - Property Image */}
+      <div className="hidden lg:block w-1/2 bg-[#366084] relative overflow-hidden">
+        <Image
+          src="/images/logo/Property.jpg"
+          alt="Lemara Commercial Property"
+          fill
+          style={{ objectFit: "cover" }}
+          priority
+          className="absolute inset-0"
+        />
+        <div className="absolute inset-0 bg-[#366084]/60 flex flex-col items-center justify-center p-8">
+          <div className="text-center text-white max-w-lg">
+            <h2 className="text-3xl font-bold mb-4">Premium Commercial Real Estate Solutions</h2>
+            <p className="text-lg opacity-90">
+              Access exclusive properties and manage your commercial real estate portfolio with Lemara Commercial's
+              professional platform.
+            </p>
+          </div>
+        </div>
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+          <div className="flex space-x-2">
+            <div className="w-3 h-3 rounded-full bg-white opacity-50"></div>
+            <div className="w-3 h-3 rounded-full bg-white"></div>
+            <div className="w-3 h-3 rounded-full bg-white opacity-50"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Global styles */}
       <style jsx global>{`
         .toast-container-custom .Toastify__toast {
           border-radius: 8px;
@@ -342,21 +393,44 @@ export default function SignInForm() {
           opacity: 1;
         }
 
-        /* Override any dark styling in Input component */
+        /* Input styling */
         input {
           background-color: white !important;
-          color: #1f2937 !important; /* text-gray-800 equivalent */
+          color: #1f2937 !important;
         }
 
-        /* Make sure placeholder text is visible */
         input::placeholder {
-          color: #9ca3af !important; /* text-gray-400 equivalent */
+          color: #9ca3af !important;
           opacity: 1;
         }
 
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
+        }
+
+        /* Card styling */
+        .rounded-xl {
+          border-radius: 1rem;
+        }
+
+        .shadow-lg {
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form container hover effect */
+        .bg-white.rounded-xl {
+          transition: all 0.3s ease;
+        }
+
+        .bg-white.rounded-xl:hover {
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          transform: translateY(-2px);
+        }
+
+        /* Improve input field focus states */
+        input:focus {
+          box-shadow: 0 0 0 2px rgba(54, 96, 132, 0.2) !important;
         }
       `}</style>
     </div>

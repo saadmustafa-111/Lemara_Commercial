@@ -35,16 +35,16 @@ const commonNavItems: NavItem[] = [
   //     { name: "Add Listing", path: "/dashboard/listings/add", pro: false },
   //   ],
   // },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
-  },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Calendar",
+  //   path: "/calendar",
+  // },
+  // {
+  //   icon: <UserCircleIcon />,
+  //   name: "User Profile",
+  //   path: "/profile",
+  // },
 ];
 
 // Admin-specific navigation items
@@ -102,16 +102,16 @@ const teacherNavItems: NavItem[] = [
     icon: <TableIcon />,
     subItems: [{ name: "Student List", path: "/dashboard/teacher/students", pro: false }],
   },
-  {
-    name: "Attendance",
-    icon: <PageIcon />,
-    path: "/dashboard/teacher/attendance",
-  },
-  {
-    name: "Assignments",
-    icon: <ListIcon />,
-    path: "/dashboard/teacher/assignments",
-  },
+  // {
+  //   name: "Attendance",
+  //   icon: <PageIcon />,
+  //   path: "/dashboard/teacher/attendance",
+  // },
+  // {
+  //   name: "Assignments",
+  //   icon: <ListIcon />,
+  //   path: "/dashboard/teacher/assignments",
+  // },
 ];
 
 // Student-specific navigation items
@@ -389,25 +389,25 @@ const AppSidebar: React.FC = () => {
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/Zara_Z.png"
+                src="/images/logo/lemaraLogo.png"
                 alt="Logo"
-                width={170}
-                height={70}
+                width={190}
+                height={90}
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/Zara_Z.png"
+                src="/images/logo/lemaraLogo.png"
                 alt="Logo"
-                width={170}
-                height={70}
+                width={190}
+                height={90}
               />
             </>
           ) : (
             <Image
-              src="/images/logo/Zara_Z.png"
+              src="/images/logo/lemaraLogo.png"
               alt="Logo"
-              width={32}
-              height={32}
+              width={40}
+              height={40}
             />
           )}
         </Link>

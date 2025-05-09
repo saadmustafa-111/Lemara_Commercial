@@ -1,9 +1,10 @@
 import React from 'react'
-
+import SignIn from '../components/auth/SignInForm'
 export default function page() {
   return (
     <div>
-      <h1>Welcome to Lemara</h1>
+  <SignIn />
+  {/* <SignUp /> */}
 </div>
   )
 }
