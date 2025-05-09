@@ -11,6 +11,7 @@ import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { toast, ToastContainer, type ToastOptions } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import { LogIn } from 'lucide-react';
 
 // Define custom toast style type
 interface CustomToastStyle extends Omit<ToastOptions, "icon"> {
@@ -21,11 +22,12 @@ interface CustomToastStyle extends Omit<ToastOptions, "icon"> {
 
 export default function SignInForm() {
   const router = useRouter()
-  const { signin, error: authError, isLoading, isAuthenticated, getRedirectPath } = useAuth()
+  const { signin, error: authError, isAuthenticated, getRedirectPath } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [isChecked, setIsChecked] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -34,10 +36,7 @@ export default function SignInForm() {
     email: "",
     password: "",
   })
-  const [titleText, setTitleText] = useState("")
-  const [typingComplete, setTypingComplete] = useState(false)
   const [signInAttempted, setSignInAttempted] = useState(false)
-  const fullTitle = "Welcome Back"
 
   const errorToastStyle: CustomToastStyle = {
     style: {
@@ -54,24 +53,13 @@ export default function SignInForm() {
     },
     icon: "⚠️",
   }
-
-  // Implement the typing effect
-  useEffect(() => {
-    let index = 0
-    const typingInterval = setInterval(() => {
-      if (index <= fullTitle.length) {
-        setTitleText(fullTitle.slice(0, index))
-        index++
-      } else {
-        clearInterval(typingInterval)
-        setTypingComplete(true)
-      }
-    }, 150)
-
-    return () => {
-      clearInterval(typingInterval)
-    }
-  }, [])
+  const handleClick = () => {
+    setIsLoading(true);
+    // Simulate form submission
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  };
 
   // Effect to handle redirection after successful authentication
   useEffect(() => {
@@ -202,20 +190,9 @@ export default function SignInForm() {
       {/* Left Section - Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-white">
         <div className="w-full max-w-md px-8 py-12 mx-6 bg-white rounded-xl border border-gray-100 shadow-lg">
-          <div className="mb-10">
-            <h1
-              className={`mb-3 font-bold text-gray-800 text-3xl sm:text-4xl relative ${
-                typingComplete ? "text-animation-complete" : ""
-              }`}
-            >
-              <span className="inline-block">{titleText}</span>
-              <span
-                className="inline-block w-1 h-8 bg-gray-800 ml-1 absolute"
-                style={{
-                  animation: "blink 1s step-end infinite",
-                  display: titleText.length === fullTitle.length ? "none" : "inline-block",
-                }}
-              ></span>
+          <div className="mb-10 text-center">
+            <h1 className="mb-3 font-bold text-[#06AED7] text-2xl sm:text-3xl md:text-[28px] ">
+              Agent Login
             </h1>
             <p className="text-base text-gray-600 mt-2">Enter your credentials to continue your journey</p>
             <div className="mt-6 mb-8 border-b border-gray-200"></div>
@@ -284,10 +261,11 @@ export default function SignInForm() {
 
             {authError && <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{authError}</div>}
 
-            <div className="pt-4">
+            <div className="flex justify-center pt-4">
               <button
                 type="submit"
-                className="w-full py-3 font-medium text-white transition-all duration-300 rounded-lg bg-[#366084] hover:bg-[#022340] focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
+                onClick={handleClick}
+                className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
                 disabled={isLoading || isSubmitting}
               >
                 {isLoading || isSubmitting ? (
@@ -315,7 +293,10 @@ export default function SignInForm() {
                     <span>Signing In...</span>
                   </>
                 ) : (
-                  "Sign In"
+                  <>
+                    <LogIn size={20} />
+                    <span>Sign In</span>
+                  </>
                 )}
               </button>
             </div>
@@ -357,13 +338,7 @@ export default function SignInForm() {
             </p>
           </div>
         </div>
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-white opacity-50"></div>
-            <div className="w-3 h-3 rounded-full bg-white"></div>
-            <div className="w-3 h-3 rounded-full bg-white opacity-50"></div>
-          </div>
-        </div>
+      
       </div>
 
       {/* Global styles */}
@@ -402,11 +377,6 @@ export default function SignInForm() {
         input::placeholder {
           color: #9ca3af !important;
           opacity: 1;
-        }
-
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
         }
 
         /* Card styling */

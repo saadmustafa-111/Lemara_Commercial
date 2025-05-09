@@ -11,6 +11,7 @@ import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { toast, ToastContainer, type ToastOptions } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import { UserPlus } from 'lucide-react';
 
 // Define custom toast style type
 interface CustomToastStyle extends Omit<ToastOptions, "icon"> {
@@ -44,9 +45,6 @@ export default function SignUpForm() {
     role: "",
     terms: "",
   })
-  const [titleText, setTitleText] = useState("")
-  const [typingComplete, setTypingComplete] = useState(false)
-  const fullTitle = "Create Account"
 
   // Custom toast styles
   const successToastStyle: CustomToastStyle = {
@@ -80,24 +78,18 @@ export default function SignUpForm() {
     },
     icon: "⚠️",
   }
-
-  // Implement the typing effect
-  useEffect(() => {
-    let index = 0
-    const typingInterval = setInterval(() => {
-      if (index <= fullTitle.length) {
-        setTitleText(fullTitle.slice(0, index))
-        index++
-      } else {
-        clearInterval(typingInterval)
-        setTypingComplete(true)
-      }
-    }, 150)
-
-    return () => {
-      clearInterval(typingInterval)
-    }
-  }, [])
+  const handleClick = () => {
+    setIsSubmitting(true);
+    // Simulate form submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setAuthLoading(true);
+      // Simulate auth processing
+      setTimeout(() => {
+        setAuthLoading(false);
+      }, 2000);
+    }, 2000);
+  };
 
   useEffect(() => {
     if (selectedRoleFromQuery) {
@@ -263,21 +255,11 @@ export default function SignUpForm() {
         {/* Added responsive padding to ensure form is visible on smaller screens */}
         <div className="w-full max-w-md px-6 sm:px-8 py-8 mx-4 sm:mx-6 my-4 sm:my-6 bg-white rounded-xl border border-gray-100 shadow-lg">
           <div className="mb-6">
-            <h1
-              className={`mb-3 font-bold text-gray-800 text-2xl sm:text-3xl md:text-4xl relative ${
-                typingComplete ? "text-animation-complete" : ""
-              }`}
-            >
-              <span className="inline-block">{titleText}</span>
-              <span
-                className="inline-block w-1 h-8 bg-gray-800 ml-1 absolute"
-                style={{
-                  animation: "blink 1s step-end infinite",
-                  display: titleText.length === fullTitle.length ? "none" : "inline-block",
-                }}
-              ></span>
+            {/* Simple centered title without animation */}
+            <h1 className="mb-3 font-bold text-[#06AED7] text-2xl sm:text-3xl md:text-[28px] text-center">
+              Agent Registration
             </h1>
-            <p className="text-base text-gray-600 mt-2">Enter your details to create your account</p>
+            <p className="text-base text-gray-600 mt-2 text-center">Enter your details to create your account</p>
             <div className="mt-4 mb-5 border-b border-gray-200"></div>
           </div>
 
@@ -311,7 +293,7 @@ export default function SignUpForm() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter your phone number"
+                  placeholder="Enter your phone no"
                   error={!!errors.phone}
                   hint={errors.phone}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
@@ -370,7 +352,7 @@ export default function SignUpForm() {
                   placeholder="Enter your password"
                   error={!!errors.password}
                   hint={errors.password}
-                  className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+                  className="bg-white text-gray-800 !rounded-lg border-gray-100 focus:border-gray-100 focus:ring-gray-100 shadow-sm"
                 />
                 <button
                   type="button"
@@ -400,52 +382,55 @@ export default function SignUpForm() {
               <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{errors.role}</div>
             )}
 
-            <div className="pt-3 mt-3">
-              <button
-                type="submit"
-                className="w-full py-3 font-medium text-white transition-all duration-300 rounded-lg bg-[#366084] hover:bg-[#022340] focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
-                disabled={isSubmitting || authLoading}
-              >
-                {isSubmitting ? (
-                  <>
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    <span>Loading...</span>
-                  </>
-                ) : authLoading ? (
-                  <>
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  "Sign Up"
-                )}
-              </button>
-            </div>
-
+<div className="pt-3 mt-3 flex justify-center">
+      <button
+        type="submit"
+        onClick={handleClick}
+        className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
+        disabled={isSubmitting || authLoading}
+      >
+        {isSubmitting ? (
+          <>
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <span>Loading...</span>
+          </>
+        ) : authLoading ? (
+          <>
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <span>Processing...</span>
+          </>
+        ) : (
+          <>
+            <UserPlus size={20} />
+            <span>Sign Up</span>
+          </>
+        )}
+      </button>
+    </div>
             <p className="text-sm text-center text-gray-600 mt-4">
               Already have an account?{" "}
               <Link href="/signin" className="font-medium text-[#366084] transition-colors hover:text-[#022340]">
@@ -476,11 +461,7 @@ export default function SignUpForm() {
           </div>
         </div>
         <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-white opacity-50"></div>
-            <div className="w-3 h-3 rounded-full bg-white"></div>
-            <div className="w-3 h-3 rounded-full bg-white opacity-50"></div>
-          </div>
+          
         </div>
       </div>
 
@@ -520,11 +501,6 @@ export default function SignUpForm() {
         input::placeholder {
           color: #9ca3af !important;
           opacity: 1;
-        }
-
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
         }
 
         /* Card styling */

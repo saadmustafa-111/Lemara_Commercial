@@ -1,5 +1,4 @@
 // File: c:\Users\CUI\OneDrive\Desktop\ZaraSchool_Nextjs\src\app\(full-width-pages)\(auth)\layout.tsx
-import * as entry from '../../../../../src/app/(full-width-pages)/(auth)/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 type TEntry = typeof import('../../../../../src/app/(full-width-pages)/(auth)/layout.js')
