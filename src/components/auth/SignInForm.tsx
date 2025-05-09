@@ -27,7 +27,6 @@ export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isChecked, setIsChecked] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -53,13 +52,6 @@ export default function SignInForm() {
     },
     icon: "⚠️",
   }
-  const handleClick = () => {
-    setIsLoading(true);
-    // Simulate form submission
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-  };
 
   // Effect to handle redirection after successful authentication
   useEffect(() => {
@@ -80,7 +72,9 @@ export default function SignInForm() {
       icon: "🎉",
     }
 
-    if (signInAttempted && isAuthenticated && !isLoading && !isSubmitting) {
+    if (signInAttempted && isAuthenticated && !isSubmitting) {
+      console.log("Authentication successful, preparing to redirect...");
+      
       // Show success toast with custom styling
       toast.success(
         <div className="flex flex-col">
@@ -91,12 +85,16 @@ export default function SignInForm() {
       )
 
       // Redirect after a short delay to allow the toast to be seen
-      setTimeout(() => {
-        const redirectPath = getRedirectPath()
-        router.push(redirectPath)
+      const redirectTimeout = setTimeout(() => {
+        const redirectPath = getRedirectPath() || "/dashboard";
+        console.log("Redirecting to:", redirectPath);
+        router.push(redirectPath);
       }, 2000)
+      
+      // Clean up timeout if component unmounts
+      return () => clearTimeout(redirectTimeout);
     }
-  }, [isAuthenticated, isLoading, signInAttempted, getRedirectPath, router, isSubmitting])
+  }, [isAuthenticated, signInAttempted, getRedirectPath, router, isSubmitting])
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,8 +149,14 @@ export default function SignInForm() {
       setIsSubmitting(true)
       setSignInAttempted(true)
 
+      console.log("Attempting signin with:", formData.email);
+      
       // Authenticate the user - the useEffect will handle redirection
       await signin(formData.email, formData.password)
+      
+      // Check if authentication was successful
+      console.log("Signin function completed. isAuthenticated:", isAuthenticated);
+      
     } catch (error) {
       console.error("Signin failed:", error)
       // Reset the sign-in attempt flag if there was an error
@@ -264,11 +268,10 @@ export default function SignInForm() {
             <div className="flex justify-center pt-4">
               <button
                 type="submit"
-                onClick={handleClick}
                 className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
-                disabled={isLoading || isSubmitting}
+                disabled={isSubmitting}
               >
-                {isLoading || isSubmitting ? (
+                {isSubmitting ? (
                   <>
                     <svg
                       className="animate-spin h-5 w-5 text-white"
@@ -304,13 +307,8 @@ export default function SignInForm() {
             <p className="text-sm text-center text-gray-600 mt-6">
               Are you new to Lemara Commercial?{" "}
               <Link
-                href="/roles"
+                href="/signup"
                 className="font-medium text-[#366084] transition-colors hover:text-[#022340]"
-                prefetch={true}
-                onClick={(e) => {
-                  e.preventDefault()
-                  router.push("/signup")
-                }}
               >
                 Sign up
               </Link>
