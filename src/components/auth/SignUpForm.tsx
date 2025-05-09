@@ -242,8 +242,8 @@ export default function SignUpForm() {
   }
 
   return (
-    // Changed from min-h-screen to h-screen and added overflow-hidden to prevent scrolling
-    <div className="flex h-screen w-full overflow-hidden">
+    // Changed to min-h-screen with overflow-y-auto to enable scrolling when needed
+    <div className="flex min-h-screen w-full">
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -259,14 +259,12 @@ export default function SignUpForm() {
       />
 
       {/* Left Section - Signup Form */}
-      {/* Added py-8 to create padding at top and bottom */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white py-8">
-        {/* Added my-6 for vertical margin and reduced padding */}
-        <div className="w-full max-w-md px-8 py-10 mx-6 my-6 bg-white rounded-xl border border-gray-100 shadow-lg">
-          {/* Reduced bottom margin */}
-          <div className="mb-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white overflow-y-auto py-8">
+        {/* Added responsive padding to ensure form is visible on smaller screens */}
+        <div className="w-full max-w-md px-6 sm:px-8 py-8 mx-4 sm:mx-6 my-4 sm:my-6 bg-white rounded-xl border border-gray-100 shadow-lg">
+          <div className="mb-6">
             <h1
-              className={`mb-3 font-bold text-gray-800 text-3xl sm:text-4xl relative ${
+              className={`mb-3 font-bold text-gray-800 text-2xl sm:text-3xl md:text-4xl relative ${
                 typingComplete ? "text-animation-complete" : ""
               }`}
             >
@@ -280,17 +278,13 @@ export default function SignUpForm() {
               ></span>
             </h1>
             <p className="text-base text-gray-600 mt-2">Enter your details to create your account</p>
-            {/* Reduced margins */}
-            <div className="mt-5 mb-6 border-b border-gray-200"></div>
+            <div className="mt-4 mb-5 border-b border-gray-200"></div>
           </div>
 
-          {/* Reduced space-y-5 to space-y-4 */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Reduced gap-5 to gap-4 */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* First Name */}
               <div className="sm:col-span-1">
-                {/* Reduced mb-2 to mb-1 and added text-sm */}
                 <Label htmlFor="name" className="mb-1 text-gray-700 font-medium text-sm">
                   Name<span className="text-red-500">*</span>
                 </Label>
@@ -406,8 +400,7 @@ export default function SignUpForm() {
               <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{errors.role}</div>
             )}
 
-            {/* Reduced padding and margin */}
-            <div className="pt-4 mt-4">
+            <div className="pt-3 mt-3">
               <button
                 type="submit"
                 className="w-full py-3 font-medium text-white transition-all duration-300 rounded-lg bg-[#366084] hover:bg-[#022340] focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
@@ -453,7 +446,6 @@ export default function SignUpForm() {
               </button>
             </div>
 
-            {/* Reduced margin */}
             <p className="text-sm text-center text-gray-600 mt-4">
               Already have an account?{" "}
               <Link href="/signin" className="font-medium text-[#366084] transition-colors hover:text-[#022340]">
@@ -476,9 +468,9 @@ export default function SignUpForm() {
         />
         <div className="absolute inset-0 bg-[#366084]/60 flex flex-col items-center justify-center p-8">
           <div className="text-center text-white max-w-lg">
-            <h2 className="text-3xl font-bold mb-4">Premium Commercial Real Estate Solutions</h2>
+            <h2 className="text-3xl font-bold mb-4">Lemara Commercial</h2>
             <p className="text-lg opacity-90">
-              Access exclusive properties and manage your commercial real estate portfolio with Lemara Commercial's
+              Access exclusive properties and manage your commercial real estate portfolio with Lemara Commercial&apos;s
               professional platform.
             </p>
           </div>

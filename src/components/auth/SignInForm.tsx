@@ -350,7 +350,7 @@ export default function SignInForm() {
         />
         <div className="absolute inset-0 bg-[#366084]/60 flex flex-col items-center justify-center p-8">
           <div className="text-center text-white max-w-lg">
-            <h2 className="text-3xl font-bold mb-4">Premium Commercial Real Estate Solutions</h2>
+            <h2 className="text-3xl font-bold mb-4">Lemara Commercial</h2>
             <p className="text-lg opacity-90">
               Access exclusive properties and manage your commercial real estate portfolio with Lemara Commercial&apos;s
               professional platform.
