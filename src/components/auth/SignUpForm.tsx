@@ -83,10 +83,10 @@ export default function SignUpForm() {
     // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
-      setAuthLoading(true);
+     
       // Simulate auth processing
       setTimeout(() => {
-        setAuthLoading(false);
+  
       }, 2000);
     }, 2000);
   };
