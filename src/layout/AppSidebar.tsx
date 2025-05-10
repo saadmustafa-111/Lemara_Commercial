@@ -14,7 +14,7 @@ import {
   TableIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
-
+import { Contact } from 'lucide-react';
 // Define the type for navigation items
 type NavItem = {
   name: string;
@@ -66,8 +66,29 @@ const studentNavItems: NavItem[] = [
     name: "Reminders",
     icon: <TableIcon />,
     path: "/dashboard/agent/reminders",
-  }
+  },
   
+  ...commonNavItems,
+  {
+    name: "My Contacts",
+    icon: <Contact />,
+    path: "/dashboard/agent/mycontacts",
+  },
+  // {
+  //   name: "Assignments",
+  //   icon: <TableIcon />,
+  //   path: "/dashboard/student/assignments",
+  // },
+  // {
+  //   name: "Grades",
+  //   icon: <PageIcon />,
+  //   path: "/dashboard/student/grades",
+  // },
+  // {
+  //   name: "Attendance",
+  //   icon: <ListIcon />,
+  //   path: "/dashboard/student/attendance",
+  // },
 ];
 
 const AppSidebar: React.FC = () => {
