@@ -25,24 +25,6 @@ type NavItem = {
 
 // Common navigation items for all roles
 const commonNavItems: NavItem[] = [
-  // {
-  //   icon: <ListIcon />,
-  //   name: "Listings",
-  //   subItems: [
-  //     { name: "All Listings", path: "/dashboard/listings", pro: false },
-  //     { name: "Add Listing", path: "/dashboard/listings/add", pro: false },
-  //   ],
-  // },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Calendar",
-  //   path: "/calendar",
-  // },
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "User Profile",
-  //   path: "/profile",
-  // },
 ];
 
 // Admin-specific navigation items
@@ -54,32 +36,8 @@ const adminNavItems: NavItem[] = [
       { name: "Admin Overview", path: "/dashboard/admin", pro: false },
       { name: "Analytics", path: "/dashboard/admin/analytics", pro: false },
     ],
-  },
-  ...commonNavItems,
-  {
-    name: "Teachers Management",
-    icon: <ListIcon />,
-    subItems: [
-      { name: "All Teachers", path: "/dashboard/admin/teachers", pro: false },
-      { name: "Add Teacher", path: "/dashboard/admin/teachers/add", pro: false },
-    ],
-  },
-  {
-    name: "Students Management",
-    icon: <TableIcon />,
-    subItems: [
-      { name: "All Students", path: "/dashboard/admin/students", pro: false },
-      { name: "Add Student", path: "/dashboard/admin/students/add", pro: false },
-    ],
-  },
-  {
-    name: "Courses Management",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "All Courses", path: "/dashboard/admin/courses", pro: false },
-      { name: "Add Courses", path: "/dashboard/admin/courses/add", pro: false },
-    ],
-  },
+  }
+ 
 ];
 
 // Teacher-specific navigation items
@@ -88,28 +46,8 @@ const teacherNavItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     subItems: [{ name: "Teacher Overview", path: "/dashboard/teacher", pro: false }],
-  },
-  ...commonNavItems,
-  {
-    name: "My Classes",
-    icon: <ListIcon />,
-    subItems: [{ name: "Class List", path: "/dashboard/teacher/classes", pro: false }],
-  },
-  {
-    name: "My Students",
-    icon: <TableIcon />,
-    subItems: [{ name: "Student List", path: "/dashboard/teacher/students", pro: false }],
-  },
-  // {
-  //   name: "Attendance",
-  //   icon: <PageIcon />,
-  //   path: "/dashboard/teacher/attendance",
-  // },
-  // {
-  //   name: "Assignments",
-  //   icon: <ListIcon />,
-  //   path: "/dashboard/teacher/assignments",
-  // },
+  }
+  
 ];
 
 // Student-specific navigation items
@@ -123,28 +61,13 @@ const studentNavItems: NavItem[] = [
     name: "My Listings",
     icon: <ListIcon />,
     path: "/dashboard/agent/add",
+  },
+  {
+    name: "Reminders",
+    icon: <TableIcon />,
+    path: "/dashboard/agent/reminders",
   }
-  // ...commonNavItems,
-  // {
-  //   name: "My Courses",
-  //   icon: <ListIcon />,
-  //   path: "/dashboard/student/courses",
-  // },
-  // {
-  //   name: "Assignments",
-  //   icon: <TableIcon />,
-  //   path: "/dashboard/student/assignments",
-  // },
-  // {
-  //   name: "Grades",
-  //   icon: <PageIcon />,
-  //   path: "/dashboard/student/grades",
-  // },
-  // {
-  //   name: "Attendance",
-  //   icon: <ListIcon />,
-  //   path: "/dashboard/student/attendance",
-  // },
+  
 ];
 
 const AppSidebar: React.FC = () => {

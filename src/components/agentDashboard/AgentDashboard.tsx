@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; 
+import Link from 'next/link';
+import Badge from '@/components/ui/badge/Badge';
 import LoadingOverlay from '@/components/common/LoadingOverlay';
 import useLoading from '@/hooks/useLoading';
 
@@ -58,7 +59,7 @@ export default function AgentDashboard() {
                     downPayment: "N/A",
                     price: "$122,222",
                     category: "Other",
-                    image: "/images/no-image-placeholder.svg"
+                    image: "/images/grid-image/image-01.png"
                   },
                   {
                     id: 2,
@@ -74,7 +75,7 @@ export default function AgentDashboard() {
                     downPayment: "N/A",
                     price: "$12,222",
                     category: "Express Car Washes",
-                    image: "/images/no-image-placeholder.svg"
+                    image: "/images/grid-image/image-02.png"
                   },
                   {
                     id: 3,
@@ -90,7 +91,7 @@ export default function AgentDashboard() {
                     downPayment: "N/A",
                     price: "$2,200,000",
                     category: "Hotels",
-                    image: "/images/property-sample.jpg"
+                    image: "/images/grid-image/image-03.png"
                   }
                 ]
               });
@@ -136,12 +137,13 @@ export default function AgentDashboard() {
       {/* Property cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 rounded-full">
         {dashboardData.properties.map(property => (
-          <div key={property.id} className="flex flex-col rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm h-[580px] bg-white dark:bg-gray-800">
-            <div className="relative h-64 w-full">
+          <div key={property.id} className="flex flex-col rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="relative aspect-[16/9] w-full">
               <Image 
                 src={property.image}
                 alt={property.title}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
               />
               <div className="absolute top-3 left-3">
@@ -181,37 +183,37 @@ export default function AgentDashboard() {
               )}
             </div>
             <div className="p-4 flex-grow flex flex-col">
-              <h3 className="font-bold text-lg mb-1 text-gray-900 dark:text-white">{property.title}</h3>
+              <h3 className="font-bold text-lg mb-1">{property.title}</h3>
               {property.location && (
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{property.location}</p>
+                <p className="text-gray-600 text-sm mb-3">{property.location}</p>
               )}
               {!property.location && <div className="mb-3"></div>}
               
               <div className="mb-3">
-                <p className="font-medium text-gray-800 dark:text-gray-200">Income</p>
+                <p className="font-medium text-gray-800">Income</p>
                 <div className="grid grid-cols-2 gap-1 text-sm">
-                  <div className="text-gray-600 dark:text-gray-400">Gross Operating Income</div>
-                  <div className="text-right dark:text-gray-300">{property.grossIncome}</div>
-                  <div className="text-gray-600 dark:text-gray-400">Net Operating Income</div>
-                  <div className="text-right dark:text-gray-300">{property.netIncome}</div>
-                  <div className="text-gray-600 dark:text-gray-400">CAP Rate</div>
-                  <div className="text-right dark:text-gray-300">{property.capRate}</div>
+                  <div className="text-gray-600">Gross Operating Income</div>
+                  <div className="text-right">{property.grossIncome}</div>
+                  <div className="text-gray-600">Net Operating Income</div>
+                  <div className="text-right">{property.netIncome}</div>
+                  <div className="text-gray-600">CAP Rate</div>
+                  <div className="text-right">{property.capRate}</div>
                 </div>
               </div>
               
               <div className="mb-auto">
-                <p className="font-medium text-gray-800 dark:text-gray-200">Details</p>
+                <p className="font-medium text-gray-800">Details</p>
                 <div className="grid grid-cols-2 gap-1 text-sm">
-                  <div className="text-gray-600 dark:text-gray-400">Lot Size</div>
-                  <div className="text-right dark:text-gray-300">{property.lotSize}</div>
-                  <div className="text-gray-600 dark:text-gray-400">Build Area</div>
-                  <div className="text-right dark:text-gray-300">{property.buildArea}</div>
-                  <div className="text-gray-600 dark:text-gray-400">Down Payment</div>
-                  <div className="text-right dark:text-gray-300">{property.downPayment}</div>
+                  <div className="text-gray-600">Lot Size</div>
+                  <div className="text-right">{property.lotSize}</div>
+                  <div className="text-gray-600">Build Area</div>
+                  <div className="text-right">{property.buildArea}</div>
+                  <div className="text-gray-600">Down Payment</div>
+                  <div className="text-right">{property.downPayment}</div>
                 </div>
               </div>
               
-              <div className="mt-4 flex justify-between items-center bg-[#00a0d1] hover:bg-[#0088b3] dark:bg-[#0088b3] dark:hover:bg-[#00a0d1] text-white p-3 rounded-md transition-colors">
+              <div className="mt-4 flex justify-between items-center bg-[#00a0d1] text-white p-3 rounded-md">
                 <div className="font-bold">{property.price}</div>
                 <div>{property.category}</div>
               </div>
