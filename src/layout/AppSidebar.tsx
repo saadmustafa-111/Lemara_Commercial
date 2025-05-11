@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import {
   ChevronDownIcon,
   GridIcon,
@@ -79,6 +80,7 @@ const studentNavItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const { user } = useAuth();
+  const { theme } = useTheme();
   const pathname = usePathname();
   const [navItems, setNavItems] = useState<NavItem[]>([]);
 
@@ -111,10 +113,10 @@ const AppSidebar: React.FC = () => {
         <li key={nav.name}>
           {nav.subItems ? (              <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group bg-transparent text-white ${
+              className={`menu-item group bg-transparent text-white dark:text-white ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "bg-white/20"
-                  : "hover:bg-white/10"
+                  ? "bg-white/20 dark:bg-white/10"
+                  : "hover:bg-white/10 dark:hover:bg-white/5"
               } cursor-pointer ${
                 !isExpanded && !isHovered
                   ? "lg:justify-center"
@@ -147,8 +149,8 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
-                className={`menu-item group bg-transparent text-white ${
-                  isActive(nav.path) ? "bg-white/20" : "hover:bg-white/10"
+                className={`menu-item group bg-transparent text-white dark:text-white ${
+                  isActive(nav.path) ? "bg-white/20 dark:bg-white/10" : "hover:bg-white/10 dark:hover:bg-white/5"
                 }`}
               >
                 <span
@@ -291,7 +293,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#00a0d1] dark:bg-[#00a0d1] text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-[#0080a9] 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#00a0d1] dark:bg-gray-800 text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-[#0080a9] dark:border-gray-700 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -305,7 +307,7 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-3 flex items-center bg-white border-b border-gray-200 dark:border-gray-800 dark:bg-gray-900 mx-[-20px] px-6 ${
+        className={`py-3 flex items-center bg-white border-b border-gray-200 dark:border-gray-900 dark:bg-gray-900 mx-[-20px] px-6 ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-between"
         }`}
       >
@@ -342,7 +344,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-white ${
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-white dark:text-gray-200 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"

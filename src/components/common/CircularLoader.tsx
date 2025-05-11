@@ -20,12 +20,10 @@ const CircularLoader: React.FC<CircularLoaderProps> = ({
   return (
     <div className={`flex items-center justify-center ${className}`}>
       <div 
-        className={`${sizeClasses[size]} rounded-full border-t-[#15eb9e] border-r-[#6a00b8] border-b-[#15eb9e] border-l-[#6a00b8] animate-spin`}
+        className={`${sizeClasses[size]} rounded-full border-t-transparent border-blue-500 animate-spin`}
         style={{ 
-          borderTopColor: '#15eb9e',
-          borderRightColor: '#6a00b8',
-          borderBottomColor: '#15eb9e',
-          borderLeftColor: '#6a00b8'
+          borderTopColor: 'transparent',
+          borderColor: '#00a0d1'
         }}
       ></div>
     </div>
