@@ -79,29 +79,79 @@ export default function RemindersPage() {
   const deleteReminder = (id: string) => {
     setSnoozedReminders(prev => prev.filter(reminder => reminder.id !== id));
     setActiveDropdown(null);
-  };
-  // State for reminder modal
+  };  // State for reminder modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // State to track the reminder being edited
+  const [reminderToEdit, setReminderToEdit] = useState<{
+    id: string;
+    title: string;
+    date: string;
+    priority: string;
+  } | null>(null);
 
   // Function to add a new reminder
   const addNewReminder = () => {
+    setReminderToEdit(null); // Reset any reminder that was being edited
     setIsModalOpen(true);
   };
   
-  // Function to handle saving a new reminder
+  // Function to edit a reminder
+  const editReminder = (reminder: Reminder) => {
+    setReminderToEdit({
+      id: reminder.id,
+      title: reminder.title,
+      date: reminder.date,
+      priority: reminder.priority
+    });
+    setIsModalOpen(true);
+    // Close dropdown if open
+    setActiveDropdown(null);
+  };
+  
+  // Function to handle saving a new reminder or updating an existing one
   const handleSaveReminder = (reminderData: any) => {
-    // Create a new reminder with the data
-    const newReminder: Reminder = {
-      id: (reminders.length + 1).toString(),
-      title: reminderData.title || 'Untitled Reminder',
-      notes: 'Notes: will get a notification reminder on the day or time that you selected!',
-      date: reminderData.date || 'No date selected',
-      priority: reminderData.priority as 'Low' | 'Medium' | 'Hight',
-      status: 'In Progress'
-    };
+    if (reminderData.id) {
+      // Editing an existing reminder
+      setReminders(prev => prev.map(reminder => 
+        reminder.id === reminderData.id 
+          ? {
+              ...reminder,
+              title: reminderData.title || 'Untitled Reminder',
+              date: reminderData.date || 'No date selected',
+              priority: reminderData.priority as 'Low' | 'Medium' | 'Hight',
+            }
+          : reminder
+      ));
+      
+      // Also update in snoozed reminders if it exists there
+      setSnoozedReminders(prev => prev.map(reminder => 
+        reminder.id === reminderData.id 
+          ? {
+              ...reminder,
+              title: reminderData.title || 'Untitled Reminder',
+              date: reminderData.date || 'No date selected',
+              priority: reminderData.priority as 'Low' | 'Medium' | 'Hight',
+            }
+          : reminder
+      ));
+    } else {
+      // Adding a new reminder
+      const newReminder: Reminder = {
+        id: (reminders.length + 1).toString(),
+        title: reminderData.title || 'Untitled Reminder',
+        notes: 'Notes: will get a notification reminder on the day or time that you selected!',
+        date: reminderData.date || 'No date selected',
+        priority: reminderData.priority as 'Low' | 'Medium' | 'Hight',
+        status: 'In Progress'
+      };
+      
+      // Add the new reminder to the list
+      setReminders(prev => [...prev, newReminder]);
+    }
     
-    // Add the new reminder to the list
-    setReminders(prev => [...prev, newReminder]);
+    // Reset the reminder being edited
+    setReminderToEdit(null);
   };
 
   return (
@@ -186,11 +236,40 @@ export default function RemindersPage() {
                   </span>                  <span className="px-3 py-1 bg-orange-50 text-orange-500 border border-orange-100 rounded-full text-sm">
                     {reminder.status}
                   </span>                  
-                  <button className="text-blue-500 hover:text-blue-600 ml-70">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M6 10a2 2 0 110-4 2 2 0 010 4zM12 10a2 2 0 110-4 2 2 0 010 4zM18 10a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                  </button>                </div>
+                  <div className="relative">
+                    <button 
+                      className="text-blue-500 hover:text-blue-600 ml-70"
+                      onClick={() => toggleDropdown(reminder.id)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M6 10a2 2 0 110-4 2 2 0 010 4zM12 10a2 2 0 110-4 2 2 0 010 4zM18 10a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                      {activeDropdown === reminder.id && (
+                      <div className="absolute right-0 mt-2 w-30 h-30 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-blue-600 z-10">
+                        <div>
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => editReminder(reminder)}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => deleteReminder(reminder.id)}
+                          >
+                            Delete
+                          </button>
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => handleSnooze(reminder.id, 'custom')}
+                          >
+                            Snooze It
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>                </div>
               </div>            </div>
                 ))
             ) : (
@@ -230,15 +309,43 @@ export default function RemindersPage() {
                         </div>
                         <span className={`text-${reminder.priority === 'Hight' ? 'red' : reminder.priority === 'Medium' ? 'orange' : 'blue'}-500 font-medium text-sm`}>
                           {reminder.priority}
-                        </span>
-                        <span className="px-3 py-1 bg-green-50 text-green-500 border border-green-100 rounded-full text-sm">
+                        </span>                        <span className="px-3 py-1 bg-green-50 text-green-500 border border-green-100 rounded-full text-sm">
                           {reminder.status}
                         </span>                  
-                        <button className="text-blue-500 hover:text-blue-600 ml-70">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M6 10a2 2 0 110-4 2 2 0 010 4zM12 10a2 2 0 110-4 2 2 0 010 4zM18 10a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
-                        </button>
+                        <div className="relative">
+                          <button 
+                            className="text-blue-500 hover:text-blue-600 ml-70"
+                            onClick={() => toggleDropdown(reminder.id)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M6 10a2 2 0 110-4 2 2 0 010 4zM12 10a2 2 0 110-4 2 2 0 010 4zM18 10a2 2 0 110-4 2 2 0 010 4z" />
+                            </svg>
+                          </button>
+                          {activeDropdown === reminder.id && (
+                            <div className="absolute right-0 mt-2 w-30 h-30 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-blue-600 z-10">
+                              <div>
+                                <button 
+                                  className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                  onClick={() => editReminder(reminder)}
+                                >
+                                  Edit
+                                </button>
+                                <button 
+                                  className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                  onClick={() => deleteReminder(reminder.id)}
+                                >
+                                  Delete
+                                </button>
+                                <button 
+                                  className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                  onClick={() => handleSnooze(reminder.id, 'custom')}
+                                >
+                                  Snooze It
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -260,8 +367,7 @@ export default function RemindersPage() {
             
             {snoozedReminders.map(reminder => (
               <div key={reminder.id} className="mb-4">
-                <h4 className="font-medium text-gray-800 dark:text-white mb-2">{reminder.title}</h4>
-                <div className="flex items-center justify-between">
+                <h4 className="font-medium text-gray-800 dark:text-white mb-2">{reminder.title}</h4>                  <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <svg className="w-5 h-5 mr-1.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -271,22 +377,65 @@ export default function RemindersPage() {
                     </svg>
                     <span className="text-gray-700 dark:text-gray-300 text-sm">{reminder.date}</span>
                   </div>
-                  <button className="text-blue-500 hover:text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M6 10a2 2 0 110-4 2 2 0 010 4zM12 10a2 2 0 110-4 2 2 0 010 4zM18 10a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                  </button>
+                  <div className="relative">
+                    <button 
+                      className="text-blue-500 hover:text-blue-600"
+                      onClick={() => toggleDropdown(reminder.id)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M6 10a2 2 0 110-4 2 2 0 010 4zM12 10a2 2 0 110-4 2 2 0 010 4zM18 10a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                      {activeDropdown === reminder.id && (
+                      <div className="absolute right-0 mt-2 w-50 h-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-blue-600 z-10">
+                        <div className="py-1 bg-red-50 dark:bg-red-900/20">
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => handleSnooze(reminder.id, '15 Minutes')}
+                          >
+                            Snooze For 15 Minutes
+                          </button>
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => handleSnooze(reminder.id, '30 Minutes')}
+                          >
+                            Snooze For 30 Minutes
+                          </button>
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => handleSnooze(reminder.id, '1 Hour')}
+                          >
+                            Snooze For 1 Hour
+                          </button>
+                        </div>
+                        <div className="border-t border-gray-100 dark:border-gray-700">
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => editReminder(reminder)}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className="block w-full text-left px-4 py-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            onClick={() => deleteReminder(reminder.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>      
-      {/* Add Reminder Modal */}
+      </div>        {/* Add/Edit Reminder Modal */}
       <AddReminderModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveReminder}
+        reminderToEdit={reminderToEdit}
       />
     </div>
   );

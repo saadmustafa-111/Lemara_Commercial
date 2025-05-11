@@ -50,11 +50,11 @@ const PREDEFINED_USERS = [
   },
   {
     id: 3,
-    email: "student@zaraschool.com",
-    password: "student123",
-    firstName: "Student",
-    lastName: "Jones",
-    role: "student"
+    email: "agent@lemaraconstruction.com",
+    password: "123",
+    firstName: "AJ",
+    lastName: "Rana",
+    role: "agent"
   }
 ];
 
@@ -62,7 +62,7 @@ const PREDEFINED_USERS = [
 const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   admin: "/dashboard/admin",
   teacher: "/dashboard/teacher",
-  student: "/dashboard/agent",
+  agent: "/dashboard/agent",
   default: "/dashboard" 
 };
 

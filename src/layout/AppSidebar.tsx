@@ -60,7 +60,13 @@ const studentNavItems: NavItem[] = [
   {
     name: "My Listings",
     icon: <ListIcon />,
-    path: "/dashboard/agent/add",
+    path: "/dashboard/listings",
+  },
+  ...commonNavItems,
+  {
+    name: "My Contacts",
+    icon: <Contact />,
+    path: "/dashboard/agent/mycontacts",
   },
   {
     name: "Reminders",
@@ -68,27 +74,6 @@ const studentNavItems: NavItem[] = [
     path: "/dashboard/agent/reminders",
   },
   
-  ...commonNavItems,
-  {
-    name: "My Contacts",
-    icon: <Contact />,
-    path: "/dashboard/agent/mycontacts",
-  },
-  // {
-  //   name: "Assignments",
-  //   icon: <TableIcon />,
-  //   path: "/dashboard/student/assignments",
-  // },
-  // {
-  //   name: "Grades",
-  //   icon: <PageIcon />,
-  //   path: "/dashboard/student/grades",
-  // },
-  // {
-  //   name: "Attendance",
-  //   icon: <ListIcon />,
-  //   path: "/dashboard/student/attendance",
-  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -105,7 +90,7 @@ const AppSidebar: React.FC = () => {
         setNavItems(adminNavItems);
       } else if (role === 'teacher') {
         setNavItems(teacherNavItems);
-      } else if (role === 'student') {
+      } else if (role === 'agent') {
         setNavItems(studentNavItems);
       } else {
         // Default to common items if role is not recognized
@@ -124,24 +109,22 @@ const AppSidebar: React.FC = () => {
     <ul className="flex flex-col gap-4">
       {navItems.map((nav, index) => (
         <li key={nav.name}>
-          {nav.subItems ? (
-            <button
+          {nav.subItems ? (              <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${
+              className={`menu-item group bg-transparent text-white ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
+                  ? "bg-white/20"
+                  : "hover:bg-white/10"
               } cursor-pointer ${
                 !isExpanded && !isHovered
                   ? "lg:justify-center"
                   : "lg:justify-start"
               }`}
-            >
-              <span
-                className={` ${
+            >                <span
+                className={`text-white ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
+                    ? "text-white"
+                    : "text-white"
                 }`}
               >
                 {nav.icon}
@@ -151,10 +134,10 @@ const AppSidebar: React.FC = () => {
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${
+                  className={`ml-auto w-5 h-5 transition-transform duration-200 text-white ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
+                      ? "rotate-180"
                       : ""
                   }`}
                 />
@@ -164,21 +147,21 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                className={`menu-item group bg-transparent text-white ${
+                  isActive(nav.path) ? "bg-white/20" : "hover:bg-white/10"
                 }`}
               >
                 <span
-                  className={`${
+                  className={`text-white ${
                     isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
+                      ? "text-white"
+                      : "text-white"
                   }`}
                 >
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
+                  <span className={`text-white`}>{nav.name}</span>
                 )}
               </Link>
             )
@@ -308,7 +291,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#00a0d1] dark:bg-[#00a0d1] text-white h-screen transition-all duration-300 ease-in-out z-50 border-r border-[#0080a9] 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -322,8 +305,8 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-8 flex  ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+        className={`py-3 flex items-center bg-white border-b border-gray-200 dark:border-gray-800 dark:bg-gray-900 mx-[-20px] px-6 ${
+          !isExpanded && !isHovered ? "lg:justify-center" : "justify-between"
         }`}
       >
         <Link href="/">
@@ -333,15 +316,15 @@ const AppSidebar: React.FC = () => {
                 className="dark:hidden"
                 src="/images/logo/lemaraLogo.png"
                 alt="Logo"
-                width={190}
-                height={90}
+                width={140}
+                height={30}
               />
               <Image
                 className="hidden dark:block"
                 src="/images/logo/lemaraLogo.png"
                 alt="Logo"
-                width={190}
-                height={90}
+                width={140}
+                height={30}
               />
             </>
           ) : (
@@ -359,7 +342,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-white ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface AddReminderModalProps {
   isOpen: boolean;
@@ -11,10 +11,18 @@ interface AddReminderModalProps {
     time: { hour: string; minute: string; ampm: string };
     priority: string;
     notificationType: string[];
+    id?: string; // Optional id for editing existing reminders
   }) => void;
+  reminderToEdit?: {
+    id: string;
+    title: string;
+    date: string;
+    priority: string;
+  } | null;
 }
 
-export default function AddReminderModal({ isOpen, onClose, onSave }: AddReminderModalProps) {  const [title, setTitle] = useState<string>('');
+export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEdit }: AddReminderModalProps) {
+  const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>('01/01/1900');
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
@@ -26,8 +34,25 @@ export default function AddReminderModal({ isOpen, onClose, onSave }: AddReminde
     minute: '00',
     ampm: 'AM'
   });
-  const [priority, setPriority] = useState<string>('Low');
-  const [notificationType, setNotificationType] = useState<string[]>(['EMAIL']);
+  const [priority, setPriority] = useState<string>('Low');  const [notificationType, setNotificationType] = useState<string[]>(['EMAIL']);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [reminderId, setReminderId] = useState<string | undefined>(undefined);
+  
+  // Effect to handle populating form when editing a reminder
+  useEffect(() => {
+    if (reminderToEdit) {
+      setTitle(reminderToEdit.title);
+      setDate(reminderToEdit.date);
+      setPriority(reminderToEdit.priority);
+      setReminderId(reminderToEdit.id);
+      setEditMode(true);
+    } else {
+      // Reset the form when not editing
+      resetForm();
+      setEditMode(false);
+      setReminderId(undefined);
+    }
+  }, [reminderToEdit]);
 
   const handleNotificationToggle = (type: string) => {
     setNotificationType(prev => 
@@ -36,18 +61,20 @@ export default function AddReminderModal({ isOpen, onClose, onSave }: AddReminde
         : [...prev, type]
     );
   };
-
   const handleSubmit = () => {
     onSave({
       title,
       date,
       time,
       priority,
-      notificationType
+      notificationType,
+      id: reminderId // Include the ID when editing
     });
     resetForm();
+    setEditMode(false);
+    setReminderId(undefined);
     onClose();
-  };  const resetForm = () => {
+  };const resetForm = () => {
     setTitle('');
     setDate('01/01/1900');
     setShowCalendar(false);
@@ -74,7 +101,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave }: AddReminde
           </button>
         </div>
           <div className="p-8">
-          <h2 className="text-2xl font-medium text-[#00a0d1] mb-8">Reminder Details</h2>
+          <h2 className="text-2xl font-medium text-[#00a0d1] mb-8">{editMode ? 'Edit Reminder' : 'Reminder Details'}</h2>
 
           <div className="mb-8">
             <input
