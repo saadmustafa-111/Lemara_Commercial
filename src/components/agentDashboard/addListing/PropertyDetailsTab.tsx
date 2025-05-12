@@ -1,9 +1,83 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
+
+// Define a proper FormData interface instead of using 'any'
+interface PropertyFormData {
+  totalLotSize?: string | number;
+  totalLotSizeUnit?: string;
+  totalBuildArea?: string | number;
+  totalBuildAreaUnit?: string;
+  buildingClass?: string;
+  furniture?: string;
+  apn?: string;
+  assessorsParcel?: string;
+  lotNumber?: string;
+  blockNumber?: string;
+  parcelSidewell?: string;
+  title?: string;
+  propertyType?: string;
+  yearEstablished?: string | number;
+  homeBased?: string;
+  relocatable?: string;
+  lease?: string;
+  comments?: string;
+  absenteeOwnerOperation?: boolean;
+  ownerOperated?: boolean;
+  semiAbsenteeOwner?: boolean;
+  securitySystem?: boolean;
+  multipleLocations?: boolean;
+  experienceNecessary?: boolean;
+  legalDescriptions?: string;
+  downPayment?: string | number;
+  netOperatingIncome?: string | number;
+  grossOperatingIncome?: string | number;
+  capitalizationRate?: string | number;
+  grossRentMultiplier?: string | number;
+  cashOnCashReturn?: string | number;
+  proformaCap?: string;
+  proformaGrm?: string;
+  proformaCocr?: string;
+  internalRateOfReturn?: string | number;
+  estimationLoanPayment?: string | number;
+  ebitda?: string | number;
+  proformaIrr?: string;
+  cashFlowBeforeTax?: string | number;
+  cashFlowAfterTax?: string | number;
+  monthlyCashFlow?: string | number;
+  inventoryIncluded?: string;
+  realEstateIncluded?: boolean;
+  estimatedInventory?: string | number;
+  franchise?: string;
+  franchiseTransferFee?: string | number;
+  companyTypeIndividual?: boolean;
+  companyTypePartnership?: boolean;
+  companyTypeLLC?: boolean;
+  companyTypeLLP?: boolean;
+  companyTypeCorporation?: boolean;
+  companyTypeOther?: boolean;
+  ownershipTypeOwn?: boolean;
+  ownershipTypeRent?: boolean;
+  ownershipTypeSubLease?: boolean;
+  ownershipTypeLease?: boolean;
+  ownershipTypeUnderContract?: boolean;
+  airRights?: string;
+  airRightsUnit?: string;
+  // Additional fields from errors
+  investmentHighlights?: string;
+  prosAndCons?: string;
+  trainingSupport?: string;
+  expansionPotential?: string;
+  competitionMarket?: string;
+  reasonForSale?: string;
+  // Add activities array for the Activities tab
+  activities?: Array<{timestamp: string; message: string; user: string}>;
+  // Update index signature to accept arrays
+  [key: string]: string | number | boolean | undefined | Array<any>;
+}
 
 interface PropertyDetailsTabProps {
-  formData: any;
+  formData: PropertyFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
 }
 
@@ -1066,8 +1140,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
         <div className="mt-8 mb-4">
           <h3 className="text-lg font-medium text-gray-800">Additional Details</h3>
         </div>
-        
-        {/* Investment Highlights and Pro's And Con's in one row */}
+          {/* Investment Highlights and Pros And Cons in one row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="investmentHighlights" className="block mb-2 text-sm font-medium text-gray-700">
@@ -1085,7 +1158,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
           
           <div>
             <label htmlFor="prosAndCons" className="block mb-2 text-sm font-medium text-gray-700">
-              Pro's And Con's
+              Pros And Cons
             </label>
             <textarea
               id="prosAndCons"
