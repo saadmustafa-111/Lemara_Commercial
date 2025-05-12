@@ -19,7 +19,7 @@ export default function DashboardLayout({
     : "lg:ml-[90px]";
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full dark:bg-gray-900">
       {/* Sidebar */}
       <Sidebar />
       

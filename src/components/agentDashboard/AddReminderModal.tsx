@@ -34,10 +34,11 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
     minute: '00',
     ampm: 'AM'
   });
-  const [priority, setPriority] = useState<string>('Low');  const [notificationType, setNotificationType] = useState<string[]>(['EMAIL']);
+  const [priority, setPriority] = useState<string>('Low');
+  const [notificationType, setNotificationType] = useState<string[]>(['EMAIL']);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [reminderId, setReminderId] = useState<string | undefined>(undefined);
-  
+
   // Effect to handle populating form when editing a reminder
   useEffect(() => {
     if (reminderToEdit) {
@@ -61,6 +62,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
         : [...prev, type]
     );
   };
+
   const handleSubmit = () => {
     onSave({
       title,
@@ -74,7 +76,9 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
     setEditMode(false);
     setReminderId(undefined);
     onClose();
-  };const resetForm = () => {
+  };
+
+  const resetForm = () => {
     setTitle('');
     setDate('01/01/1900');
     setShowCalendar(false);
@@ -85,10 +89,11 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
     setPriority('Low');
     setNotificationType(['EMAIL']);
   };
+
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-gray-200 bg-opacity-50 flex justify-center items-center z-[100000] p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-4xl w-[50%]  relative shadow-xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[100000] p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-4xl w-[50%] relative shadow-xl">
         <div className="absolute top-4 right-4">
           <button 
             onClick={onClose}
@@ -101,7 +106,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
           </button>
         </div>
           <div className="p-8">
-          <h2 className="text-2xl font-medium text-[#00a0d1] mb-8">{editMode ? 'Edit Reminder' : 'Reminder Details'}</h2>
+          <h2 className="text-2xl font-medium text-[#00a0d1] dark:text-[#00c1f5] mb-8">{editMode ? 'Edit Reminder' : 'Reminder Details'}</h2>
 
           <div className="mb-8">
             <input
@@ -109,9 +114,10 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
               placeholder="Enter the reminder title here"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
             />
-          </div>          <div className="mb-6">
+          </div>
+          <div className="mb-6">
             <div className="text-gray-700 dark:text-gray-300 mb-2">Notifications</div>
             <div className="flex space-x-3">
               <button
@@ -119,8 +125,8 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 onClick={() => handleNotificationToggle('EMAIL')}
                 className={`px-6 py-2 border rounded-full ${
                   notificationType.includes('EMAIL')
-                    ? 'bg-blue-50 border-blue-200 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-700'
+                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'
+                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
                 } transition-colors`}
               >
                 EMAIL
@@ -130,8 +136,8 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 onClick={() => handleNotificationToggle('PHONE CALL')}
                 className={`px-6 py-2 border rounded-full ${
                   notificationType.includes('PHONE CALL')
-                    ? 'bg-blue-50 border-blue-200 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-700'
+                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'
+                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
                 } transition-colors`}
               >
                 PHONE CALL
@@ -141,19 +147,20 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 onClick={() => handleNotificationToggle('FLOATING (WEB)')}
                 className={`px-6 py-2 border rounded-full ${
                   notificationType.includes('FLOATING (WEB)')
-                    ? 'bg-blue-50 border-blue-200 text-blue-600'
-                    : 'bg-white border-gray-300 text-gray-700'
+                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'
+                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
                 } transition-colors`}
               >
                 FLOATING (WEB)
               </button>
             </div>
-          </div>          <div className="mb-6">
+          </div>
+          <div className="mb-6">
             <div className="text-gray-700 dark:text-gray-300 mb-2">Priority</div>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-full appearance-none bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
                 backgroundPosition: "right 0.5rem center", 
                 backgroundRepeat: "no-repeat", 
@@ -164,7 +171,8 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
               <option value="Medium">Medium</option>
               <option value="Hight">High</option>
             </select>
-          </div>            <div className="mb-8">
+          </div>
+          <div className="mb-8">
             <div className="text-gray-700 dark:text-gray-300 mb-2">Start Date</div>
             <div className="flex space-x-2">
               <div className="flex-1 relative">
@@ -175,12 +183,12 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                     placeholder="mm/dd/yyyy"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                   />
                   <button 
                     type="button"
                     onClick={() => setShowCalendar(!showCalendar)}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-300"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -189,13 +197,14 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                       <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                   </button>
-                </div>                {showCalendar && (
+                </div>
+                {showCalendar && (
                   <div className="fixed inset-0 flex items-center justify-center z-20">
                     <div className="absolute inset-0 bg-transparent" onClick={() => setShowCalendar(false)}></div>
-                    <div className="bg-white border border-gray-200 rounded-2xl shadow-xl p-4 w-[350px] z-30 relative">
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-4 w-[350px] z-30 relative">
                     {/* Close button */}
                     <button 
-                      className="absolute top-2 right-2 text-blue-600"
+                      className="absolute top-2 right-2 text-blue-600 dark:text-blue-400"
                       onClick={() => setShowCalendar(false)}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -212,7 +221,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                           className={`px-6 py-2 rounded-full text-sm ${
                             selectedYear === year
                               ? 'bg-[#00a0d1] text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                           }`}
                         >
                           {year}
@@ -229,7 +238,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                           className={`w-12 py-2 rounded-full text-sm ${
                             selectedMonth === index
                               ? 'bg-[#ff8f8f] text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                           }`}
                         >
                           {month}
@@ -252,12 +261,13 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                           className={`w-10 h-10 rounded-full flex items-center justify-center text-sm ${
                             selectedDay === day && selectedMonth === new Date().getMonth() && selectedYear === new Date().getFullYear()
                               ? 'bg-[#00a0d1] text-white'
-                              : 'hover:bg-gray-100'
+                              : 'hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                           }`}
                         >
                           {day.toString().padStart(2, '0')}
                         </button>
-                      ))}                    </div>
+                      ))}
+                    </div>
                     </div>
                   </div>
                 )}
@@ -266,7 +276,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 <select
                   value={time.hour}
                   onChange={(e) => setTime({ ...time, hour: e.target.value })}
-                  className="w-20 px-2 py-2 border border-gray-300 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
                   style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
                     backgroundPosition: "right 0.5rem center", 
                     backgroundRepeat: "no-repeat", 
@@ -282,7 +292,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 <select
                   value={time.minute}
                   onChange={(e) => setTime({ ...time, minute: e.target.value })}
-                  className="w-20 px-2 py-2 border border-gray-300 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
                   style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
                     backgroundPosition: "right 0.5rem center", 
                     backgroundRepeat: "no-repeat", 
@@ -298,7 +308,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 <select
                   value={time.ampm}
                   onChange={(e) => setTime({ ...time, ampm: e.target.value })}
-                  className="w-20 px-2 py-2 border border-gray-300 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
                   style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
                     backgroundPosition: "right 0.5rem center", 
                     backgroundRepeat: "no-repeat", 
@@ -310,23 +320,24 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                 </select>
               </div>
             </div>
-          </div>          <div className="flex justify-between">
+          </div>
+          <div className="flex justify-between">
             <div className="flex space-x-3">
               <button
                 onClick={resetForm}
-                className="px-8 py-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                className="px-8 py-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
               >
                 Stop
               </button>
               <button
-                className="px-8 py-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                className="px-8 py-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
               >
                 Snooze
               </button>
             </div>
             <button
               onClick={handleSubmit}
-              className="px-8 py-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+              className="px-8 py-2 bg-[#00a0d1] dark:bg-[#0088b3] text-white rounded-full hover:bg-[#0088b3] dark:hover:bg-[#00759a] transition-colors"
             >
               Start
             </button>
