@@ -11,7 +11,7 @@ import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { toast, ToastContainer, type ToastOptions } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import { UserPlus } from 'lucide-react';
+import { UserPlus } from "lucide-react"
 
 // Define custom toast style type
 interface CustomToastStyle extends Omit<ToastOptions, "icon"> {
@@ -79,17 +79,15 @@ export default function SignUpForm() {
     icon: "⚠️",
   }
   const handleClick = () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     // Simulate form submission
     setTimeout(() => {
-      setIsSubmitting(false);
-     
+      setIsSubmitting(false)
+
       // Simulate auth processing
-      setTimeout(() => {
-  
-      }, 2000);
-    }, 2000);
-  };
+      setTimeout(() => {}, 2000)
+    }, 2000)
+  }
 
   useEffect(() => {
     if (selectedRoleFromQuery) {
@@ -251,7 +249,7 @@ export default function SignUpForm() {
       />
 
       {/* Left Section - Signup Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white overflow-y-auto py-8">
+      <div className="w-full lg:w-1/2 flex items-start justify-center bg-white h-screen overflow-y-auto scrollbar-hide">
         {/* Added responsive padding to ensure form is visible on smaller screens */}
         <div className="w-full max-w-md px-6 sm:px-8 py-8 mx-4 sm:mx-6 my-4 sm:my-6 bg-white rounded-xl border border-gray-100 shadow-lg">
           <div className="mb-6">
@@ -268,7 +266,7 @@ export default function SignUpForm() {
               {/* First Name */}
               <div className="sm:col-span-1">
                 <Label htmlFor="name" className="mb-1 text-gray-700 font-medium text-sm">
-                  Name<span className="text-red-500">*</span>
+                  First Name<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   type="text"
@@ -276,7 +274,7 @@ export default function SignUpForm() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter your name"
+                  placeholder="Enter your first name"
                   error={!!errors.name}
                   hint={errors.name}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
@@ -285,7 +283,7 @@ export default function SignUpForm() {
               {/* Phone */}
               <div className="sm:col-span-1">
                 <Label htmlFor="phone" className="mb-1 text-gray-700 font-medium text-sm">
-                  Phone<span className="text-red-500">*</span>
+                  Last Name<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   type="text"
@@ -293,7 +291,7 @@ export default function SignUpForm() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter your phone no"
+                  placeholder="Enter your last name"
                   error={!!errors.phone}
                   hint={errors.phone}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
@@ -322,7 +320,7 @@ export default function SignUpForm() {
             {/* address*/}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
-                Address<span className="text-red-500">*</span>
+                Phone<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
@@ -330,7 +328,87 @@ export default function SignUpForm() {
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                placeholder="Enter your address"
+                placeholder="Enter your Phone Number "
+                error={!!errors.address}
+                hint={errors.address}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
+                Whatsapp<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter your Phone Number "
+                error={!!errors.address}
+                hint={errors.address}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
+                Facebook<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter your facebook "
+                error={!!errors.address}
+                hint={errors.address}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
+                Twitter<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter your twitter "
+                error={!!errors.address}
+                hint={errors.address}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
+                LinkedIn<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter your LinkedIn "
+                error={!!errors.address}
+                hint={errors.address}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
+                Instagram<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Enter your Instagram "
                 error={!!errors.address}
                 hint={errors.address}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
@@ -382,55 +460,69 @@ export default function SignUpForm() {
               <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{errors.role}</div>
             )}
 
-<div className="pt-3 mt-3 flex justify-center">
-      <button
-        type="submit"
-        onClick={handleClick}
-        className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
-        disabled={isSubmitting || authLoading}
-      >
-        {isSubmitting ? (
-          <>
-            <svg
-              className="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            <span>Loading...</span>
-          </>
-        ) : authLoading ? (
-          <>
-            <svg
-              className="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            <span>Processing...</span>
-          </>
-        ) : (
-          <>
-            <UserPlus size={20} />
-            <span>Sign Up</span>
-          </>
-        )}
-      </button>
-    </div>
+            <div className="pt-3 mt-3 flex justify-center">
+              <button
+                type="submit"
+                onClick={handleClick}
+                className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
+                disabled={isSubmitting || authLoading}
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Loading...</span>
+                  </>
+                ) : authLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus size={20} />
+                    <span>Sign Up</span>
+                  </>
+                )}
+              </button>
+            </div>
             <p className="text-sm text-center text-gray-600 mt-4">
               Already have an account?{" "}
               <Link href="/signin" className="font-medium text-[#366084] transition-colors hover:text-[#022340]">
@@ -442,7 +534,7 @@ export default function SignUpForm() {
       </div>
 
       {/* Right Section - Property Image */}
-      <div className="hidden lg:block w-1/2 bg-[#366084] relative overflow-hidden">
+      <div className="hidden lg:block w-1/2 bg-[#366084] fixed right-0 top-0 bottom-0 overflow-hidden">
         <Image
           src="/images/logo/Property.jpg"
           alt="Lemara Commercial Property"
@@ -460,9 +552,7 @@ export default function SignUpForm() {
             </p>
           </div>
         </div>
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-          
-        </div>
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center"></div>
       </div>
 
       {/* Global styles */}
@@ -525,6 +615,21 @@ export default function SignUpForm() {
         /* Improve input field focus states */
         input:focus {
           box-shadow: 0 0 0 2px rgba(54, 96, 132, 0.2) !important;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari and Opera */
+        }
+
+        /* Ensure content starts from the top */
+        .items-start {
+          align-items: flex-start;
         }
       `}</style>
     </div>
