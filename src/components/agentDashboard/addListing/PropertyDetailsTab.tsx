@@ -73,7 +73,7 @@ interface PropertyFormData {
   // Add activities array for the Activities tab
   activities?: Array<{timestamp: string; message: string; user: string}>;
   // Update index signature to accept arrays
-  [key: string]: string | number | boolean | undefined | Array<any>;
+  [key: string]: string | number | boolean | undefined | Array<{timestamp: string; message: string; user: string} | unknown>;
 }
 
 interface PropertyDetailsTabProps {

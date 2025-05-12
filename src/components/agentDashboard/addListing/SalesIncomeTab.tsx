@@ -2,8 +2,20 @@
 
 import React from 'react';
 
+// Create a proper interface for the sales income form data
+interface SalesIncomeFormData {
+  annualTaxableSales?: string | number;
+  annualNonTaxSales?: string | number;
+  annualOtherIncome?: string | number;
+  annualRentalIncome?: string | number;
+  regularSales?: string | number;
+  regularSalesUnit?: string;
+  // Add an index signature to allow for additional properties
+  [key: string]: string | number | boolean | undefined;
+}
+
 interface SalesIncomeTabProps {
-  formData: any;
+  formData: SalesIncomeFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
 }
 
