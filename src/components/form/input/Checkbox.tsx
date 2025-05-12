@@ -1,82 +1,64 @@
-import type React from "react";
+"use client"
+
+import type React from "react"
 
 interface CheckboxProps {
-  label?: string;
-  checked: boolean;
-  className?: string;
-  id?: string;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
+  id: string
+  label?: string
+  checked: boolean
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  className?: string
+  disabled?: boolean
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({
-  label,
-  checked,
-  id,
-  onChange,
-  className = "",
-  disabled = false,
-}) => {
+const Checkbox: React.FC<CheckboxProps> = ({ id, label, checked, onChange, className = "", disabled = false }) => {
   return (
-    <label
-      className={`flex items-center space-x-3 group cursor-pointer ${
-        disabled ? "cursor-not-allowed opacity-60" : ""
-      }`}
-    >
-      <div className="relative w-5 h-5">
+    <div className="flex items-center">
+      <div className="relative flex items-center">
         <input
-          id={id}
           type="checkbox"
-          className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
-          ${className}`}
+          id={id}
           checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
+          onChange={onChange}
           disabled={disabled}
+          className="sr-only" // Hide the actual input
         />
-        {checked && (
-          <svg
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-          >
-            <path
-              d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-              stroke="white"
-              strokeWidth="1.94437"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-        {disabled && (
-          <svg
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-          >
-            <path
-              d="M11.6666 3.5L5.24992 9.91667L2.33325 7"
-              stroke="#E4E7EC"
-              strokeWidth="2.33333"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
+        <div
+          className={`w-5 h-5 border rounded flex items-center justify-center transition-colors ${
+            checked
+              ? "bg-[#06AED7] border-[#06AED7]" // Checked state - use the blue color from the design
+              : "bg-white border-gray-300"
+          } ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+          onClick={() => !disabled && onChange({ target: { checked: !checked } } as any)}
+        >
+          {checked && (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-3.5 w-3.5 text-white"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          )}
+        </div>
       </div>
       {label && (
-        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+        <label
+          htmlFor={id}
+          className={`ml-2 text-sm font-medium ${
+            disabled ? "text-gray-400" : className || "text-gray-700"
+          } cursor-pointer`}
+        >
           {label}
-        </span>
+        </label>
       )}
-    </label>
-  );
-};
+    </div>
+  )
+}
 
-export default Checkbox;
+export default Checkbox

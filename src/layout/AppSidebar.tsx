@@ -11,7 +11,6 @@ import {
   GridIcon,
   HorizontaLDots,
   ListIcon,
-  PageIcon,
   TableIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";

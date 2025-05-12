@@ -218,14 +218,23 @@ const AddListingForm = () => {
         <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Add getErrorMessage to the tab components */}
           {/* Tab 1: Property Basics */}
           {activeTab === 1 && (
-            <PropertyBasicsTab formData={formData} handleChange={handleChange} />
+            <PropertyBasicsTab 
+              formData={formData} 
+              handleChange={handleChange} 
+              getErrorMessage={getErrorMessage} 
+            />
           )}
           
           {/* Tab 2: Details */}
           {activeTab === 2 && (
-            <PropertyDetailsTab formData={formData} handleChange={handleChange} />
+            <PropertyDetailsTab 
+              formData={formData} 
+              handleChange={handleChange} 
+              getErrorMessage={getErrorMessage} 
+            />
           )}
           
           {/* Tab 3: Sales / Income */}
