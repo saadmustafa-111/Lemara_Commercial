@@ -50,14 +50,15 @@ const PREDEFINED_USERS = [
   },
   {
     id: 3,
-    email: "agent@gmail.com",
-    password: "agent123",
-    firstName: "Agent",
-    lastName: "",
-    role: "student"
+    email: "agent@lemaraconstruction.com",
+    password: "123",
+    firstName: "AJ",
+    lastName: "Rana",
+    role: "agent"
   }
 ];
 
+// Define dashboard paths for each role
 const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   admin: "/dashboard/admin",
   teacher: "/dashboard/teacher",
@@ -65,6 +66,7 @@ const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   default: "/dashboard" 
 };
 
+// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
