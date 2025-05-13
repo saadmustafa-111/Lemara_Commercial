@@ -12,6 +12,7 @@ import FolderIcon from "./folder.svg";
 import VideoIcon from "./videos.svg";
 import AudioIcon from "./audio.svg";
 import GridIcon from "./grid.svg";
+import EnvelopeListIcon from "./envelope-list.svg";
 import FileIcon from "./file.svg";
 import DownloadIcon from "./download.svg";
 import ArrowRightIcon from "./arrow-right.svg";
@@ -103,7 +104,7 @@ export {
   PlugInIcon,
   DocsIcon,
   MailIcon,
-  HorizontaLDots,
-  ChevronUpIcon,
+  HorizontaLDots,  ChevronUpIcon,
   ChatIcon,
+  EnvelopeListIcon,
 };

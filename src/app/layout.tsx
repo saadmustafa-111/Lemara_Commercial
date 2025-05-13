@@ -1,10 +1,12 @@
-"use client"
 // Import CSS for fonts instead of using next/font/google
 import './globals.css';
+import Providers from '@/components/common/Providers';
+import { Metadata } from 'next';
 
-import { SidebarProvider } from '@/context/SidebarContext';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { AuthProvider } from '@/context/AuthContext'; 
+export const metadata: Metadata = {
+  title: 'Lemara Commercial',
+  description: 'Commercial real estate platform',
+};
 
 export default function RootLayout({
   children,
@@ -13,14 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-outfit dark:bg-gray-900">
-        <AuthProvider> 
-          <ThemeProvider>
-            <SidebarProvider>
-              {children}
-            </SidebarProvider>
-          </ThemeProvider>
-        </AuthProvider>
+      <body className="font-outfit dark:bg-gray-900" suppressHydrationWarning={true}>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

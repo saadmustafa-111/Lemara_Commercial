@@ -8,9 +8,11 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import {
   ChevronDownIcon,
+  EnvelopeListIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
+  PaperPlaneIcon,
   TableIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
@@ -72,7 +74,16 @@ const studentNavItems: NavItem[] = [
     name: "Reminders",
     icon: <TableIcon />,
     path: "/dashboard/agent/reminders",
+  },  {
+    name: "Email Lists",
+    icon: <EnvelopeListIcon />,
+    path: "/dashboard/email-lists",
   },
+  // {
+  //   name: "Email Campaigns",
+  //   icon: <PaperPlaneIcon />,
+  //   path: "/dashboard/email-campaigns",
+  // },
   
 ];
 
