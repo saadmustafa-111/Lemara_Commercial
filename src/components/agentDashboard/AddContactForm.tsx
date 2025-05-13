@@ -17,6 +17,7 @@ const AddContactForm = () => {
     zipcode: "",
     companyTitle: "",
     website: "",
+    group:"",
   })
 
   // Error state
@@ -33,6 +34,7 @@ const AddContactForm = () => {
     zipcode: "",
     companyTitle: "",
     website: "",
+    group:"",
   })
 
   // Form submission status
@@ -150,6 +152,7 @@ const AddContactForm = () => {
         zipcode: "",
         companyTitle: "",
         website: "",
+        group:"",
       });
       
     } catch (error) {
@@ -357,7 +360,21 @@ const AddContactForm = () => {
               {errors.website && <p className="text-red-500 text-xs mt-1">{errors.website}</p>}
             </div>
           </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Groups</label>
+              <select 
+                name="group"
+                value={formData.group}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border ${errors.group ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
+              >
+                <option value="usa">Groups....</option>
+                <option value="canada">Group1</option>
+              </select>
+              {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
+            </div>
+          </div>
           {/* Buttons */}
           <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
@@ -377,6 +394,7 @@ const AddContactForm = () => {
                   zipcode: "",
                   companyTitle: "",
                   website: "",
+                  group:"",
                 });
                 setErrors({
                   firstName: "",
@@ -391,6 +409,7 @@ const AddContactForm = () => {
                   zipcode: "",
                   companyTitle: "",
                   website: "",
+                  group:"",
                 });
                 setSubmitStatus({ success: false, message: "" });
               }}

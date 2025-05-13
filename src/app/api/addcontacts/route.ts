@@ -18,7 +18,8 @@ export async function POST(request: Request) {
       address,
       zipcode,
       companyTitle,
-      website
+        website,
+        group
     } = await request.json();
 
     console.log("API: Parsed contact data", {
@@ -38,7 +39,8 @@ export async function POST(request: Request) {
         address,
         zipcode,
         companyTitle,
-        website
+          website,
+        group,
       });
 
       console.log("API: Contact creation success:", response.status);
