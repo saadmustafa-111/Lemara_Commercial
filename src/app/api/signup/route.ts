@@ -4,14 +4,21 @@ import axios from "axios"; // Import the main axios library for isAxiosError
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name, phone, address, role } = await request.json();
+    const {firstname,lastname, phone,email, password,whatsapp,facebook,twitter,linkedln,instagram,nmls,dre, role } = await request.json();
     const response = await axiosInstance.post("/user", {
+    firstname,
+      lastname,
+      phone,
       email,
       password,
-      name,
-      phone,
-      address,
-      role,
+      whatsapp,
+      facebook,
+      twitter,
+      linkedln,
+      instagram,
+      nmls,
+      dre,
+  
     });
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {

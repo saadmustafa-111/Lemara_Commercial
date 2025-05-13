@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateUser, UserData } from "@/lib/authService";
-
-// POST /api/signin - Authenticate a user
 export async function POST(request: NextRequest) {
   try {
-    // Get request body
     const body = await request.json();
     
-    // Validate required fields
     if (!body.email || !body.password) {
       return NextResponse.json(
         { error: "Email and password are required" },

@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Checkbox from "@/components/form/input/Checkbox"
 import Input from "@/components/form/input/InputField"
 import Label from "@/components/form/Label"
-import { EyeCloseIcon, EyeIcon } from "@/icons"
 import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { toast, ToastContainer, type ToastOptions } from "react-toastify"
@@ -30,18 +29,34 @@ export default function SignUpForm() {
   const [isChecked, setIsChecked] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
+    firstname: "",
+    lastname: "",
     phone: "",
     email: "",
     address: "",
     password: "",
+    whatsapp: "",
+    facebook: "",
+    twitter: "",
+    linkedln: "",
+    instagram: "",
+    nmls: "",
+    dre: "",
   })
   const [errors, setErrors] = useState({
-    name: "",
+    firstname: "",
+    lastname: "",
     phone: "",
     email: "",
     address: "",
     password: "",
+    whatsapp: "",
+    facebook: "",
+    linkedln: "",
+    twitter: "",
+    instagram: "",
+    nmls: "",
+    dre: "",
     role: "",
     terms: "",
   })
@@ -78,7 +93,14 @@ export default function SignUpForm() {
     },
     icon: "⚠️",
   }
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    // Validate form before setting isSubmitting
+    if (!validateForm()) {
+      return
+    }
+
     setIsSubmitting(true)
     // Simulate form submission
     setTimeout(() => {
@@ -115,8 +137,12 @@ export default function SignUpForm() {
     let isValid = true
     const newErrors = { ...errors }
 
-    if (!formData.name.trim()) {
-      newErrors.name = "First name is required"
+    if (!formData.firstname.trim()) {
+      newErrors.firstname = "First name is required"
+      isValid = false
+    }
+    if (!formData.lastname.trim()) {
+      newErrors.lastname = "First name is required"
       isValid = false
     }
 
@@ -146,10 +172,6 @@ export default function SignUpForm() {
       isValid = false
     }
 
-    if (!selectedRoleFromQuery) {
-      newErrors.role = "Role selection is required"
-      isValid = false
-    }
 
     if (!isChecked) {
       newErrors.terms = "You must agree to the terms and conditions"
@@ -181,7 +203,7 @@ export default function SignUpForm() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          name: formData.name,
+          name: formData.firstname,
           phone: formData.phone,
           address: formData.address,
           role: selectedRoleFromQuery || "User",
@@ -270,30 +292,30 @@ export default function SignUpForm() {
                 </Label>
                 <Input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="firstname"
+                  name="firstname"
+                  value={formData.firstname}
                   onChange={handleChange}
                   placeholder="Enter your first name"
-                  error={!!errors.name}
-                  hint={errors.name}
+                  error={!!errors.firstname}
+                  hint={errors.firstname}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
                 />
               </div>
-              {/* Phone */}
+              {/* Last Name */}
               <div className="sm:col-span-1">
                 <Label htmlFor="phone" className="mb-1 text-gray-700 font-medium text-sm">
                   Last Name<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   type="text"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  id="lastname"
+                  name="lastname"
+                  value={formData.lastname}
                   onChange={handleChange}
                   placeholder="Enter your last name"
-                  error={!!errors.phone}
-                  hint={errors.phone}
+                  error={!!errors.lastname}
+                  hint={errors.lastname}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
                 />
               </div>
@@ -316,142 +338,181 @@ export default function SignUpForm() {
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
+            <div>
+              {/* Password */}
+              <Label htmlFor="email" className="mb-1 text-gray-700 font-medium text-sm">
+                Password<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                error={!!errors.password}
+                hint={errors.password}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
 
-            {/* address*/}
+            {/* phone  */}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
                 Phone<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="phone"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter your Phone Number "
-                error={!!errors.address}
-                hint={errors.address}
+                error={!!errors.phone}
+                hint={errors.phone}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
             <div>
+              {/* whatsapp  */}
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
                 Whatsapp<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="whatsapp"
+                name="whatsapp"
+                value={formData.whatsapp}
                 onChange={handleChange}
                 placeholder="Enter your Phone Number "
-                error={!!errors.address}
-                hint={errors.address}
+                error={!!errors.whatsapp}
+                hint={errors.whatsapp}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
+            {/* facebook  */}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
                 Facebook<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="facebook"
+                name="facebook"
+                value={formData.facebook}
                 onChange={handleChange}
                 placeholder="Enter your facebook "
-                error={!!errors.address}
-                hint={errors.address}
+                error={!!errors.facebook}
+                hint={errors.facebook}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
+            {/* twitter  */}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
                 Twitter<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="twitter"
+                name="twitter"
+                value={formData.twitter}
                 onChange={handleChange}
                 placeholder="Enter your twitter "
-                error={!!errors.address}
-                hint={errors.address}
+                error={!!errors.twitter}
+                hint={errors.twitter}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
+            {/* linkedin  */}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
                 LinkedIn<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="linkedln"
+                name="linkedln"
+                value={formData.linkedln}
                 onChange={handleChange}
                 placeholder="Enter your LinkedIn "
-                error={!!errors.address}
-                hint={errors.address}
+                error={!!errors.linkedln}
+                hint={errors.linkedln}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
+            {/* instagram  */}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
                 Instagram<span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="instagram"
+                name="instagram"
+                value={formData.instagram}
                 onChange={handleChange}
                 placeholder="Enter your Instagram "
-                error={!!errors.address}
-                hint={errors.address}
+                error={!!errors.instagram}
+                hint={errors.instagram}
+                className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
+              />
+            </div>
+            {/* NMLS  */}
+            <div>
+              <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">
+                NMLS #<span className="text-red-500">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="nmls"
+                name="nmls"
+                value={formData.nmls}
+                onChange={handleChange}
+                placeholder="NMLS #"
+                error={!!errors.nmls}
+                hint={errors.nmls}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
 
-            {/* Password */}
+            {/* DRE  */}
             <div>
               <Label htmlFor="password" className="mb-1 text-gray-700 font-medium text-sm">
-                Password<span className="text-red-500">*</span>
+                DRE #<span className="text-red-500">*</span>
               </Label>
               <div className="relative">
                 <Input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  name="password"
-                  value={formData.password}
+                  type="text"
+                  id="dre"
+                  name="dre"
+                  value={formData.dre}
                   onChange={handleChange}
-                  placeholder="Enter your password"
-                  error={!!errors.password}
-                  hint={errors.password}
+                  placeholder="  DRE #  "
+                  error={!!errors.dre}
+                  hint={errors.dre}
                   className="bg-white text-gray-800 !rounded-lg border-gray-100 focus:border-gray-100 focus:ring-gray-100 shadow-sm"
                 />
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeCloseIcon /> : <EyeIcon />}
-                </button>
+                ></button>
               </div>
             </div>
 
             {/* Terms */}
             <div className="flex items-center">
-              <Checkbox
-                id="terms"
-                label="I agree to the terms and conditions"
-                checked={isChecked}
-                onChange={() => setIsChecked(!isChecked)}
-                className="text-gray-900"
-              />
-            </div>
+  <span
+    onClick={() => {
+      console.log("Open Independent Contractor Agreement modal");
+    }}
+    className="text-blue-600 underline cursor-pointer"
+  >
+    Click to view & sign the Independent Contractor Agreement terms
+  </span>
+</div>
+
             {errors.terms && <p className="mt-1 text-xs text-red-500">{errors.terms}</p>}
 
             {authError && <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{authError}</div>}
@@ -463,7 +524,7 @@ export default function SignUpForm() {
             <div className="pt-3 mt-3 flex justify-center">
               <button
                 type="submit"
-                onClick={handleClick}
+                onClick={(e) => handleSubmit(e)}
                 className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
                 disabled={isSubmitting || authLoading}
               >
