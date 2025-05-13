@@ -91,7 +91,7 @@ const AppSidebar: React.FC = () => {
         setNavItems(adminNavItems);
       } else if (role === 'teacher') {
         setNavItems(teacherNavItems);
-      } else if (role === 'agent') {
+      } else if (role === 'broker' || role === 'agent') {
         setNavItems(studentNavItems);
       } else {
         // Default to common items if role is not recognized
