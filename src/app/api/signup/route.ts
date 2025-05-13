@@ -5,11 +5,11 @@ import axios from "axios";
 export async function POST(request: Request) {
   try {
     console.log("API: Received signup request");
-    const {firstname, lastname, phone, email, password, whatsapp, facebook, twitter, linkedln, instagram, nmls, dre, role } = await request.json();
+    const {firstName, lastName, phone, email, password, whatsapp, facebook, twitter, linkedIn, instagram, nmls, dre, role } = await request.json();
     
     console.log("API: Parsed request data", { 
-      firstname, lastname, phone, email, 
-      whatsapp, facebook, twitter, linkedln, instagram, 
+      firstName, lastName, phone, email, 
+      whatsapp, facebook, twitter, linkedIn, instagram, 
       nmls, dre, role 
     });
     
@@ -18,15 +18,15 @@ export async function POST(request: Request) {
     // Using a try-catch block specifically for the axios request
     try {
       const response = await axiosInstance.post("/user", {
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         phone,
         email,
         password,
         whatsapp,
         facebook,
         twitter,
-        linkedln,
+        linkedIn,
         instagram,
         nmls,
         dre,
@@ -43,8 +43,8 @@ export async function POST(request: Request) {
       console.log("API: Creating a mock successful response");
       const mockResponse = {
         id: Date.now(),
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         email,
         role,
         message: "User created successfully (Mock response - backend unavailable)"

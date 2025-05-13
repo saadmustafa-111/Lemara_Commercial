@@ -36,8 +36,8 @@ export default function SignUpForm() {
   const [isChecked, setIsChecked] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
+    firstName: "",
+    lastName: "",
     phone: "",
     email: "",
     address: "",
@@ -45,22 +45,22 @@ export default function SignUpForm() {
     whatsapp: "",
     facebook: "",
     twitter: "",
-    linkedln: "",
+    linkedIn: "",
     instagram: "",
     nmls: "",
     dre: "",
     role: selectedRoleFromQuery || Role.USER,
   })
   const [errors, setErrors] = useState({
-    firstname: "",
-    lastname: "",
+    firstName: "",
+    lastName: "",
     phone: "",
     email: "",
     address: "",
     password: "",
     whatsapp: "",
     facebook: "",
-    linkedln: "",
+    linkedIn: "",
     twitter: "",
     instagram: "",
     nmls: "",
@@ -149,12 +149,12 @@ export default function SignUpForm() {
     let isValid = true
     const newErrors = { ...errors }
 
-    if (!formData.firstname.trim()) {
-      newErrors.firstname = "First name is required"
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "First name is required"
       isValid = false
     }
-    if (!formData.lastname.trim()) {
-      newErrors.lastname = "First name is required"
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "First name is required"
       isValid = false
     }
 
@@ -217,15 +217,15 @@ export default function SignUpForm() {
 
       // Add this before the fetch call
       console.log("Sending data to API:", {
-        firstname: formData.firstname,
-        lastname: formData.lastname,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
         whatsapp: formData.whatsapp,
         facebook: formData.facebook,
         twitter: formData.twitter,
-        linkedln: formData.linkedln,
+        linkedIn: formData.linkedIn,
         instagram: formData.instagram,
         nmls: formData.nmls,
         dre: formData.dre,
@@ -236,15 +236,15 @@ export default function SignUpForm() {
       
       // Create the request body
       const requestBody = {
-        firstname: formData.firstname,
-        lastname: formData.lastname,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
         whatsapp: formData.whatsapp,
         facebook: formData.facebook,
         twitter: formData.twitter,
-        linkedln: formData.linkedln,
+        linkedIn: formData.linkedIn,
         instagram: formData.instagram,
         nmls: formData.nmls,
         dre: formData.dre,
@@ -391,13 +391,13 @@ export default function SignUpForm() {
                 </Label>
                 <Input
                   type="text"
-                  id="firstname"
-                  name="firstname"
-                  value={formData.firstname}
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleChange}
                   placeholder="Enter your first name"
-                  error={!!errors.firstname}
-                  hint={errors.firstname}
+                  error={!!errors.firstName}
+                  hint={errors.firstName}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
                 />
               </div>
@@ -408,13 +408,13 @@ export default function SignUpForm() {
                 </Label>
                 <Input
                   type="text"
-                  id="lastname"
-                  name="lastname"
-                  value={formData.lastname}
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Enter your last name"
-                  error={!!errors.lastname}
-                  hint={errors.lastname}
+                  error={!!errors.lastName}
+                  hint={errors.lastName}
                   className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
                 />
               </div>
@@ -530,13 +530,13 @@ export default function SignUpForm() {
               </Label>
               <Input
                 type="text"
-                id="linkedln"
-                name="linkedln"
-                value={formData.linkedln}
+                id="linkedIn"
+                name="linkedIn"
+                value={formData.linkedIn}
                 onChange={handleChange}
                 placeholder="Enter your LinkedIn "
-                error={!!errors.linkedln}
-                hint={errors.linkedln}
+                error={!!errors.linkedIn}
+                hint={errors.linkedIn}
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
