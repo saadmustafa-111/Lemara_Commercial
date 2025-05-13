@@ -12,6 +12,13 @@ import { toast, ToastContainer, type ToastOptions } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { UserPlus } from "lucide-react"
 
+// Define roles enum
+export enum Role {
+  ADMIN = 'admin',
+  USER = 'user',
+  BROKER = 'broker',
+}
+
 // Define custom toast style type
 interface CustomToastStyle extends Omit<ToastOptions, "icon"> {
   style?: React.CSSProperties
@@ -42,6 +49,7 @@ export default function SignUpForm() {
     instagram: "",
     nmls: "",
     dre: "",
+    role: selectedRoleFromQuery || Role.USER,
   })
   const [errors, setErrors] = useState({
     firstname: "",
@@ -114,11 +122,15 @@ export default function SignUpForm() {
   useEffect(() => {
     if (selectedRoleFromQuery) {
       console.log(`Role selected: ${selectedRoleFromQuery}`) // Log selected role
+      setFormData(prev => ({
+        ...prev,
+        role: selectedRoleFromQuery
+      }))
     }
   }, [selectedRoleFromQuery])
 
   // Handle input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
@@ -159,16 +171,22 @@ export default function SignUpForm() {
       isValid = false
     }
 
-    if (!formData.address) {
-      newErrors.address = "Address is required"
-      isValid = false
-    }
+    // Remove address validation since there's no address field in the form
+    // if (!formData.address) {
+    //   newErrors.address = "Address is required"
+    //   isValid = false
+    // }
 
     if (!formData.password) {
       newErrors.password = "Password is required"
       isValid = false
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters"
+      isValid = false
+    }
+
+    if (!formData.role) {
+      newErrors.role = "Please select an account type"
       isValid = false
     }
 
@@ -186,9 +204,11 @@ export default function SignUpForm() {
     e.preventDefault()
 
     if (!validateForm()) {
+      console.log("Form validation failed")
       return
     }
 
+    console.log("Form validation passed, submitting...")
     setIsSubmitting(true)
 
     try {
@@ -209,74 +229,120 @@ export default function SignUpForm() {
         instagram: formData.instagram,
         nmls: formData.nmls,
         dre: formData.dre,
-        role: selectedRoleFromQuery || "User",
+        role: formData.role,
       })
 
-      const response = await fetch("/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstname: formData.firstname,
-          lastname: formData.lastname,
-          phone: formData.phone,
-          email: formData.email,
-          password: formData.password,
-          whatsapp: formData.whatsapp,
-          facebook: formData.facebook,
-          twitter: formData.twitter,
-          linkedln: formData.linkedln,
-          instagram: formData.instagram,
-          nmls: formData.nmls,
-          dre: formData.dre,
-          role: selectedRoleFromQuery || "User",
-        }),
-      })
-
-      // Add this after the fetch call (before the if statement)
-      console.log("API Response status:", response.status)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        console.error("Signup failed:", errorData)
-        toast.error(
-          <div className="flex flex-col">
-            <span className="text-lg font-medium mb-1">Signup Failed</span>
-            <span className="text-sm opacity-90">{errorData.message || "Please try again later."}</span>
-          </div>,
-          errorToastStyle as ToastOptions,
-        )
-        return
+      console.log("Starting fetch request to /api/signup")
+      
+      // Create the request body
+      const requestBody = {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        phone: formData.phone,
+        email: formData.email,
+        password: formData.password,
+        whatsapp: formData.whatsapp,
+        facebook: formData.facebook,
+        twitter: formData.twitter,
+        linkedln: formData.linkedln,
+        instagram: formData.instagram,
+        nmls: formData.nmls,
+        dre: formData.dre,
+        role: formData.role,
+      };
+      
+      console.log("Request body:", JSON.stringify(requestBody));
+      
+      let response;
+      try {
+        response = await fetch("/api/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+        
+        console.log("API Response status:", response.status);
+        console.log("API Response headers:", Object.fromEntries([...response.headers.entries()]));
+      } catch (fetchError) {
+        console.error("Fetch error:", fetchError);
+        throw fetchError;
       }
 
-      const data = await response.json()
-      console.log("Signup successful:", data)
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          console.error("Signup failed with error data:", errorData);
+          toast.error(
+            <div className="flex flex-col">
+              <span className="text-lg font-medium mb-1">Signup Failed</span>
+              <span className="text-sm opacity-90">{errorData.message || "Please try again later."}</span>
+            </div>,
+            errorToastStyle as ToastOptions,
+          );
+        } catch (jsonError) {
+          console.error("Failed to parse error response:", jsonError);
+          toast.error(
+            <div className="flex flex-col">
+              <span className="text-lg font-medium mb-1">Signup Failed</span>
+              <span className="text-sm opacity-90">Server returned an error. Please try again later.</span>
+            </div>,
+            errorToastStyle as ToastOptions,
+          );
+        }
+        return;
+      }
 
-      // Show success toast with custom styling
-      toast.success(
-        <div className="flex flex-col">
-          <span className="text-lg font-medium mb-1">Account Created!</span>
-          <span className="text-sm opacity-90">You&apos;ll be redirected to login in a moment.</span>
-        </div>,
-        successToastStyle as ToastOptions,
-      )
+      try {
+        const data = await response.json();
+        console.log("Signup successful, response data:", data);
 
-      // Redirect after a short delay to allow the toast to be seen
-      setTimeout(() => {
-        router.push("/signin")
-      }, 3000)
+        // Show success toast with custom styling
+        toast.success(
+          <div className="flex flex-col">
+            <span className="text-lg font-medium mb-1">Account Created!</span>
+            <span className="text-sm opacity-90">You&apos;ll be redirected to login in a moment.</span>
+          </div>,
+          successToastStyle as ToastOptions,
+        );
+
+        // Redirect after a short delay to allow the toast to be seen
+        setTimeout(() => {
+          router.push("/signin");
+        }, 3000);
+      } catch (jsonError) {
+        console.error("Error parsing success response:", jsonError);
+        // Still treat it as success if response was ok but JSON parsing failed
+        toast.success(
+          <div className="flex flex-col">
+            <span className="text-lg font-medium mb-1">Account Created!</span>
+            <span className="text-sm opacity-90">You&apos;ll be redirected to login in a moment.</span>
+          </div>,
+          successToastStyle as ToastOptions,
+        );
+        
+        setTimeout(() => {
+          router.push("/signin");
+        }, 3000);
+      }
     } catch (error: unknown) {
-      console.error("Signup failed:", error)
+      console.error("Signup process failed with error:", error);
+      let errorMessage = "Please try again later.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast.error(
         <div className="flex flex-col">
           <span className="text-lg font-medium mb-1">Signup Failed</span>
-          <span className="text-sm opacity-90">Please try again later.</span>
+          <span className="text-sm opacity-90">{errorMessage}</span>
         </div>,
         errorToastStyle as ToastOptions,
-      )
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -532,6 +598,33 @@ export default function SignUpForm() {
                   onClick={() => setShowPassword(!showPassword)}
                 ></button>
               </div>
+            </div>
+
+            {/* Role Selection */}
+            <div>
+              <Label htmlFor="role" className="mb-1 text-gray-700 font-medium text-sm">
+                Account Type<span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm appearance-none"
+                  required
+                >
+                  <option value="" disabled>Select Account Type</option>
+                  <option value={Role.USER}>User</option>
+                  <option value={Role.BROKER}>Broker</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-0 text-gray-700">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+              {errors.role && <p className="mt-1 text-xs text-red-500">{errors.role}</p>}
             </div>
 
             {/* Terms */}
