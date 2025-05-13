@@ -62,7 +62,7 @@ const PREDEFINED_USERS = [
 const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   admin: "/dashboard/admin",
   teacher: "/dashboard/teacher",
-  agent: "/dashboard/agent",
+  broker: "/dashboard/agent",
   default: "/dashboard" 
 };
 

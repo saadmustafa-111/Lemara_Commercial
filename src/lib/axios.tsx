@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "https://zaraschool-05bf2031623e.herokuapp.com",
+  baseURL: "http://192.168.1.24:3000",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -40,6 +40,8 @@ axiosInstance.interceptors.response.use(
         
         // Redirect to login page
         window.location.href = '/signin';
+        
+        console.log('Unauthorized access detected, redirecting to login page');
       }
     }
     

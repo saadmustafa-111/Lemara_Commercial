@@ -30,6 +30,8 @@ export const authenticateUser = async (email: string, password: string): Promise
       password
     });
 
+    console.log('Auth API response:', response.data);
+
     // Handle the actual API response format
     if (response.data && response.data.access_token) {
       // Store the access token
@@ -39,7 +41,7 @@ export const authenticateUser = async (email: string, password: string): Promise
 
       // Return a user object constructed from the response
       return {
-        id: response.data.id,
+        id: Number(response.data.id) || 0, // Convert to number and default to 0 if not provided
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -48,7 +50,7 @@ export const authenticateUser = async (email: string, password: string): Promise
         email: email,
         phone: '',
         address: '',
-        role: response.data.role
+        role: response.data.role || 'user' // Default to 'user' if not provided
       };
     } else {
       console.log('Login response is missing access_token:', response.data);

@@ -148,6 +148,10 @@ export default function SignInForm() {
       // Set loading states
       setIsSubmitting(true)
       setSignInAttempted(true)
+      
+      // Clear any existing auth data before attempting login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
 
       console.log("Attempting signin with:", formData.email);
       
