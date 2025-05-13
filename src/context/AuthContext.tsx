@@ -54,7 +54,7 @@ const PREDEFINED_USERS = [
     password: "123",
     firstName: "AJ",
     lastName: "Rana",
-    role: "broker"
+    role: "agent"
   }
 ];
 
@@ -63,6 +63,7 @@ const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   admin: "/dashboard/admin",
   teacher: "/dashboard/teacher",
   broker: "/dashboard/agent",
+  agent: "/dashboard/agent",
   default: "/dashboard" 
 };
 
