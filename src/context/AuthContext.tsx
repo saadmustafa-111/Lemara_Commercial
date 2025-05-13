@@ -54,7 +54,7 @@ const PREDEFINED_USERS = [
     password: "123",
     firstName: "AJ",
     lastName: "Rana",
-    role: "agent"
+    role: "broker"
   }
 ];
 

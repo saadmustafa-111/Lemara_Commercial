@@ -1,10 +1,10 @@
 import axiosInstance from "@/lib/axios";
 import { NextResponse } from "next/server";
-import axios from "axios"; // Import the main axios library for isAxiosError
+import axios from "axios";
 
 export async function POST(request: Request) {
   try {
-    const {firstname,lastname, phone,email, password,whatsapp,facebook,twitter,linkedln,instagram,nmls,dre, role } = await request.json();
+    const {firstname,lastname, phone,email, password,whatsapp,facebook,twitter,linkedln,instagram,nmls,dre } = await request.json();
     const response = await axiosInstance.post("/user", {
     firstname,
       lastname,

@@ -172,7 +172,6 @@ export default function SignUpForm() {
       isValid = false
     }
 
-
     if (!isChecked) {
       newErrors.terms = "You must agree to the terms and conditions"
       isValid = false
@@ -183,6 +182,7 @@ export default function SignUpForm() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("handleSubmit called")
     e.preventDefault()
 
     if (!validateForm()) {
@@ -195,20 +195,47 @@ export default function SignUpForm() {
       console.log("Form Data:", formData)
       console.log("Selected Role:", selectedRoleFromQuery)
 
+      // Add this before the fetch call
+      console.log("Sending data to API:", {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        phone: formData.phone,
+        email: formData.email,
+        password: formData.password,
+        whatsapp: formData.whatsapp,
+        facebook: formData.facebook,
+        twitter: formData.twitter,
+        linkedln: formData.linkedln,
+        instagram: formData.instagram,
+        nmls: formData.nmls,
+        dre: formData.dre,
+        role: selectedRoleFromQuery || "User",
+      })
+
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          firstname: formData.firstname,
+          lastname: formData.lastname,
+          phone: formData.phone,
           email: formData.email,
           password: formData.password,
-          name: formData.firstname,
-          phone: formData.phone,
-          address: formData.address,
+          whatsapp: formData.whatsapp,
+          facebook: formData.facebook,
+          twitter: formData.twitter,
+          linkedln: formData.linkedln,
+          instagram: formData.instagram,
+          nmls: formData.nmls,
+          dre: formData.dre,
           role: selectedRoleFromQuery || "User",
         }),
       })
+
+      // Add this after the fetch call (before the if statement)
+      console.log("API Response status:", response.status)
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -283,7 +310,13 @@ export default function SignUpForm() {
             <div className="mt-4 mb-5 border-b border-gray-200"></div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit(e)
+            }}
+            className="space-y-4"
+          >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* First Name */}
               <div className="sm:col-span-1">
@@ -503,16 +536,14 @@ export default function SignUpForm() {
 
             {/* Terms */}
             <div className="flex items-center">
-  <span
-    onClick={() => {
-      console.log("Open Independent Contractor Agreement modal");
-    }}
-    className="text-blue-600 underline cursor-pointer"
-  >
-    Click to view & sign the Independent Contractor Agreement terms
-  </span>
-</div>
-
+              <Checkbox
+                id="terms"
+                label="Click to view & sign the Independent Contractor Agreement terms"
+                checked={isChecked}
+                onChange={() => setIsChecked(!isChecked)}
+                className="text-gray-900"
+              />
+            </div>
             {errors.terms && <p className="mt-1 text-xs text-red-500">{errors.terms}</p>}
 
             {authError && <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{authError}</div>}
@@ -524,7 +555,6 @@ export default function SignUpForm() {
             <div className="pt-3 mt-3 flex justify-center">
               <button
                 type="submit"
-                onClick={(e) => handleSubmit(e)}
                 className="w-48 py-3 font-medium text-white transition-all duration-300 rounded-full bg-[#06AED7] hover:bg-[#022340] hover:translate-y-1 hover:shadow-lg focus:ring-2 focus:ring-[#366084] focus:ring-offset-2 shadow-md disabled:opacity-70 flex justify-center items-center gap-2"
                 disabled={isSubmitting || authLoading}
               >

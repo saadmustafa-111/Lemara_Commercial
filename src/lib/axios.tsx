@@ -8,10 +8,8 @@ const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
-// Add a request interceptor to include the auth token in all requests
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Get the token from localStorage if it exists
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
     
     // If token exists, add it to the authorization header
