@@ -114,8 +114,8 @@ const MyContacts = () => {
   // State for create group popup
   const [showGroupModal, setShowGroupModal] = useState(false)
   const [showEditGroupModal, setShowEditGroupModal] = useState(false)
-  const [groupTitle, setGroupTitle] = useState("")
-  const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const [name, setname] = useState("")
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
 
   // State for actions dropdown
   const [showActionsDropdown, setShowActionsDropdown] = useState(false)
@@ -127,15 +127,22 @@ const MyContacts = () => {
   ])
 
   // State for selected group
-  const [selectedGroup, setSelectedGroup] = useState(null)
+  const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
+  
+  // State for notification
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({ show: false, message: '', type: 'success' });
 
   // State for showing delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [groupToDelete, setGroupToDelete] = useState(null)
+  const [groupToDelete, setGroupToDelete] = useState<number | null>(null)
 
   // State for showing delete contact confirmation modal
   const [showDeleteContactModal, setShowDeleteContactModal] = useState(false)
-  const [contactToDelete, setContactToDelete] = useState(null)
+  const [contactToDelete, setContactToDelete] = useState<number | null>(null)
 
   // Filter contacts based on search and selected group
   const filteredContacts = contactsData.filter((contact) => {
@@ -165,61 +172,121 @@ const MyContacts = () => {
   }, [searchTerm, selectedGroup])
 
   // Handle page change
-  const handlePageChange = (pageNumber) => {
+  const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
   }
 
   // Handle delete contact
-  const handleDeleteContact = (id) => {
+  const handleDeleteContact = (id: number) => {
     setContactToDelete(id)
     setShowDeleteContactModal(true)
   }
 
   // Handle edit contact
-  const handleEditContact = (id) => {
+  const handleEditContact = (id: number) => {
     // In a real app, you would navigate to an edit page with this ID
     console.log(`Edit contact with ID: ${id}`)
     router.push(`/dashboard/agent/editcontact/${id}`)
   }
 
   // Handle create group
-  const handleCreateGroup = () => {
-    if (groupTitle.trim()) {
-      // In a real app, you would call an API to create the group
-      const newGroup = {
-        id: contactGroups.length + 1,
-        title: groupTitle,
-        contacts: [],
-      }
+  const handleCreateGroup = async () => {
+    if (name.trim()) {
+      try {
+        // Call the API endpoint through Next.js API route
+        const response = await fetch('/api/contacts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Adding token directly here too
+          },
+          body: JSON.stringify({ 
+            name: name 
+          }),
+        });
 
-      setContactGroups([...contactGroups, newGroup])
-      setGroupTitle("")
-      setShowGroupModal(false)
+        const data = await response.json();
+        
+        if (response.ok) {
+          console.log('Group created successfully:', data);
+          
+          // Add the new group to the local state
+          const newGroup = {
+            id: contactGroups.length + 1,
+            title: name,
+            contacts: [],
+          }
+
+          setContactGroups([...contactGroups, newGroup])
+          setname("")
+          setShowGroupModal(false)
+          
+          // Show success notification
+          setNotification({
+            show: true,
+            message: 'Group created successfully!',
+            type: 'success'
+          });
+          
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification({ show: false, message: '', type: 'success' });
+          }, 3000);
+        } else {
+          console.error('Failed to create group:', data);
+          
+          // Show detailed error notification
+          setNotification({
+            show: true,
+            message: data.error || data.details?.message || 'Failed to create group. Please try again.',
+            type: 'error'
+          });
+          
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification({ show: false, message: '', type: 'success' });
+          }, 3000);
+        }
+      } catch (error) {
+        console.error('Error creating group:', error);
+        
+        // Show error notification
+        setNotification({
+          show: true,
+          message: 'Error creating group. Please try again.',
+          type: 'error'
+        });
+        
+        // Hide notification after 3 seconds
+        setTimeout(() => {
+          setNotification({ show: false, message: '', type: 'success' });
+        }, 3000);
+      }
     }
   }
 
   // Handle edit group
   const handleEditGroup = () => {
-    if (groupTitle.trim() && selectedGroupId) {
+    if (name.trim() && selectedGroupId) {
       // In a real app, you would call an API to update the group
       const updatedGroups = contactGroups.map((group) => {
         if (group.id === selectedGroupId) {
-          return { ...group, title: groupTitle }
+          return { ...group, title: name }
         }
         return group
       })
 
       setContactGroups(updatedGroups)
-      setGroupTitle("")
+      setname("")
       setSelectedGroupId(null)
       setShowEditGroupModal(false)
     }
   }
 
   // Open edit group modal
-  const openEditGroupModal = (group) => {
+  const openEditGroupModal = (group: { id: number; title: string; contacts: number[] }) => {
     setSelectedGroupId(group.id)
-    setGroupTitle(group.title)
+    setname(group.title)
     setShowEditGroupModal(true)
     setShowActionsDropdown(false)
   }
@@ -254,14 +321,14 @@ const MyContacts = () => {
   }
 
   // Open delete confirmation modal
-  const openDeleteModal = (groupId) => {
+  const openDeleteModal = (groupId: number) => {
     setGroupToDelete(groupId)
     setShowDeleteModal(true)
     setShowActionsDropdown(false)
   }
 
   // Handle group selection
-  const handleGroupSelection = (groupId) => {
+  const handleGroupSelection = (groupId: number) => {
     if (selectedGroup === groupId) {
       // If clicking the same group, clear selection
       setSelectedGroup(null)
@@ -273,6 +340,34 @@ const MyContacts = () => {
   return (
     <>
       <div className="flex flex-col gap-4 w-full p-4 dark:bg-gray-900">
+        {/* Notification */}
+        {notification.show && (
+          <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md flex items-center ${
+            notification.type === 'success' 
+              ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 border-l-4 border-green-500' 
+              : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100 border-l-4 border-red-500'
+          }`}>
+            <div className="mr-3">
+              {notification.type === 'success' ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              )}
+            </div>
+            <div className="flex-1">{notification.message}</div>
+            <button 
+              onClick={() => setNotification({ ...notification, show: false })}
+              className="ml-auto text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        
         <div className="flex items-center gap-3">
           <span>
             <Contact size={50} color="#06AED7" />
@@ -628,16 +723,16 @@ const MyContacts = () => {
 
               <div className="mb-6">
                 <label
-                  htmlFor="groupTitle"
+                  htmlFor="name"
                   className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Enter the title for your new group
                 </label>
                 <input
                   type="text"
-                  id="groupTitle"
-                  value={groupTitle}
-                  onChange={(e) => setGroupTitle(e.target.value)}
+                  id="name"
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                   placeholder="E.g., VIP Clients, Marketing Team, etc."
                 />
@@ -701,8 +796,8 @@ const MyContacts = () => {
                 <input
                   type="text"
                   id="editGroupTitle"
-                  value={groupTitle}
-                  onChange={(e) => setGroupTitle(e.target.value)}
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                   placeholder="Enter group title"
                 />
