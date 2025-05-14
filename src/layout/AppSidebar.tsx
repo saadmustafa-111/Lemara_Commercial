@@ -14,6 +14,7 @@ import {
   ListIcon,
   PaperPlaneIcon,
   TableIcon,
+  UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 import { Contact } from 'lucide-react';
@@ -71,6 +72,11 @@ const studentNavItems: NavItem[] = [
     path: "/dashboard/agent/mycontacts",
   },
   {
+    name: "Profile",
+    icon: <UserCircleIcon />,
+    path: "/dashboard/account/profile",
+  },
+  {
     name: "Reminders",
     icon: <TableIcon />,
     path: "/dashboard/agent/reminders",
@@ -84,8 +90,7 @@ const studentNavItems: NavItem[] = [
   //   icon: <PaperPlaneIcon />,
   //   path: "/dashboard/email-campaigns",
   // },
-  
-];
+  ];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
