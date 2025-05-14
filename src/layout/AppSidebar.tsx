@@ -85,11 +85,11 @@ const studentNavItems: NavItem[] = [
     icon: <EnvelopeListIcon />,
     path: "/dashboard/email-lists",
   },
-  // {
-  //   name: "Email Campaigns",
-  //   icon: <PaperPlaneIcon />,
-  //   path: "/dashboard/email-campaigns",
-  // },
+  {
+    name: "Email Campaigns",
+    icon: <PaperPlaneIcon />,
+    path: "/dashboard/email-campaigns",
+  },
   ];
 
 const AppSidebar: React.FC = () => {
