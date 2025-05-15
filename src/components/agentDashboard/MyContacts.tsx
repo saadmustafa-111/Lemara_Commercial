@@ -217,7 +217,7 @@ const MyContacts = () => {
     setApiError(null)
   
     try {
-      const response = await axiosInstance.get("/contacts/group");
+      const response = await axiosInstance.get("/contacts");
       const data = response.data;
   
       if (response.status === 200) {
