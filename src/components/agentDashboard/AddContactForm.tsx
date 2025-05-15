@@ -1,8 +1,17 @@
-'use client'
+"use client"
 import { Save, X } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useAuth } from "../../context/AuthContext" // Make sure to adjust this path
 
 const AddContactForm = () => {
+  // Get authentication context
+  const { user, isAuthenticated } = useAuth()
+
+  // State for contact groups
+  const [contactGroups, setContactGroups] = useState([])
+  const [isLoadingGroups, setIsLoadingGroups] = useState(true)
+  const [groupsError, setGroupsError] = useState("")
+
   // Form state
   const [formData, setFormData] = useState({
     firstName: "",
@@ -17,7 +26,7 @@ const AddContactForm = () => {
     zipcode: "",
     companyTitle: "",
     website: "",
-    group:"",
+    group: "", // This will be converted to a number when sending to API
   })
 
   // Error state
@@ -34,26 +43,51 @@ const AddContactForm = () => {
     zipcode: "",
     companyTitle: "",
     website: "",
-    group:"",
+    group: "",
   })
 
-  // Form submission status
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState({ success: false, message: "" })
+  useEffect(() => {
+    const fetchContactGroups = async () => {
+      setIsLoadingGroups(true)
+      setGroupsError("")
 
-  // Handle input changes
+      try {
+        const authToken = localStorage.getItem("authToken")
+        const response = await fetch("http://192.168.1.24:3000/contacts/group", {
+          headers: {
+            ...(authToken && { Authorization: `Bearer ${authToken}` }),
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch groups: ${response.status}`)
+        }
+
+        const result = await response.json()
+        setContactGroups(Array.isArray(result) ? result : result.data || [])
+      } catch (error) {
+        console.error("Error fetching contact groups:", error)
+        setGroupsError("Failed to load contact groups. Please try again later.")
+      } finally {
+        setIsLoadingGroups(false)
+      }
+    }
+    if (isAuthenticated) {
+      fetchContactGroups()
+    }
+  }, [isAuthenticated])
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     })
-    
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ""
+        [name]: "",
       })
     }
   }
@@ -61,19 +95,19 @@ const AddContactForm = () => {
   // Validate form data
   const validateForm = () => {
     let isValid = true
-    const newErrors = {...errors}
-    
+    const newErrors = { ...errors }
+
     // Required fields
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required"
       isValid = false
     }
-    
+
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Last name is required"
       isValid = false
     }
-    
+
     // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required"
@@ -82,62 +116,79 @@ const AddContactForm = () => {
       newErrors.email = "Email is invalid"
       isValid = false
     }
-    
+
     // Phone number validation (basic)
-    if (formData.mobileNumber && !/^[0-9\-\+\(\)\s]{10,15}$/.test(formData.mobileNumber)) {
+    if (formData.mobileNumber && !/^[0-9\-+$$$$\s]{10,15}$/.test(formData.mobileNumber)) {
       newErrors.mobileNumber = "Please enter a valid phone number"
       isValid = false
     }
-    
+
     // Zip code validation (US format)
     if (formData.zipcode && !/^\d{5}(-\d{4})?$/.test(formData.zipcode)) {
       newErrors.zipcode = "Please enter a valid US zip code"
       isValid = false
     }
-    
+
     // Website validation (basic)
-    if (formData.website && !/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+[\/\w\.-]*$/.test(formData.website)) {
+    if (formData.website && !/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+[/\w.-]*$/.test(formData.website)) {
       newErrors.website = "Please enter a valid website URL"
       isValid = false
     }
-    
+
     setErrors(newErrors)
     return isValid
   }
 
-  // Handle form submission
+  // Handle form submission with authentication
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setSubmitStatus({
+        success: false,
+        message: "You must be logged in to add contacts",
+      })
+      return
+    }
+
     // Validate form before submission
     if (!validateForm()) {
       return
     }
-    
+
     setIsSubmitting(true)
     setSubmitStatus({ success: false, message: "" })
-    
+
     try {
-      const response = await fetch("/api/contacts", {
+      const authToken = localStorage.getItem("authToken")
+      const apiData = {
+        ...formData,
+        group: formData.group ? Number.parseInt(formData.group, 10) : 0, 
+        userId: user?.id,
+      }
+
+      const response = await fetch("/api/addcontacts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(authToken && { Authorization: `Bearer ${authToken}` }),
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiData),
       })
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status}`)
       }
-      
+
       // Success
-      const data = await response.json();
-      setSubmitStatus({ 
-        success: true, 
-        message: "Contact added successfully!" 
-      });
-      
+      const data = await response.json()
+      setSubmitStatus({
+        success: true,
+        message: "Contact added successfully!",
+      })
+
       // Reset form after successful submission
       setFormData({
         firstName: "",
@@ -152,45 +203,110 @@ const AddContactForm = () => {
         zipcode: "",
         companyTitle: "",
         website: "",
-        group:"",
-      });
-      
+        group: "",
+      })
     } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmitStatus({ 
-        success: false, 
-        message: error.message || "Failed to add contact. Please try again." 
-      });
+      console.error("Error submitting form:", error)
+      setSubmitStatus({
+        success: false,
+        message: error.message || "Failed to add contact. Please try again.",
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   // Array of all US states for dropdown
   const usStates = [
-    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
-    "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
-    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
-    "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
-    "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
-    "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", 
-    "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
-    "District of Columbia"
-  ];
+    "Alabama",
+    "Alaska",
+    "Arizona",
+    "Arkansas",
+    "California",
+    "Colorado",
+    "Connecticut",
+    "Delaware",
+    "Florida",
+    "Georgia",
+    "Hawaii",
+    "Idaho",
+    "Illinois",
+    "Indiana",
+    "Iowa",
+    "Kansas",
+    "Kentucky",
+    "Louisiana",
+    "Maine",
+    "Maryland",
+    "Massachusetts",
+    "Michigan",
+    "Minnesota",
+    "Mississippi",
+    "Missouri",
+    "Montana",
+    "Nebraska",
+    "Nevada",
+    "New Hampshire",
+    "New Jersey",
+    "New Mexico",
+    "New York",
+    "North Carolina",
+    "North Dakota",
+    "Ohio",
+    "Oklahoma",
+    "Oregon",
+    "Pennsylvania",
+    "Rhode Island",
+    "South Carolina",
+    "South Dakota",
+    "Tennessee",
+    "Texas",
+    "Utah",
+    "Vermont",
+    "Virginia",
+    "Washington",
+    "West Virginia",
+    "Wisconsin",
+    "Wyoming",
+    "District of Columbia",
+  ]
+
+  // If not authenticated, show login message (optional)
+  if (!isAuthenticated) {
+    return (
+      <div className="w-full mx-auto p-6 dark:bg-gray-900">
+        <div className="flex flex-col gap-6">
+          <h1 className="text-3xl font-light text-gray-800 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-4">
+            New Contact
+          </h1>
+          <div className="p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-100 dark:border-gray-700">
+            <p className="text-center text-gray-700 dark:text-gray-300">You need to be logged in to add contacts.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full mx-auto p-6 dark:bg-gray-900">
       <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-light text-gray-800 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-4">New Contact</h1>
+        <h1 className="text-3xl font-light text-gray-800 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-4">
+          New Contact
+        </h1>
 
         {/* Status message */}
         {submitStatus.message && (
-          <div className={`p-4 rounded-lg ${submitStatus.success ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
+          <div
+            className={`p-4 rounded-lg ${submitStatus.success ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200"}`}
+          >
             {submitStatus.message}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="w-full p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-8 border border-gray-100 dark:border-gray-700">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-8 border border-gray-100 dark:border-gray-700"
+        >
           {/* First row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
@@ -201,7 +317,7 @@ const AddContactForm = () => {
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="Enter your first name"
-                className={`w-full px-4 py-3 border ${errors.firstName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.firstName ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
             </div>
@@ -213,7 +329,7 @@ const AddContactForm = () => {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Enter your last name"
-                className={`w-full px-4 py-3 border ${errors.lastName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.lastName ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
             </div>
@@ -225,7 +341,7 @@ const AddContactForm = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className={`w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.email ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
@@ -241,7 +357,7 @@ const AddContactForm = () => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="Enter title (e.g. Manager)"
-                className={`w-full px-4 py-3 border ${errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.title ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
             </div>
@@ -253,7 +369,7 @@ const AddContactForm = () => {
                 value={formData.mobileNumber}
                 onChange={handleChange}
                 placeholder="Enter your mobile number"
-                className={`w-full px-4 py-3 border ${errors.mobileNumber ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.mobileNumber ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.mobileNumber && <p className="text-red-500 text-xs mt-1">{errors.mobileNumber}</p>}
             </div>
@@ -263,11 +379,11 @@ const AddContactForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Country</label>
-              <select 
+              <select
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border ${errors.country ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
+                className={`w-full px-4 py-3 border ${errors.country ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
               >
                 <option value="usa">United States of America</option>
                 <option value="canada">Canada</option>
@@ -278,15 +394,15 @@ const AddContactForm = () => {
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">State</label>
-              <select 
+              <select
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border ${errors.state ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
+                className={`w-full px-4 py-3 border ${errors.state ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
               >
                 <option value="">Select a state</option>
                 {usStates.map((state, index) => (
-                  <option key={index} value={state.toLowerCase().replace(/\s/g, '-')}>
+                  <option key={index} value={state.toLowerCase().replace(/\s/g, "-")}>
                     {state}
                   </option>
                 ))}
@@ -301,7 +417,7 @@ const AddContactForm = () => {
                 value={formData.city}
                 onChange={handleChange}
                 placeholder="Enter your city"
-                className={`w-full px-4 py-3 border ${errors.city ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.city ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
             </div>
@@ -316,7 +432,7 @@ const AddContactForm = () => {
                 value={formData.address}
                 onChange={handleChange}
                 placeholder="Enter your address"
-                className={`w-full px-4 py-3 border ${errors.address ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.address ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
             </div>
@@ -328,7 +444,7 @@ const AddContactForm = () => {
                 value={formData.zipcode}
                 onChange={handleChange}
                 placeholder="Enter your zip code"
-                className={`w-full px-4 py-3 border ${errors.zipcode ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.zipcode ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.zipcode && <p className="text-red-500 text-xs mt-1">{errors.zipcode}</p>}
             </div>
@@ -343,7 +459,7 @@ const AddContactForm = () => {
                 value={formData.companyTitle}
                 onChange={handleChange}
                 placeholder="Enter company title"
-                className={`w-full px-4 py-3 border ${errors.companyTitle ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.companyTitle ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.companyTitle && <p className="text-red-500 text-xs mt-1">{errors.companyTitle}</p>}
             </div>
@@ -355,7 +471,7 @@ const AddContactForm = () => {
                 value={formData.website}
                 onChange={handleChange}
                 placeholder="Enter company website"
-                className={`w-full px-4 py-3 border ${errors.website ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
+                className={`w-full px-4 py-3 border ${errors.website ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400`}
               />
               {errors.website && <p className="text-red-500 text-xs mt-1">{errors.website}</p>}
             </div>
@@ -363,16 +479,30 @@ const AddContactForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Groups</label>
-              <select 
+              <select
                 name="group"
                 value={formData.group}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border ${errors.group ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
+                disabled={isLoadingGroups}
+                className={`w-full px-4 py-3 border ${
+                  errors.group ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                } rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100 ${isLoadingGroups ? "opacity-70 cursor-not-allowed" : ""}`}
               >
-                <option value="usa">Groups....</option>
-                <option value="canada">Group1</option>
+                <option value="">Select a group</option>
+                {isLoadingGroups ? (
+                  <option disabled>Loading groups...</option>
+                ) : contactGroups && contactGroups.length > 0 ? (
+                  contactGroups.map((group) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No groups available</option>
+                )}
               </select>
-              {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
+              {groupsError && <p className="text-amber-500 text-xs mt-1">{groupsError}</p>}
+              {errors.group && <p className="text-red-500 text-xs mt-1">{errors.group}</p>}
             </div>
           </div>
           {/* Buttons */}
@@ -394,8 +524,8 @@ const AddContactForm = () => {
                   zipcode: "",
                   companyTitle: "",
                   website: "",
-                  group:"",
-                });
+                  group: "",
+                })
                 setErrors({
                   firstName: "",
                   lastName: "",
@@ -409,9 +539,9 @@ const AddContactForm = () => {
                   zipcode: "",
                   companyTitle: "",
                   website: "",
-                  group:"",
-                });
-                setSubmitStatus({ success: false, message: "" });
+                  group: "",
+                })
+                setSubmitStatus({ success: false, message: "" })
               }}
               className="px-6 py-3 rounded-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2 transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
             >
@@ -421,10 +551,10 @@ const AddContactForm = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-6 py-3 rounded-full bg-[#06AED7] text-white font-medium flex items-center gap-2 transition-all duration-300 hover:bg-[#0590b3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:ring-offset-2 dark:bg-[#06AED7] dark:hover:bg-[#0590b3] dark:focus:ring-[#00c1f5] ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+              className={`px-6 py-3 rounded-full bg-[#06AED7] text-white font-medium flex items-center gap-2 transition-all duration-300 hover:bg-[#0590b3] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:ring-offset-2 dark:bg-[#06AED7] dark:hover:bg-[#0590b3] dark:focus:ring-[#00c1f5] ${isSubmitting ? "opacity-75 cursor-not-allowed" : ""}`}
             >
               <Save size={18} />
-              {isSubmitting ? 'Saving...' : 'Save Contact'}
+              {isSubmitting ? "Saving..." : "Save Contact"}
             </button>
           </div>
         </form>

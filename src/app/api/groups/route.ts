@@ -35,12 +35,12 @@ export async function POST(request: NextRequest) {
       );
     } catch (apiError: any) {
       console.error("API: Error creating group:", apiError.response?.data || apiError.message);
-        // Check for network errors
-      if (apiError.code === 'ECONNREFUSED' || 
-          apiError.code === 'ETIMEDOUT' || 
-          apiError.code === 'ECONNABORTED' || 
-          apiError.message?.includes('timeout') ||
-          !apiError.response) {
+      // Check for network errors
+      if (apiError.code === 'ECONNREFUSED' ||
+        apiError.code === 'ETIMEDOUT' ||
+        apiError.code === 'ECONNABORTED' ||
+        apiError.message?.includes('timeout') ||
+        !apiError.response) {
         console.log("API: Backend server unreachable, using local fallback");
         
         // Create a local group as fallback when backend is unreachable
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         }
         
         return NextResponse.json(
-          { 
+          {
             message: "Group created locally (backend unavailable)",
             data: mockResponse,
             warning: "This group was created locally due to backend connectivity issues"
@@ -74,9 +74,9 @@ export async function POST(request: NextRequest) {
       
       // Return the error from the API or a fallback error
       return NextResponse.json(
-        { 
+        {
           error: apiError.response?.data?.message || "Failed to create group",
-          details: apiError.response?.data 
+          details: apiError.response?.data
         },
         { status: apiError.response?.status || 500 }
       );
@@ -89,3 +89,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
