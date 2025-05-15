@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Contact, Search, Pencil, Trash2, ChevronLeft, ChevronRight, X, Edit, Users } from "lucide-react"
+import axiosInstance from "@/lib/axios"
 
 const MyContacts = () => {
   const router = useRouter()
@@ -216,17 +217,10 @@ const MyContacts = () => {
     setApiError(null)
   
     try {
-      const response = await fetch("http://192.168.1.5:3000/contacts", {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      })
+      const response = await axiosInstance.get("/contacts/group");
+      const data = response.data;
   
-      const data = await response.json()
-  
-      if (response.ok) {
+      if (response.status === 200) {
         const dataArray = Array.isArray(data) ? data : [data]
         const formattedContacts = dataArray.map((contact) => ({
           id: contact.id,
@@ -270,21 +264,14 @@ const MyContacts = () => {
   const handleCreateGroup = async () => {
     if (name.trim()) {
       try {
-        // Call the API endpoint through Next.js API route
-        const response = await fetch('/api/contacts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Adding token directly here too
-          },
-          body: JSON.stringify({ 
-            name: name 
-          }),
+        // Call the API endpoint using axiosInstance
+        const response = await axiosInstance.post('/contacts/group', {
+          name: name
         });
 
-        const data = await response.json();
+        const data = response.data;
         
-        if (response.ok) {
+        if (response.status >= 200 && response.status < 300) {
           console.log('Group created successfully:', data);
           
           // Add the new group to the local state

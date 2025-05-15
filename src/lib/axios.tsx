@@ -14,9 +14,14 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
     
+    console.log('Auth Token:', token ? 'Present' : 'Not found'); // Debug line
+    
     // If token exists, add it to the authorization header
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
+      console.log('Added Authorization header'); // Debug line
+    } else {
+      console.log('No token available for request'); // Debug line
     }
     
     return config;
