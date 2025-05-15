@@ -1,6 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateUser, UserData } from "@/lib/authService";
 import axiosInstance from "@/lib/axios";
+import { error } from "console";
+
+
+// export async function GET(request: NextRequest) {
+//   try {
+//     // Call the backend API using the custom axios instance
+//     const response = await axiosInstance.get("/contacts/group"); // Verify if the endpoint is correct
+//     console.log("API: Groups fetch successful:", response.status);
+
+//     // Send the backend response back to the client
+//     return NextResponse.json(response.data, { status: 200 });
+//   } catch (apiError: any) {
+//     // Log the error for debugging
+//     console.error("API: Error fetching groups:", apiError.response?.data || apiError.message);
+
+//     if (
+//       apiError.code === "ECONNREFUSED" ||
+//       apiError.code === "ETIMEDOUT" ||
+//       apiError.code === "ECONNABORTED" ||
+//       apiError.message?.includes("timeout") ||
+//       !apiError.response
+//     ) {
+//       console.log("API: Backend server unreachable, using fallback");
+
+//       // Provide a fallback response when the backend is unreachable
+//       const fallbackResponse = {
+//         data: [], // Return an empty array or mock data
+//         message: "Backend unavailable, returning empty fallback data.",
+//       };
+
+//       return NextResponse.json(fallbackResponse, {
+//         status: 200,
+//         headers: {
+//           "X-Warning": "Backend unavailable, returning fallback data.",
+//         },
+//       });
+//     }
+
+//     // For other errors, return a structured error response to the client
+//     return NextResponse.json(
+//       {
+//         error: apiError.response?.data?.message || "Failed to fetch the groups",
+//         details: apiError.response?.data,
+//       },
+//       { status: apiError.response?.status || 500 }
+//     );
+//   }
+// }
 
 export async function POST(request: NextRequest) {
   try {

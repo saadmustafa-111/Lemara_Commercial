@@ -116,15 +116,15 @@ const MyContacts = () => {
   const [showEditGroupModal, setShowEditGroupModal] = useState(false)
   const [name, setname] = useState("")
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
-
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false)
+  const [contacts, setContacts] = useState([])
   // State for actions dropdown
   const [showActionsDropdown, setShowActionsDropdown] = useState(false)
 
+  const [isLoadingGroups, setIsLoadingGroups] = useState(false);
+  const [apiError,setApiError]=useState(null)
   // State for contact groups
-  const [contactGroups, setContactGroups] = useState([
-    { id: 1, title: "VIP Clients", contacts: [1, 5, 9] },
-    { id: 2, title: "Marketing Team", contacts: [2, 6, 10] },
-  ])
+  const [contactGroups, setContactGroups] = useState([])
 
   // State for selected group
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
@@ -165,13 +165,90 @@ const MyContacts = () => {
   const indexOfFirstContact = indexOfLastContact - rowsPerPage
   const currentContacts = filteredContacts.slice(indexOfFirstContact, indexOfLastContact)
   const totalPages = Math.ceil(filteredContacts.length / rowsPerPage)
-
+  // / Add this useEffect to fetch groups when component mounts
+  useEffect(() => {
+    fetchGroups()
+  }, [])
+  useEffect(() => {
+    fetchContacts()
+  }, [])
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, selectedGroup])
-
-  // Handle page change
+  // Function to fetch groups from API
+  const fetchGroups = async () => {
+    setIsLoadingGroups(true)
+    setApiError(null)
+  
+    try {
+      const response = await fetch("http://192.168.1.5:3000/contacts/group", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+      const data = await response.json()
+      if (response.ok) {
+        const dataArray = Array.isArray(data) ? data : [data];
+        const formattedGroups = dataArray.map((group) => ({
+          id: group.id,
+          title: group.name || "Untitled Group",
+          contacts: [],
+        }));
+        setContactGroups(formattedGroups)
+        console.log("Groups loaded:", formattedGroups); 
+      }
+      else {
+        setApiError(data.error || 'Failed to Load Contacts')
+      }
+    }
+    catch (error) {
+      setApiError(error.message || 'Failed to Load Contacts')
+    }
+    finally {
+      setIsLoadingGroups(false)
+    }
+  }
+  const fetchContacts = async () => {
+    setIsLoadingContacts(true)
+    setApiError(null)
+  
+    try {
+      const response = await fetch("http://192.168.1.5:3000/contacts", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      })
+  
+      const data = await response.json()
+  
+      if (response.ok) {
+        const dataArray = Array.isArray(data) ? data : [data]
+        const formattedContacts = dataArray.map((contact) => ({
+          id: contact.id,
+          firstName: contact.firstName || "Unnamed Contact",
+          lastName: contact.lastName || "",
+          title: contact.title || "",
+          phone: contact.mobileNumber || "",
+          email: contact.email || "",
+          company: contact.companyTitle || "",
+        }))
+        setContacts(formattedContacts)
+        console.log("Contacts loaded:", formattedContacts)
+      } else {
+        setApiError(data.error || 'Failed to load contacts')
+      }
+    } catch (error) {
+      setApiError(error.message || 'Failed to load contacts')
+    } finally {
+      setIsLoadingContacts(false)
+    }
+  }
+  
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
   }
@@ -341,6 +418,7 @@ const MyContacts = () => {
     <>
       <div className="flex flex-col gap-4 w-full p-4 dark:bg-gray-900">
         {/* Notification */}
+ 
         {notification.show && (
           <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md flex items-center ${
             notification.type === 'success' 
@@ -436,34 +514,59 @@ const MyContacts = () => {
 
         {/* Group buttons */}
         <div className="flex flex-wrap gap-3 mt-2">
-          {contactGroups.map((group) => (
-            <button
-              key={group.id}
-              onClick={() => handleGroupSelection(group.id)}
-              className={`px-4 py-2 rounded-full border flex items-center gap-2 transition-all duration-300 ${
-                selectedGroup === group.id
-                  ? "bg-[#06AED7] text-white border-[#06AED7] dark:bg-[#0590b3] dark:border-[#0590b3]"
-                  : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
-              }`}
-            >
-              <Users size={16} />
-              {group.title}
-              {selectedGroup === group.id && (
-                <span className="ml-1 text-xs bg-white text-[#06AED7] dark:bg-gray-800 dark:text-[#00c1f5] rounded-full px-2 py-0.5">
-                  {group.contacts.length}
-                </span>
-              )}
-            </button>
-          ))}
+  {isLoadingGroups ? (
+    <div className="flex items-center text-gray-500 dark:text-gray-400">
+      <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Loading groups...
+    </div>
+  ) : apiError ? (
+    <div className="text-red-500 dark:text-red-400 flex items-center">
+      <span className="mr-2">⚠️</span> {apiError}
+      <button 
+        onClick={fetchGroups} 
+        className="ml-2 text-[#06AED7] dark:text-[#00c1f5] hover:underline"
+      >
+        Retry
+      </button>
+    </div>
+  ) : contactGroups.length === 0 ? (
+    <div className="text-gray-500 dark:text-gray-400">
+      No groups available. Create your first group!
+    </div>
+  ) : (
+    <>
+      {contactGroups.map((group) => (
+        <button
+          key={group.id}
+          onClick={() => handleGroupSelection(group.id)}
+          className={`px-4 py-2 rounded-full border flex items-center gap-2 transition-all duration-300 ${
+            selectedGroup === group.id
+              ? "bg-[#06AED7] text-white border-[#06AED7] dark:bg-[#0590b3] dark:border-[#0590b3]"
+              : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+          }`}
+        >
+          <Users size={16} />
+          {group.title}
+          {selectedGroup === group.id && (
+            <span className="ml-1 text-xs bg-white text-[#06AED7] dark:bg-gray-800 dark:text-[#00c1f5] rounded-full px-2 py-0.5">
+              {group.contacts.length}
+            </span>
+          )}
+        </button>
+      ))}
+    </>
+  )}
 
-          <button
-            onClick={() => setShowGroupModal(true)}
-            className="px-4 py-2 rounded-full border  border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-[#06AED7] hover:text-[#06AED7] dark:hover:border-[#00c1f5] dark:hover:text-[#00c1f5] flex items-center gap-2 transition-colors"
-          >
-            <span>+</span> Create New Group
-          </button>
-        </div>
-
+  <button
+    onClick={() => setShowGroupModal(true)}
+    className="px-4 py-2 rounded-full border border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-[#06AED7] hover:text-[#06AED7] dark:hover:border-[#00c1f5] dark:hover:text-[#00c1f5] flex items-center gap-2 transition-colors"
+  >
+    <span>+</span> Create New Group
+  </button>
+</div>
         {selectedGroup && (
           <div className="flex items-center mt-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -500,7 +603,13 @@ const MyContacts = () => {
                     scope="col"
                     className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
                   >
-                    Name
+                    FirstName
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                  >
+                    LastName
                   </th>
                   <th
                     scope="col"
@@ -535,62 +644,53 @@ const MyContacts = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {currentContacts.length > 0 ? (
-                  currentContacts.map((contact) => (
-                    <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {contact.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {contact.title}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {contact.phone}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {contact.email}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {contact.company}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-3">
-                          <button
-                            onClick={() => handleEditContact(contact.id)}
-                            className="text-[#06AED7] hover:text-[#048eb1] transition-colors dark:text-[#00c1f5] dark:hover:text-[#00a9d9]"
-                          >
-                            <Pencil size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteContact(contact.id)}
-                            className="text-red-500 hover:text-red-700 transition-colors dark:text-red-400 dark:hover:text-red-300"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                      {selectedGroup ? (
-                        <>
-                          <Users className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" />
-                          <p className="text-lg font-medium">No contacts in this group</p>
-                          <p className="text-sm mt-1">This group doesn't have any contacts yet.</p>
-                        </>
-                      ) : (
-                        <>
-                          <Search className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" />
-                          <p className="text-lg font-medium">No contacts found</p>
-                          <p className="text-sm mt-1">Try adjusting your search or filter criteria.</p>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
+  {contacts.length > 0 ? (
+    contacts.map((contact) => (
+      <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+          {contact.firstName}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+          {contact.lastName}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {contact.title}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {contact.phone}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {contact.email}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+          {contact.company}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div className="flex space-x-3">
+            <button
+              onClick={() => handleEditContact(contact.id)}
+              className="text-[#06AED7] hover:text-[#048eb1] transition-colors dark:text-[#00c1f5] dark:hover:text-[#00a9d9]"
+            >
+              <Pencil size={18} />
+            </button>
+            <button
+              onClick={() => handleDeleteContact(contact.id)}
+              className="text-red-500 hover:text-red-700 transition-colors dark:text-red-400 dark:hover:text-red-300"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+        No contacts found
+      </td>
+    </tr>
+  )}
+</tbody>
             </table>
           </div>
 

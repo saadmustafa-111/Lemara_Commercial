@@ -55,7 +55,8 @@ const AddContactForm = () => {
 
       try {
         const authToken = localStorage.getItem("authToken")
-        const response = await fetch("http://192.168.1.24:3000/contacts/group", {
+        const response = await fetch("http://192.168.1.5:3000/contacts/group", {
+        // const response = await fetch("/api/groups", {
           headers: {
             ...(authToken && { Authorization: `Bearer ${authToken}` }),
           },
