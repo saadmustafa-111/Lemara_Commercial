@@ -2,17 +2,15 @@
 import { Save, X } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useAuth } from "../../context/AuthContext" // Make sure to adjust this path
-
+import axiosInstance from "@/lib/axios"
 const AddContactForm = () => {
-  // Get authentication context
+
   const { user, isAuthenticated } = useAuth()
 
-  // State for contact groups
   const [contactGroups, setContactGroups] = useState([])
   const [isLoadingGroups, setIsLoadingGroups] = useState(true)
   const [groupsError, setGroupsError] = useState("")
 
-  // Form state
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -26,7 +24,7 @@ const AddContactForm = () => {
     zipcode: "",
     companyTitle: "",
     website: "",
-    group: "", // This will be converted to a number when sending to API
+    group: "",
   })
 
   // Error state
@@ -142,54 +140,40 @@ const AddContactForm = () => {
 
   // Handle form submission with authentication
   const handleSubmit = async (e) => {
-    e.preventDefault()
-
+    e.preventDefault();
+  
     // Check if user is authenticated
     if (!isAuthenticated) {
       setSubmitStatus({
         success: false,
         message: "You must be logged in to add contacts",
-      })
-      return
+      });
+      return;
     }
-
+  
     // Validate form before submission
     if (!validateForm()) {
-      return
+      return;
     }
-
-    setIsSubmitting(true)
-    setSubmitStatus({ success: false, message: "" })
-
+  
+    setIsSubmitting(true);
+    setSubmitStatus({ success: false, message: "" });
+  
     try {
-      const authToken = localStorage.getItem("authToken")
       const apiData = {
         ...formData,
-        group: formData.group ? Number.parseInt(formData.group, 10) : 0, 
+        group: formData.group ? Number.parseInt(formData.group, 10) : 0,
         userId: user?.id,
-      }
-
-      const response = await fetch("/api/addcontacts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken && { Authorization: `Bearer ${authToken}` }),
-        },
-        body: JSON.stringify(apiData),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `Error: ${response.status}`)
-      }
-
+      };
+  
+      const response = await axiosInstance.post("/contacts", apiData);
+  
       // Success
-      const data = await response.json()
       setSubmitStatus({
         success: true,
         message: "Contact added successfully!",
-      })
-
+      });
+  
       // Reset form after successful submission
       setFormData({
         firstName: "",
@@ -205,18 +189,17 @@ const AddContactForm = () => {
         companyTitle: "",
         website: "",
         group: "",
-      })
+      });
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Error submitting form:", error);
       setSubmitStatus({
         success: false,
         message: error.message || "Failed to add contact. Please try again.",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
-
+  };
   // Array of all US states for dropdown
   const usStates = [
     "Alabama",
