@@ -122,20 +122,20 @@ const MyContacts = () => {
   // State for actions dropdown
   const [showActionsDropdown, setShowActionsDropdown] = useState(false)
 
-  const [isLoadingGroups, setIsLoadingGroups] = useState(false);
-  const [apiError,setApiError]=useState(null)
+  const [isLoadingGroups, setIsLoadingGroups] = useState(false)
+  const [apiError, setApiError] = useState(null)
   // State for contact groups
   const [contactGroups, setContactGroups] = useState([])
 
   // State for selected group
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
-  
+
   // State for notification
   const [notification, setNotification] = useState<{
-    show: boolean;
-    message: string;
-    type: 'success' | 'error';
-  }>({ show: false, message: '', type: 'success' });
+    show: boolean
+    message: string
+    type: "success" | "error"
+  }>({ show: false, message: "", type: "success" })
 
   // State for showing delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -181,45 +181,42 @@ const MyContacts = () => {
   const fetchGroups = async () => {
     setIsLoadingGroups(true)
     setApiError(null)
-  
+
     try {
-      const response = await fetch("http://192.168.1.5:3000/contacts/group", {
-        method: 'GET',
+      const response = await fetch("http://192.168.1.11:3000/contacts/group", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
       })
       const data = await response.json()
       if (response.ok) {
-        const dataArray = Array.isArray(data) ? data : [data];
+        const dataArray = Array.isArray(data) ? data : [data]
         const formattedGroups = dataArray.map((group) => ({
           id: group.id,
           title: group.name || "Untitled Group",
           contacts: [],
-        }));
+        }))
         setContactGroups(formattedGroups)
-        console.log("Groups loaded:", formattedGroups); 
+        console.log("Groups loaded:", formattedGroups)
+      } else {
+        setApiError(data.error || "Failed to Load Contacts")
       }
-      else {
-        setApiError(data.error || 'Failed to Load Contacts')
-      }
-    }
-    catch (error) {
-      setApiError(error.message || 'Failed to Load Contacts')
-    }
-    finally {
+    } catch (error) {
+      setApiError(error.message || "Failed to Load Contacts")
+    } finally {
       setIsLoadingGroups(false)
     }
   }
   const fetchContacts = async () => {
     setIsLoadingContacts(true)
     setApiError(null)
-  
+
     try {
-      const response = await axiosInstance.get("/contacts");
-      const data = response.data;
-  
+      const response = await axiosInstance.get("/contacts")
+      const data = response.data
+
       if (response.status === 200) {
         const dataArray = Array.isArray(data) ? data : [data]
         const formattedContacts = dataArray.map((contact) => ({
@@ -234,15 +231,15 @@ const MyContacts = () => {
         setContacts(formattedContacts)
         console.log("Contacts loaded:", formattedContacts)
       } else {
-        setApiError(data.error || 'Failed to load contacts')
+        setApiError(data.error || "Failed to load contacts")
       }
     } catch (error) {
-      setApiError(error.message || 'Failed to load contacts')
+      setApiError(error.message || "Failed to load contacts")
     } finally {
       setIsLoadingContacts(false)
     }
   }
-  
+
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
   }
@@ -253,11 +250,71 @@ const MyContacts = () => {
     setShowDeleteContactModal(true)
   }
 
+  // Modify the handleEditContact function to open a modal instead of navigating to a different page
+  const [showEditContactModal, setShowEditContactModal] = useState(false)
+  const [contactToEdit, setContactToEdit] = useState(null)
+
   // Handle edit contact
   const handleEditContact = (id: number) => {
-    // In a real app, you would navigate to an edit page with this ID
-    console.log(`Edit contact with ID: ${id}`)
-    router.push(`/dashboard/agent/editcontact/${id}`)
+    const contactData = contacts.find((contact) => contact.id === id)
+    setContactToEdit(contactData)
+    setShowEditContactModal(true)
+  }
+
+  // Add this new function after handleEditContact
+  const handleUpdateContact = async () => {
+    if (!contactToEdit) return
+
+    try {
+      setNotification({
+        show: false,
+        message: "",
+        type: "success",
+      })
+
+      const response = await fetch(`http://192.168.1.14:3000/contacts/${contactToEdit.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          firstName: contactToEdit.firstName,
+          lastName: contactToEdit.lastName,
+          title: contactToEdit.title,
+          mobileNumber: contactToEdit.phone,
+          email: contactToEdit.email,
+          companyTitle: contactToEdit.company,
+        }),
+      })
+
+      if (response.ok) {
+        // Update the contact in the local state
+        const updatedContacts = contacts.map((contact) => (contact.id === contactToEdit.id ? contactToEdit : contact))
+        setContacts(updatedContacts)
+        setShowEditContactModal(false)
+        setContactToEdit(null)
+
+        setNotification({
+          show: true,
+          message: "Contact updated successfully!",
+          type: "success",
+        })
+
+        // Refresh contacts list
+        fetchContacts()
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to update contact")
+      }
+    } catch (error) {
+      console.error("Error updating contact:", error)
+      setNotification({
+        show: true,
+        message: error.message || "Error updating contact. Please try again.",
+        type: "error",
+      })
+    }
   }
 
   // Handle create group
@@ -265,15 +322,15 @@ const MyContacts = () => {
     if (name.trim()) {
       try {
         // Call the API endpoint using axiosInstance
-        const response = await axiosInstance.post('/contacts/group', {
-          name: name
-        });
+        const response = await axiosInstance.post("/contacts/group", {
+          name: name,
+        })
 
-        const data = response.data;
-        
+        const data = response.data
+
         if (response.status >= 200 && response.status < 300) {
-          console.log('Group created successfully:', data);
-          
+          console.log("Group created successfully:", data)
+
           // Add the new group to the local state
           const newGroup = {
             id: contactGroups.length + 1,
@@ -284,47 +341,47 @@ const MyContacts = () => {
           setContactGroups([...contactGroups, newGroup])
           setname("")
           setShowGroupModal(false)
-          
+
           // Show success notification
           setNotification({
             show: true,
-            message: 'Group created successfully!',
-            type: 'success'
-          });
-          
+            message: "Group created successfully!",
+            type: "success",
+          })
+
           // Hide notification after 3 seconds
           setTimeout(() => {
-            setNotification({ show: false, message: '', type: 'success' });
-          }, 3000);
+            setNotification({ show: false, message: "", type: "success" })
+          }, 3000)
         } else {
-          console.error('Failed to create group:', data);
-          
+          console.error("Failed to create group:", data)
+
           // Show detailed error notification
           setNotification({
             show: true,
-            message: data.error || data.details?.message || 'Failed to create group. Please try again.',
-            type: 'error'
-          });
-          
+            message: data.error || data.details?.message || "Failed to create group. Please try again.",
+            type: "error",
+          })
+
           // Hide notification after 3 seconds
           setTimeout(() => {
-            setNotification({ show: false, message: '', type: 'success' });
-          }, 3000);
+            setNotification({ show: false, message: "", type: "success" })
+          }, 3000)
         }
       } catch (error) {
-        console.error('Error creating group:', error);
-        
+        console.error("Error creating group:", error)
+
         // Show error notification
         setNotification({
           show: true,
-          message: 'Error creating group. Please try again.',
-          type: 'error'
-        });
-        
+          message: "Error creating group. Please try again.",
+          type: "error",
+        })
+
         // Hide notification after 3 seconds
         setTimeout(() => {
-          setNotification({ show: false, message: '', type: 'success' });
-        }, 3000);
+          setNotification({ show: false, message: "", type: "success" })
+        }, 3000)
       }
     }
   }
@@ -373,14 +430,52 @@ const MyContacts = () => {
   }
 
   // Confirm contact deletion
-  const confirmDeleteContact = () => {
+  const confirmDeleteContact = async () => {
     if (contactToDelete) {
-      // In a real app, you would call an API to delete the contact
-      console.log(`Deleting contact with ID: ${contactToDelete}`)
-      // Here you would typically make an API call to delete the contact
-      // For now, we'll just close the modal
-      setContactToDelete(null)
-      setShowDeleteContactModal(false)
+      try {
+        setNotification({
+          show: false,
+          message: "",
+          type: "success",
+        })
+
+        const response = await fetch(`http://192.168.1.14:3000/contacts/${contactToDelete}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        })
+
+        if (response.ok) {
+          // Remove the contact from the local state
+          const updatedContacts = contacts.filter((contact) => contact.id !== contactToDelete)
+          setContacts(updatedContacts)
+
+          setNotification({
+            show: true,
+            message: "Contact deleted successfully!",
+            type: "success",
+          })
+
+          // Close the modal
+          setContactToDelete(null)
+          setShowDeleteContactModal(false)
+
+          // Refresh contacts list
+          fetchContacts()
+        } else {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Failed to delete contact")
+        }
+      } catch (error) {
+        console.error("Error deleting contact:", error)
+        setNotification({
+          show: true,
+          message: error.message || "Error deleting contact. Please try again.",
+          type: "error",
+        })
+      }
     }
   }
 
@@ -405,26 +500,40 @@ const MyContacts = () => {
     <>
       <div className="flex flex-col gap-4 w-full p-4 dark:bg-gray-900">
         {/* Notification */}
- 
+
         {notification.show && (
-          <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md flex items-center ${
-            notification.type === 'success' 
-              ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 border-l-4 border-green-500' 
-              : 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100 border-l-4 border-red-500'
-          }`}>
+          <div
+            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md flex items-center ${
+              notification.type === "success"
+                ? "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 border-l-4 border-green-500"
+                : "bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100 border-l-4 border-red-500"
+            }`}
+          >
             <div className="mr-3">
-              {notification.type === 'success' ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              {notification.type === "success" ? (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               )}
             </div>
             <div className="flex-1">{notification.message}</div>
-            <button 
+            <button
               onClick={() => setNotification({ ...notification, show: false })}
               className="ml-auto text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
             >
@@ -432,7 +541,7 @@ const MyContacts = () => {
             </button>
           </div>
         )}
-        
+
         <div className="flex items-center gap-3">
           <span>
             <Contact size={50} color="#06AED7" />
@@ -501,59 +610,66 @@ const MyContacts = () => {
 
         {/* Group buttons */}
         <div className="flex flex-wrap gap-3 mt-2">
-  {isLoadingGroups ? (
-    <div className="flex items-center text-gray-500 dark:text-gray-400">
-      <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Loading groups...
-    </div>
-  ) : apiError ? (
-    <div className="text-red-500 dark:text-red-400 flex items-center">
-      <span className="mr-2">⚠️</span> {apiError}
-      <button 
-        onClick={fetchGroups} 
-        className="ml-2 text-[#06AED7] dark:text-[#00c1f5] hover:underline"
-      >
-        Retry
-      </button>
-    </div>
-  ) : contactGroups.length === 0 ? (
-    <div className="text-gray-500 dark:text-gray-400">
-      No groups available. Create your first group!
-    </div>
-  ) : (
-    <>
-      {contactGroups.map((group) => (
-        <button
-          key={group.id}
-          onClick={() => handleGroupSelection(group.id)}
-          className={`px-4 py-2 rounded-full border flex items-center gap-2 transition-all duration-300 ${
-            selectedGroup === group.id
-              ? "bg-[#06AED7] text-white border-[#06AED7] dark:bg-[#0590b3] dark:border-[#0590b3]"
-              : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
-          }`}
-        >
-          <Users size={16} />
-          {group.title}
-          {selectedGroup === group.id && (
-            <span className="ml-1 text-xs bg-white text-[#06AED7] dark:bg-gray-800 dark:text-[#00c1f5] rounded-full px-2 py-0.5">
-              {group.contacts.length}
-            </span>
+          {isLoadingGroups ? (
+            <div className="flex items-center text-gray-500 dark:text-gray-400">
+              <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Loading groups...
+            </div>
+          ) : apiError ? (
+            <div className="text-red-500 dark:text-red-400 flex items-center">
+              <span className="mr-2">⚠️</span> {apiError}
+              <button onClick={fetchGroups} className="ml-2 text-[#06AED7] dark:text-[#00c1f5] hover:underline">
+                Retry
+              </button>
+            </div>
+          ) : contactGroups.length === 0 ? (
+            <div className="text-gray-500 dark:text-gray-400">No groups available. Create your first group!</div>
+          ) : (
+            <>
+              {contactGroups.map((group) => (
+                <button
+                  key={group.id}
+                  onClick={() => handleGroupSelection(group.id)}
+                  className={`px-4 py-2 rounded-full border flex items-center gap-2 transition-all duration-300 ${
+                    selectedGroup === group.id
+                      ? "bg-[#06AED7] text-white border-[#06AED7] dark:bg-[#0590b3] dark:border-[#0590b3]"
+                      : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700"
+                  }`}
+                >
+                  <Users size={16} />
+                  {group.title}
+                  {selectedGroup === group.id && (
+                    <span className="ml-1 text-xs bg-white text-[#06AED7] dark:bg-gray-800 dark:text-[#00c1f5] rounded-full px-2 py-0.5">
+                      {group.contacts.length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </>
           )}
-        </button>
-      ))}
-    </>
-  )}
 
-  <button
-    onClick={() => setShowGroupModal(true)}
-    className="px-4 py-2 rounded-full border border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-[#06AED7] hover:text-[#06AED7] dark:hover:border-[#00c1f5] dark:hover:text-[#00c1f5] flex items-center gap-2 transition-colors"
-  >
-    <span>+</span> Create New Group
-  </button>
-</div>
+          <button
+            onClick={() => setShowGroupModal(true)}
+            className="px-4 py-2 rounded-full border border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-[#06AED7] hover:text-[#06AED7] dark:hover:border-[#00c1f5] dark:hover:text-[#00c1f5] flex items-center gap-2 transition-colors"
+          >
+            <span>+</span> Create New Group
+          </button>
+        </div>
         {selectedGroup && (
           <div className="flex items-center mt-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -631,53 +747,53 @@ const MyContacts = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-  {contacts.length > 0 ? (
-    contacts.map((contact) => (
-      <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-          {contact.firstName}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-          {contact.lastName}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-          {contact.title}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-          {contact.phone}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-          {contact.email}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-          {contact.company}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          <div className="flex space-x-3">
-            <button
-              onClick={() => handleEditContact(contact.id)}
-              className="text-[#06AED7] hover:text-[#048eb1] transition-colors dark:text-[#00c1f5] dark:hover:text-[#00a9d9]"
-            >
-              <Pencil size={18} />
-            </button>
-            <button
-              onClick={() => handleDeleteContact(contact.id)}
-              className="text-red-500 hover:text-red-700 transition-colors dark:text-red-400 dark:hover:text-red-300"
-            >
-              <Trash2 size={18} />
-            </button>
-          </div>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-        No contacts found
-      </td>
-    </tr>
-  )}
-</tbody>
+                {contacts.length > 0 ? (
+                  contacts.map((contact) => (
+                    <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        {contact.firstName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        {contact.lastName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        {contact.title}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        {contact.phone}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        {contact.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                        {contact.company}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => handleEditContact(contact.id)}
+                            className="text-[#06AED7] hover:text-[#048eb1] transition-colors dark:text-[#00c1f5] dark:hover:text-[#00a9d9]"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteContact(contact.id)}
+                            className="text-red-500 hover:text-red-700 transition-colors dark:text-red-400 dark:hover:text-red-300"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                      No contacts found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
             </table>
           </div>
 
@@ -809,10 +925,7 @@ const MyContacts = () => {
               <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
 
               <div className="mb-6">
-                <label
-                  htmlFor="name"
-                  className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label htmlFor="name" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Enter the title for your new group
                 </label>
                 <input
@@ -1004,6 +1117,109 @@ const MyContacts = () => {
                   className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
                 >
                   Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Edit Contact Modal */}
+      {showEditContactModal && contactToEdit && (
+        <>
+          {/* Backdrop blur overlay */}
+          <div className="fixed inset-0 bg-white bg-opacity-20 backdrop-blur-sm z-40"></div>
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-8 w-full max-w-2xl pointer-events-auto border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#06AED7] dark:bg-[#0590b3] rounded-full p-2 text-white">
+                    <Edit size={24} />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Edit Contact</h3>
+                </div>
+                <button
+                  onClick={() => setShowEditContactModal(false)}
+                  className="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 p-2 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
+
+              {/* Contact Form Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={contactToEdit.firstName || ""}
+                    onChange={(e) => setContactToEdit({ ...contactToEdit, firstName: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={contactToEdit.lastName || ""}
+                    onChange={(e) => setContactToEdit({ ...contactToEdit, lastName: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                  <input
+                    type="text"
+                    value={contactToEdit.title || ""}
+                    onChange={(e) => setContactToEdit({ ...contactToEdit, title: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                  <input
+                    type="text"
+                    value={contactToEdit.phone || ""}
+                    onChange={(e) => setContactToEdit({ ...contactToEdit, phone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={contactToEdit.email || ""}
+                    onChange={(e) => setContactToEdit({ ...contactToEdit, email: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
+                  <input
+                    type="text"
+                    value={contactToEdit.company || ""}
+                    onChange={(e) => setContactToEdit({ ...contactToEdit, company: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowEditContactModal(false)}
+                  className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateContact}
+                  className="px-6 py-3 bg-[#06AED7] dark:bg-[#0590b3] text-white rounded-lg hover:bg-[#048eb1] dark:hover:bg-[#047a96] transition-colors font-medium"
+                >
+                  Save Changes
                 </button>
               </div>
             </div>

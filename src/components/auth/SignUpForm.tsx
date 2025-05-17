@@ -49,6 +49,7 @@ export default function SignUpForm() {
     instagram: "",
     nmls: "",
     dre: "",
+    association:"",
     role: selectedRoleFromQuery || Role.USER,
   })
   const [errors, setErrors] = useState({
@@ -63,6 +64,7 @@ export default function SignUpForm() {
     linkedIn: "",
     twitter: "",
     instagram: "",
+    association:"",
     nmls: "",
     dre: "",
     role: "",
@@ -101,6 +103,91 @@ export default function SignUpForm() {
     },
     icon: "⚠️",
   }
+  const Associations = [
+    "Amador County Association Of Realtors®",
+  "Arcadia Association Of Realtors®",
+  "Bakersfield Association Of Realtors® Inc",
+  "Bay Area Real Estate Information Service",
+  "Bay East Association Of Realtors®",
+  "Beverly Hills/Greater Los Angeles AOR",
+  "Big Bear Association Of Realtors®",
+  "Bridge Association Of Realtors®",
+  "Burbank Association Of Realtors®",
+  "Calaveras County Association Of Realtors®",
+  "California Association Of Realtors® Inc",
+  "California Desert Association Of Realtors®",
+  "Central Valley Association Of Realtors® Inc",
+  "Citrus Valley Association Of Realtors®",
+  "Conejo Simi Moorpark Association of REALTORS®",
+  "Contra Costa Association Of Realtors®",
+  "Downey Association Of Realtors®",
+  "East Bay Association Of Realtors® Inc",
+  "El Dorado County Association Of Realtors®",
+  "Fresno Association Of Realtors®",
+  "Glendale Association Of Realtors®",
+  "Greater Antelope Valley Association of REALTORS®",
+  "High Desert Association Of Realtors®",
+  "Humboldt Association Of Realtors®",
+  "Imperial County Association Of Realtors®",
+  "Inland Valleys Association Of Realtors®",
+  "Kern River Lake Isabella Board Of Realtors® Inc",
+  "Kings County Board Of Realtors®",
+  "Lake County Association Of Realtors®",
+  "Lake Tahoe Board Of Realtors®",
+  "Lassen Association Of Realtors®",
+  "Madera Association Of Realtors®",
+  "Marin Association Of Realtors®",
+  "Mariposa County Board Of Realtors®",
+  "Mendocino Association Of Realtors®",
+  "Merced County Association Of Realtors®",
+  "Monterey County Association Of Realtors® Inc",
+  "Napa Valley Vintners",
+  "Nevada County Association Of Realtors®",
+  "Northern Solano County Association Of Realtors®",
+  "North San Diego County Association Of Realtors®",
+  "North Santa Barbara County Regional MLS",
+  "Orange County Association Of Realtors®",
+  "Pacific West Association Of Realtors®",
+  "Palm Springs Regional Association Of Realtors®",
+  "Palos Verdes Board Of Realtors®",
+  "Pasadena-Foothills Association Of Realtors®",
+  "Placer County Association Of Realtors®",
+  "Plumas Association Of Realtors®",
+  "Real Estate Business Service",
+  "Ridgecrest Area Association Of Realtors®",
+  "Russian River Real Estate",
+  "Sacramento Association Of Realtors®",
+  "San Benito County Association Of Realtors®",
+  "San Diego Association Of Realtors®",
+  "San Francisco Association Of Realtors®",
+  "San Francisco Multiple Listing Service Inc",
+  "San Luis Obispo Association Of Realtors®",
+  "San Mateo County Association Of Realtors®",
+  "Santa Barbara Association Of Realtors®",
+  "Santa Clara County Association Of Realtors®",
+  "Santa Cruz County Association Of Realtors®",
+  "Santa Maria Association Of Realtors®",
+  "Santa Ynez Valley Association Of Realtors®",
+  "Shasta Association Of Realtors®",
+  "Sierra North Valley Association Of Realtors®",
+  "Siskiyou Association Of Realtors®",
+  "Solano Association Of Realtors®",
+  "Southland Regional Association Of Realtors®",
+  "Southwest Riverside County Association Of Realtors®",
+  "Stanislaus County Multiple Listing Service",
+  "Sutter/Yuba Association Of Realtors®",
+  "Tehama County Association Of Realtors®",
+  "Trinity County Association Of Realtors®",
+  "Tulare County Association Of Realtors®",
+  "Tuolumne County Association Of Realtors®",
+  "United Multiple Listing Service Inc",
+  "Ventura County Coastal Association Of Realtors®",
+  "West Contra Costa Association Of Realtors®",
+  "West San Gabriel Valley Association Of Realtors®",
+  "Western Nevada County Association Of Realtors®",
+  "Women's Council Of Realtors® Santa Clara Chapter",
+  "Yosemite Gateway Association Of Realtors®"
+  ]
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
 
@@ -557,6 +644,24 @@ export default function SignUpForm() {
                 className="bg-white text-gray-800 !rounded-lg border-gray-300 focus:border-[#366084] focus:ring-[#366084] shadow-sm"
               />
             </div>
+            <div className="space-y-2">
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Association</label>
+  <select
+    name="association"
+    value={formData.association}
+    onChange={handleChange}
+    className={`w-full px-4 py-3 border ${errors.association ? "border-red-500" : "border-gray-300 dark:border-gray-600"} rounded-full bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] appearance-none cursor-pointer text-gray-800 dark:text-gray-100`}
+  >
+    <option value="">Select Association</option>
+    {Associations.map((assoc, index) => (
+      <option key={index} value={assoc}>
+        {assoc}
+      </option>
+    ))}
+  </select>
+  {errors.association && <p className="text-red-500 text-xs mt-1">{errors.association}</p>}
+</div>
+
             {/* NMLS  */}
             <div>
               <Label htmlFor="address" className="mb-1 text-gray-700 font-medium text-sm">

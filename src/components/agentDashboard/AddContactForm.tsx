@@ -53,7 +53,7 @@ const AddContactForm = () => {
 
       try {
         const authToken = localStorage.getItem("authToken")
-        const response = await fetch("http://192.168.1.5:3000/contacts/group", {
+        const response = await fetch("http://192.168.1.14:3000/contacts/group", {
         // const response = await fetch("/api/groups", {
           headers: {
             ...(authToken && { Authorization: `Bearer ${authToken}` }),
@@ -91,7 +91,7 @@ const AddContactForm = () => {
     }
   }
 
-  // Validate form data
+  
   const validateForm = () => {
     let isValid = true
     const newErrors = { ...errors }
@@ -113,12 +113,6 @@ const AddContactForm = () => {
       isValid = false
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid"
-      isValid = false
-    }
-
-    // Phone number validation (basic)
-    if (formData.mobileNumber && !/^[0-9\-+$$$$\s]{10,15}$/.test(formData.mobileNumber)) {
-      newErrors.mobileNumber = "Please enter a valid phone number"
       isValid = false
     }
 
@@ -254,7 +248,7 @@ const AddContactForm = () => {
     "Wyoming",
     "District of Columbia",
   ]
-
+ 
   // If not authenticated, show login message (optional)
   if (!isAuthenticated) {
     return (
