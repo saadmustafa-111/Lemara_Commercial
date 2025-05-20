@@ -150,6 +150,12 @@ const MyContacts = () => {
           phone: contact.mobileNumber || "",
           email: contact.email || "",
           company: contact.companyTitle || "",
+          country: contact.country || "",
+          state: contact.state || "",
+          city: contact.city || "",
+          address: contact.address || "",
+          zip: contact.zip || "",
+          website:contact.website || "",
         }))
         setContacts(formattedContacts)
         console.log("Contacts loaded:", formattedContacts)
@@ -183,6 +189,12 @@ const MyContacts = () => {
           phone: contact.mobileNumber || "",
           email: contact.email || "",
           company: contact.companyTitle || "",
+          country: contact.country || "",
+          state: contact.state || "",
+          city: contact.city || "",
+          address: contact.address || "",
+          zip: contact.zip || "",
+          website:contact.website || "",
         }))
         setContacts(formattedContacts)
         console.log("Group contacts loaded:", formattedContacts)
@@ -236,6 +248,12 @@ const MyContacts = () => {
         mobileNumber: contactToEdit.phone,
         email: contactToEdit.email,
         companyTitle: contactToEdit.company,
+        country:contactToEdit.country,
+        state:contactToEdit.state,
+        city: contactToEdit.city,
+        address:contactToEdit.address,
+        zipcode:contactToEdit.zipcode,
+        website:contactToEdit.website,
       })
 
       if (response.status === 200) {
@@ -1227,62 +1245,108 @@ const MyContacts = () => {
               <div className="border-b border-gray-200 dark:border-gray-700 mb-6"></div>
 
               {/* Contact Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
-                  <input
-                    type="text"
-                    value={contactToEdit.firstName || ""}
-                    onChange={(e) => setContactToEdit({ ...contactToEdit, firstName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
-                  <input
-                    type="text"
-                    value={contactToEdit.lastName || ""}
-                    onChange={(e) => setContactToEdit({ ...contactToEdit, lastName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                  <input
-                    type="text"
-                    value={contactToEdit.title || ""}
-                    onChange={(e) => setContactToEdit({ ...contactToEdit, title: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                  <input
-                    type="text"
-                    value={contactToEdit.phone || ""}
-                    onChange={(e) => setContactToEdit({ ...contactToEdit, phone: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={contactToEdit.email || ""}
-                    onChange={(e) => setContactToEdit({ ...contactToEdit, email: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
-                  <input
-                    type="text"
-                    value={contactToEdit.company || ""}
-                    onChange={(e) => setContactToEdit({ ...contactToEdit, company: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+    <input
+      type="text"
+      value={contactToEdit.firstName || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, firstName: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+    <input
+      type="text"
+      value={contactToEdit.lastName || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, lastName: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+    <input
+      type="text"
+      value={contactToEdit.title || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, title: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+    <input
+      type="text"
+      value={contactToEdit.phone || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, phone: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+    <input
+      type="email"
+      value={contactToEdit.email || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, email: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
+    <input
+      type="text"
+      value={contactToEdit.company || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, company: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country</label>
+    <input
+      type="text"
+      value={contactToEdit.country || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, country: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State</label>
+    <input
+      type="text"
+      value={contactToEdit.state || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, state: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+    <input
+      type="text"
+      value={contactToEdit.city || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, city: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
+    <input
+      type="text"
+      value={contactToEdit.address || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, address: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
+    <input
+      type="text"
+      value={contactToEdit.website || ""}
+      onChange={(e) => setContactToEdit({ ...contactToEdit, website: e.target.value })}
+      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+    />
+  </div>
+</div>
+
 
               <div className="flex justify-end space-x-3">
                 <button

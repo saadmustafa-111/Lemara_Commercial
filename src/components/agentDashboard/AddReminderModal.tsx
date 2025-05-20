@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import axiosInstance from "@/lib/axios"
 
 interface AddReminderModalProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface AddReminderModalProps {
     time: { hour: string; minute: string; ampm: string };
     priority: string;
     notificationType: string[];
-    id?: string; // Optional id for editing existing reminders
+    id?: string; 
   }) => void;
   reminderToEdit?: {
     id: string;
@@ -38,6 +39,8 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
   const [notificationType, setNotificationType] = useState<string[]>(['EMAIL']);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [reminderId, setReminderId] = useState<string | undefined>(undefined);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Effect to handle populating form when editing a reminder
   useEffect(() => {
@@ -63,19 +66,52 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
     );
   };
 
-  const handleSubmit = () => {
-    onSave({
-      title,
-      date,
-      time,
-      priority,
-      notificationType,
-      id: reminderId // Include the ID when editing
-    });
-    resetForm();
-    setEditMode(false);
-    setReminderId(undefined);
-    onClose();
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      const formattedTime = `${time.hour}:${time.minute} ${time.ampm}`;
+      
+      const reminderData = {
+        title,
+        notifications: notificationType.join(','), // Convert array to comma-separated string
+        priority,
+        startDate: date, // Use the date in MM/DD/YYYY format
+        time: formattedTime,
+        // Include id only when editing
+        ...(reminderId ? { id: reminderId } : {})
+      };
+
+      if (editMode && reminderId) {
+        // Update existing reminder
+        await axiosInstance.put(`/reminders/${reminderId}`, reminderData);
+      } else {
+        // Create new reminder
+        await axiosInstance.post('/reminders', reminderData);
+      }
+
+      // Call the onSave prop to update parent component state
+      onSave({
+        title,
+        date,
+        time,
+        priority,
+        notificationType,
+        id: reminderId
+      });
+
+      // Reset form and close modal
+      resetForm();
+      setEditMode(false);
+      setReminderId(undefined);
+      onClose();
+    } catch (err: any) {
+      console.error('Error saving reminder:', err);
+      setError(err.response?.data?.message || 'Failed to save reminder. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -88,6 +124,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
     setTime({ hour: '12', minute: '00', ampm: 'AM' });
     setPriority('Low');
     setNotificationType(['EMAIL']);
+    setError(null);
   };
 
   if (!isOpen) return null;
@@ -107,6 +144,12 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
         </div>
           <div className="p-8">
           <h2 className="text-2xl font-medium text-[#00a0d1] dark:text-[#00c1f5] mb-8">{editMode ? 'Edit Reminder' : 'Reminder Details'}</h2>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg">
+              {error}
+            </div>
+          )}
 
           <div className="mb-8">
             <input
@@ -169,7 +212,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
-              <option value="Hight">High</option>
+              <option value="High">High</option>
             </select>
           </div>
           <div className="mb-8">
@@ -337,9 +380,24 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
             </div>
             <button
               onClick={handleSubmit}
-              className="px-8 py-2 bg-[#00a0d1] dark:bg-[#0088b3] text-white rounded-full hover:bg-[#0088b3] dark:hover:bg-[#00759a] transition-colors"
+              disabled={isSubmitting || !title}
+              className={`px-8 py-2 ${
+                isSubmitting || !title 
+                  ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' 
+                  : 'bg-[#00a0d1] dark:bg-[#0088b3] hover:bg-[#0088b3] dark:hover:bg-[#00759a]'
+              } text-white rounded-full transition-colors flex items-center`}
             >
-              Start
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                'Start'
+              )}
             </button>
           </div>
         </div>
