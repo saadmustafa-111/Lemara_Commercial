@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // Import Tab Components
-
+import TabNavigation from './TabNavigation';
 import PropertyBasicsTab from './PropertyBasicsTab';
 import PropertyDetailsTab from './PropertyDetailsTab';
 import SalesIncomeTab from './SalesIncomeTab';
@@ -24,7 +24,6 @@ import { ValidationError } from './formValidation';
 const AddListingForm = () => {
   const router = useRouter();
   const [showInitialForm, setShowInitialForm] = useState(true);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [activeTab, setActiveTab] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
@@ -43,13 +42,10 @@ const AddListingForm = () => {
       marketType
     }));
     
-    // Show success message
-    setShowSuccessMessage(true);
-    
-    // Hide success message after 5 seconds
+    // Show success message after form submission
     setTimeout(() => {
-      setShowSuccessMessage(false);
-    }, 5000);
+      alert("Listing created successfully");
+    }, 100);
   };
   
   // Form state for all tabs
@@ -57,7 +53,8 @@ const AddListingForm = () => {
     // Initial form fields
     listingType: "",
     marketType: "On Market",
-      // Basics Tab
+    
+    // Basics Tab
     businessLegalName: "",
     propertyType: "Agriculture",
     propertySubtype: "Greenhouse With Processing Unit",
@@ -103,7 +100,8 @@ const AddListingForm = () => {
     employees: "",
     reasonForSelling: "",
     competitiveAdvantage: "",
-      // Accessibility Tab
+    
+    // Accessibility Tab
     wheelchairAccessible: "false",
     elevatorAccess: "false",
     handicapParking: "false",
@@ -130,7 +128,7 @@ const AddListingForm = () => {
       const target = e.target as HTMLInputElement;
       setFormData({
         ...formData,
-        [name]: target.checked
+        [name]: target.checked ? "true" : "false"
       });
     } else {
       setFormData({
@@ -139,7 +137,8 @@ const AddListingForm = () => {
       });
     }
   };
-    // Validate current tab before proceeding
+  
+  // Validate current tab before proceeding
   const validateCurrentTab = (): boolean => {
     const errors = validatePropertyForm(formData as unknown as PropertyFormData);
     setValidationErrors(errors);
@@ -164,7 +163,8 @@ const AddListingForm = () => {
     
     return currentTabErrors.length === 0;
   };
-    // Handle form submission
+  
+  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
@@ -189,7 +189,8 @@ const AddListingForm = () => {
     
     setIsSubmitting(true);
     
-    try {      // Prepare data for submission
+    try {
+      // Prepare data for submission
       const submissionData = {
         ...formatFormData(formData as unknown as PropertyFormData),
         photos: photos // You might need to convert these to form data or handle differently depending on your API
@@ -241,17 +242,18 @@ const AddListingForm = () => {
       ) : (
         <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
           {/* Success Message */}
-          {showSuccessMessage && (
-            <div className="mb-4 p-4 border-l-4 border-green-500 bg-green-50 text-green-800">
-              <div className="flex items-center">
-                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="font-medium">Listing created successfully!</span>
-              </div>
+          <div className="mb-4 p-4 border-l-4 border-green-500 bg-green-50 text-green-800">
+            <div className="flex items-center">
+              <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-medium">Listing created successfully!</span>
             </div>
-          )}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+            
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Add getErrorMessage to the tab components */}
               {/* Tab 1: Property Basics */}
@@ -268,7 +270,6 @@ const AddListingForm = () => {
                 <PropertyDetailsTab 
                   formData={formData} 
                   handleChange={handleChange} 
-                  getErrorMessage={getErrorMessage} 
                 />
               )}
               
