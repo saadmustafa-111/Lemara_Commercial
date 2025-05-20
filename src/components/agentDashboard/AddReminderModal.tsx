@@ -1,94 +1,135 @@
-"use client";
+"use client"
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react"
 import axiosInstance from "@/lib/axios"
+import { useAuth } from "../../context/AuthContext" // Import the auth context
 
 interface AddReminderModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   onSave: (reminderData: {
-    title: string;
-    date: string;
-    time: { hour: string; minute: string; ampm: string };
-    priority: string;
-    notificationType: string[];
-    id?: string; 
-  }) => void;
+    title: string
+    date: string
+    time: { hour: string; minute: string; ampm: string }
+    priority: string
+    notificationType: string[]
+    id?: string
+  }) => void
   reminderToEdit?: {
-    id: string;
-    title: string;
-    date: string;
-    priority: string;
-  } | null;
+    id: string
+    title: string
+    date: string
+    priority: string
+  } | null
 }
 
 export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEdit }: AddReminderModalProps) {
-  const [title, setTitle] = useState<string>('');
-  const [date, setDate] = useState<string>('01/01/1900');
-  const [showCalendar, setShowCalendar] = useState<boolean>(false);
-  const dateInputRef = useRef<HTMLInputElement>(null);
-  const [selectedYear, setSelectedYear] = useState<number>(2025);
-  const [selectedMonth, setSelectedMonth] = useState<number>(0); // 0-indexed (0 = January)
-  const [selectedDay, setSelectedDay] = useState<number>(1);
+  const [title, setTitle] = useState<string>("")
+  const [date, setDate] = useState<string>("01/01/1900")
+  const [showCalendar, setShowCalendar] = useState<boolean>(false)
+  const dateInputRef = useRef<HTMLInputElement>(null)
+  const [selectedYear, setSelectedYear] = useState<number>(2025)
+  const [selectedMonth, setSelectedMonth] = useState<number>(0) // 0-indexed (0 = January)
+  const [selectedDay, setSelectedDay] = useState<number>(1)
   const [time, setTime] = useState<{ hour: string; minute: string; ampm: string }>({
-    hour: '12',
-    minute: '00',
-    ampm: 'AM'
-  });
-  const [priority, setPriority] = useState<string>('Low');
-  const [notificationType, setNotificationType] = useState<string[]>(['EMAIL']);
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const [reminderId, setReminderId] = useState<string | undefined>(undefined);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+    hour: "12",
+    minute: "00",
+    ampm: "AM",
+  })
+  const [priority, setPriority] = useState<string>("Low")
+  const [notificationType, setNotificationType] = useState<string[]>(["EMAIL"])
+  const [editMode, setEditMode] = useState<boolean>(false)
+  const [reminderId, setReminderId] = useState<string | undefined>(undefined)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Get user from auth context
+  const { user } = useAuth()
+  const userId = user?.id || ""
 
   // Effect to handle populating form when editing a reminder
   useEffect(() => {
     if (reminderToEdit) {
-      setTitle(reminderToEdit.title);
-      setDate(reminderToEdit.date);
-      setPriority(reminderToEdit.priority);
-      setReminderId(reminderToEdit.id);
-      setEditMode(true);
+      setTitle(reminderToEdit.title)
+      setDate(reminderToEdit.date)
+      setPriority(reminderToEdit.priority)
+      setReminderId(reminderToEdit.id)
+      setEditMode(true)
     } else {
       // Reset the form when not editing
-      resetForm();
-      setEditMode(false);
-      setReminderId(undefined);
+      resetForm()
+      setEditMode(false)
+      setReminderId(undefined)
     }
-  }, [reminderToEdit]);
+  }, [reminderToEdit])
 
   const handleNotificationToggle = (type: string) => {
-    setNotificationType(prev => 
-      prev.includes(type) 
-        ? prev.filter(t => t !== type) 
-        : [...prev, type]
-    );
-  };
+    setNotificationType((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]))
+  }
+
+  // Function to convert MM/DD/YYYY format to a valid ISO date string
+  const formatDateTimeToISO = (dateStr: string, timeObj: { hour: string; minute: string; ampm: string }): string => {
+    try {
+      // Parse the date parts
+      const [month, day, year] = dateStr.split("/").map((part) => Number.parseInt(part, 10))
+
+      // Convert 12-hour format to 24-hour format
+      let hour = Number.parseInt(timeObj.hour, 10)
+      const minute = Number.parseInt(timeObj.minute, 10)
+
+      // Adjust hour for PM
+      if (timeObj.ampm === "PM" && hour < 12) {
+        hour += 12
+      }
+      // Adjust for 12 AM
+      if (timeObj.ampm === "AM" && hour === 12) {
+        hour = 0
+      }
+
+      // Create a valid date object
+      const dateObj = new Date(year, month - 1, day, hour, minute, 0)
+
+      // Return ISO string
+      return dateObj.toISOString()
+    } catch (err) {
+      console.error("Error formatting date:", err)
+      // Return a fallback date if parsing fails
+      return new Date().toISOString()
+    }
+  }
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setError(null);
-    
+    if (!userId) {
+      setError("User not authenticated. Please log in again.")
+      return
+    }
+
+    setIsSubmitting(true)
+    setError(null)
+
     try {
-      const formattedTime = `${time.hour}:${time.minute} ${time.ampm}`;
-      
+      // Format the date and time to ISO format
+      const isoDateTime = formatDateTimeToISO(date, time)
+      const formattedTime = `${time.hour}:${time.minute} ${time.ampm}`
+
       const reminderData = {
         title,
-        notifications: notificationType.join(','), // Convert array to comma-separated string
+        notifications: notificationType[0], // Send just the first notification type as a string
         priority,
-        startDate: date, // Use the date in MM/DD/YYYY format
+        startDate: isoDateTime, // Send the ISO formatted date string
         time: formattedTime,
-        // Include id only when editing
-        ...(reminderId ? { id: reminderId } : {})
-      };
+        // The user ID is automatically included from the token
+        // No need to explicitly include user object
+      }
+
+      console.log("Sending reminder data:", reminderData)
 
       if (editMode && reminderId) {
         // Update existing reminder
-        await axiosInstance.put(`/reminders/${reminderId}`, reminderData);
+        await axiosInstance.put(`/reminders/${reminderId}`, reminderData)
       } else {
         // Create new reminder
-        await axiosInstance.post('/reminders', reminderData);
+        await axiosInstance.post("/reminders", reminderData)
       }
 
       // Call the onSave prop to update parent component state
@@ -98,52 +139,66 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
         time,
         priority,
         notificationType,
-        id: reminderId
-      });
+        id: reminderId,
+      })
 
       // Reset form and close modal
-      resetForm();
-      setEditMode(false);
-      setReminderId(undefined);
-      onClose();
+      resetForm()
+      setEditMode(false)
+      setReminderId(undefined)
+      onClose()
     } catch (err: any) {
-      console.error('Error saving reminder:', err);
-      setError(err.response?.data?.message || 'Failed to save reminder. Please try again.');
+      console.error("Error saving reminder:", err)
+      console.error("Response data:", err.response?.data)
+      console.error("Status:", err.response?.status)
+      setError(err.response?.data?.message || "Failed to save reminder. Please try again.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const resetForm = () => {
-    setTitle('');
-    setDate('01/01/1900');
-    setShowCalendar(false);
-    setSelectedYear(2025);
-    setSelectedMonth(0);
-    setSelectedDay(1);
-    setTime({ hour: '12', minute: '00', ampm: 'AM' });
-    setPriority('Low');
-    setNotificationType(['EMAIL']);
-    setError(null);
-  };
+    setTitle("")
+    setDate("01/01/1900")
+    setShowCalendar(false)
+    setSelectedYear(2025)
+    setSelectedMonth(0)
+    setSelectedDay(1)
+    setTime({ hour: "12", minute: "00", ampm: "AM" })
+    setPriority("Low")
+    setNotificationType(["EMAIL"])
+    setError(null)
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[100000] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-4xl w-[50%] relative shadow-xl">
         <div className="absolute top-4 right-4">
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
-          <div className="p-8">
-          <h2 className="text-2xl font-medium text-[#00a0d1] dark:text-[#00c1f5] mb-8">{editMode ? 'Edit Reminder' : 'Reminder Details'}</h2>
+        <div className="p-8">
+          <h2 className="text-2xl font-medium text-[#00a0d1] dark:text-[#00c1f5] mb-8">
+            {editMode ? "Edit Reminder" : "Reminder Details"}
+          </h2>
 
           {error && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg">
@@ -165,33 +220,33 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
             <div className="flex space-x-3">
               <button
                 type="button"
-                onClick={() => handleNotificationToggle('EMAIL')}
+                onClick={() => handleNotificationToggle("EMAIL")}
                 className={`px-6 py-2 border rounded-full ${
-                  notificationType.includes('EMAIL')
-                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'
-                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
+                  notificationType.includes("EMAIL")
+                    ? "bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300"
+                    : "bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
                 } transition-colors`}
               >
                 EMAIL
               </button>
               <button
                 type="button"
-                onClick={() => handleNotificationToggle('PHONE CALL')}
+                onClick={() => handleNotificationToggle("PHONE CALL")}
                 className={`px-6 py-2 border rounded-full ${
-                  notificationType.includes('PHONE CALL')
-                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'
-                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
+                  notificationType.includes("PHONE CALL")
+                    ? "bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300"
+                    : "bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
                 } transition-colors`}
               >
                 PHONE CALL
               </button>
               <button
                 type="button"
-                onClick={() => handleNotificationToggle('FLOATING (WEB)')}
+                onClick={() => handleNotificationToggle("FLOATING (WEB)")}
                 className={`px-6 py-2 border rounded-full ${
-                  notificationType.includes('FLOATING (WEB)')
-                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300'
-                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
+                  notificationType.includes("FLOATING (WEB)")
+                    ? "bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/40 dark:border-blue-700 dark:text-blue-300"
+                    : "bg-white border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
                 } transition-colors`}
               >
                 FLOATING (WEB)
@@ -204,11 +259,14 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
-                backgroundPosition: "right 0.5rem center", 
-                backgroundRepeat: "no-repeat", 
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
+                backgroundPosition: "right 0.5rem center",
+                backgroundRepeat: "no-repeat",
                 backgroundSize: "1.5em 1.5em",
-                paddingRight: "2.5rem" }}
+                paddingRight: "2.5rem",
+              }}
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
@@ -228,12 +286,22 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                     onChange={(e) => setDate(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowCalendar(!showCalendar)}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-300"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                       <line x1="16" y1="2" x2="16" y2="6"></line>
                       <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -245,72 +313,89 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                   <div className="fixed inset-0 flex items-center justify-center z-20">
                     <div className="absolute inset-0 bg-transparent" onClick={() => setShowCalendar(false)}></div>
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-4 w-[350px] z-30 relative">
-                    {/* Close button */}
-                    <button 
-                      className="absolute top-2 right-2 text-blue-600 dark:text-blue-400"
-                      onClick={() => setShowCalendar(false)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M15 9l-6 6M9 9l6 6" />
-                      </svg>
-                    </button>
-                    {/* Year selection */}
-                    <div className="flex justify-center mb-4 space-x-2 overflow-x-auto py-2">
-                      {[2025, 2026, 2027, 2028, 2029].map((year) => (
-                        <button
-                          key={year}
-                          onClick={() => setSelectedYear(year)}
-                          className={`px-6 py-2 rounded-full text-sm ${
-                            selectedYear === year
-                              ? 'bg-[#00a0d1] text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                          }`}
+                      {/* Close button */}
+                      <button
+                        className="absolute top-2 right-2 text-blue-600 dark:text-blue-400"
+                        onClick={() => setShowCalendar(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         >
-                          {year}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    {/* Month selection */}
-                    <div className="flex flex-wrap justify-center mb-4 gap-1">
-                      {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
-                        <button
-                          key={month}
-                          onClick={() => setSelectedMonth(index)}
-                          className={`w-12 py-2 rounded-full text-sm ${
-                            selectedMonth === index
-                              ? 'bg-[#ff8f8f] text-white'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                          }`}
-                        >
-                          {month}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    {/* Days selection */}
-                    <div className="grid grid-cols-7 gap-1">
-                      {Array.from({ length: new Date(selectedYear, selectedMonth + 1, 0).getDate() }, (_, i) => i + 1).map((day) => (
-                        <button
-                          key={day}
-                          onClick={() => {
-                            setSelectedDay(day);
-                            const month = selectedMonth + 1;
-                            const formattedDate = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${selectedYear}`;
-                            setDate(formattedDate);
-                            setShowCalendar(false);
-                          }}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center text-sm ${
-                            selectedDay === day && selectedMonth === new Date().getMonth() && selectedYear === new Date().getFullYear()
-                              ? 'bg-[#00a0d1] text-white'
-                              : 'hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-                          }`}
-                        >
-                          {day.toString().padStart(2, '0')}
-                        </button>
-                      ))}
-                    </div>
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M15 9l-6 6M9 9l6 6" />
+                        </svg>
+                      </button>
+                      {/* Year selection */}
+                      <div className="flex justify-center mb-4 space-x-2 overflow-x-auto py-2">
+                        {[2025, 2026, 2027, 2028, 2029].map((year) => (
+                          <button
+                            key={year}
+                            onClick={() => setSelectedYear(year)}
+                            className={`px-6 py-2 rounded-full text-sm ${
+                              selectedYear === year
+                                ? "bg-[#00a0d1] text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                            }`}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Month selection */}
+                      <div className="flex flex-wrap justify-center mb-4 gap-1">
+                        {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
+                          (month, index) => (
+                            <button
+                              key={month}
+                              onClick={() => setSelectedMonth(index)}
+                              className={`w-12 py-2 rounded-full text-sm ${
+                                selectedMonth === index
+                                  ? "bg-[#ff8f8f] text-white"
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                              }`}
+                            >
+                              {month}
+                            </button>
+                          ),
+                        )}
+                      </div>
+
+                      {/* Days selection */}
+                      <div className="grid grid-cols-7 gap-1">
+                        {Array.from(
+                          { length: new Date(selectedYear, selectedMonth + 1, 0).getDate() },
+                          (_, i) => i + 1,
+                        ).map((day) => (
+                          <button
+                            key={day}
+                            onClick={() => {
+                              setSelectedDay(day)
+                              const month = selectedMonth + 1
+                              const formattedDate = `${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")}/${selectedYear}`
+                              setDate(formattedDate)
+                              setShowCalendar(false)
+                            }}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm ${
+                              selectedDay === day &&
+                              selectedMonth === new Date().getMonth() &&
+                              selectedYear === new Date().getFullYear()
+                                ? "bg-[#00a0d1] text-white"
+                                : "hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                            }`}
+                          >
+                            {day.toString().padStart(2, "0")}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -320,15 +405,18 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                   value={time.hour}
                   onChange={(e) => setTime({ ...time, hour: e.target.value })}
                   className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
-                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
-                    backgroundPosition: "right 0.5rem center", 
-                    backgroundRepeat: "no-repeat", 
+                  style={{
+                    backgroundImage:
+                      "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
+                    backgroundPosition: "right 0.5rem center",
+                    backgroundRepeat: "no-repeat",
                     backgroundSize: "1.5em 1.5em",
-                    paddingRight: "2.5rem" }}
+                    paddingRight: "2.5rem",
+                  }}
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
-                    <option key={hour} value={hour.toString().padStart(2, '0')}>
-                      {hour.toString().padStart(2, '0')}
+                    <option key={hour} value={hour.toString().padStart(2, "0")}>
+                      {hour.toString().padStart(2, "0")}
                     </option>
                   ))}
                 </select>
@@ -336,15 +424,18 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                   value={time.minute}
                   onChange={(e) => setTime({ ...time, minute: e.target.value })}
                   className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
-                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
-                    backgroundPosition: "right 0.5rem center", 
-                    backgroundRepeat: "no-repeat", 
+                  style={{
+                    backgroundImage:
+                      "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
+                    backgroundPosition: "right 0.5rem center",
+                    backgroundRepeat: "no-repeat",
                     backgroundSize: "1.5em 1.5em",
-                    paddingRight: "2.5rem" }}
+                    paddingRight: "2.5rem",
+                  }}
                 >
                   {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
-                    <option key={minute} value={minute.toString().padStart(2, '0')}>
-                      {minute.toString().padStart(2, '0')}
+                    <option key={minute} value={minute.toString().padStart(2, "0")}>
+                      {minute.toString().padStart(2, "0")}
                     </option>
                   ))}
                 </select>
@@ -352,11 +443,14 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                   value={time.ampm}
                   onChange={(e) => setTime({ ...time, ampm: e.target.value })}
                   className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-full appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
-                  style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", 
-                    backgroundPosition: "right 0.5rem center", 
-                    backgroundRepeat: "no-repeat", 
+                  style={{
+                    backgroundImage:
+                      "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
+                    backgroundPosition: "right 0.5rem center",
+                    backgroundRepeat: "no-repeat",
                     backgroundSize: "1.5em 1.5em",
-                    paddingRight: "2.5rem" }}
+                    paddingRight: "2.5rem",
+                  }}
                 >
                   <option value="AM">AM</option>
                   <option value="PM">PM</option>
@@ -372,36 +466,50 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
               >
                 Stop
               </button>
-              <button
-                className="px-8 py-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
-              >
+              <button className="px-8 py-2 border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">
                 Snooze
               </button>
             </div>
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting || !title}
+              disabled={isSubmitting || !title || !userId}
               className={`px-8 py-2 ${
-                isSubmitting || !title 
-                  ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' 
-                  : 'bg-[#00a0d1] dark:bg-[#0088b3] hover:bg-[#0088b3] dark:hover:bg-[#00759a]'
+                isSubmitting || !title || !userId
+                  ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+                  : "bg-[#00a0d1] dark:bg-[#0088b3] hover:bg-[#0088b3] dark:hover:bg-[#00759a]"
               } text-white rounded-full transition-colors flex items-center`}
             >
               {isSubmitting ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Processing...
                 </>
               ) : (
-                'Start'
+                "Start"
               )}
             </button>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
