@@ -7,13 +7,8 @@ import Link from 'next/link';
 // Import Tab Components
 
 import PropertyBasicsTab from './PropertyBasicsTab';
-import PropertyDetailsTab from './PropertyDetailsTab';
-import SalesIncomeTab from './SalesIncomeTab';
-import ExpensesTab from './ExpensesTab';
-import AdditionalInfoTab from './AdditionalInfoTab';
 import AccessibilityTab from './AccessibilityTab';
 import PhotosTab from './PhotosTab';
-import ActivitiesTab from './ActivitiesTab';
 import InitialListingForm from './InitialListingForm';
 
 // Import Utilities
@@ -213,10 +208,9 @@ const AddListingForm = () => {
       setIsSubmitting(false);
     }
   };
-  
-  // Handle next tab
+    // Handle next tab
   const handleNext = () => {
-    if (validateCurrentTab() && activeTab < 8) {
+    if (validateCurrentTab() && activeTab < 3) {
       setActiveTab(activeTab + 1);
     }
   };
@@ -253,8 +247,7 @@ const AddListingForm = () => {
           )}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Add getErrorMessage to the tab components */}
-              {/* Tab 1: Property Basics */}
+              {/* Add getErrorMessage to the tab components */}              {/* Tab 1: Property Basics */}
               {activeTab === 1 && (
                 <PropertyBasicsTab 
                   formData={formData} 
@@ -263,47 +256,18 @@ const AddListingForm = () => {
                 />
               )}
               
-              {/* Tab 2: Details */}
+              {/* Tab 2: Accessibility Settings */}
               {activeTab === 2 && (
-                <PropertyDetailsTab 
-                  formData={formData} 
-                  handleChange={handleChange} 
-                  getErrorMessage={getErrorMessage} 
-                />
-              )}
-              
-              {/* Tab 3: Sales / Income */}
-              {activeTab === 3 && (
-                <SalesIncomeTab formData={formData} handleChange={handleChange} />
-              )}
-              
-              {/* Tab 4: Expenses */}
-              {activeTab === 4 && (
-                <ExpensesTab formData={formData} handleChange={handleChange} />
-              )}
-              
-              {/* Tab 5: Additional Information */}
-              {activeTab === 5 && (
-                <AdditionalInfoTab formData={formData} handleChange={handleChange} />
-              )}
-              
-              {/* Tab 6: Accessibility Settings */}
-              {activeTab === 6 && (
                 <AccessibilityTab formData={formData} handleChange={handleChange} />
               )}
               
-              {/* Tab 7: Photos */}
-              {activeTab === 7 && (
+              {/* Tab 3: Photos */}
+              {activeTab === 3 && (
                 <PhotosTab 
                   photos={photos} 
                   handleFileChange={handleFileChange} 
                   removeImage={removeImage} 
                 />
-              )}
-              
-              {/* Tab 8: Activities */}
-              {activeTab === 8 && (
-                <ActivitiesTab activities={formData.activities} />
               )}
 
               {/* Display validation errors */}
@@ -338,8 +302,7 @@ const AddListingForm = () => {
                   >
                     Cancel
                   </Link>
-                  
-                  {activeTab < 8 ? (
+                    {activeTab < 3 ? (
                     <button
                       type="button"
                       onClick={handleNext}
@@ -357,7 +320,7 @@ const AddListingForm = () => {
                     </button>
                   )}
                   
-                  {activeTab < 8 && (
+                  {activeTab < 3 && (
                     <button
                       type="button"
                       className="px-4 py-2 text-[#9A2236] hover:underline"

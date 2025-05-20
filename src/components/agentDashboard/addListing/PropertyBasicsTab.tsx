@@ -54,8 +54,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
       handleChange(lngEvent);
     }
   }, [coordinates, handleChange]);
-  
-  // Define sections for the tab navigation
+    // Define sections for the tab navigation
   const sections = [
     { id: 'basic-information', label: 'Basic Information', icon: '📋' },
     { id: 'address', label: 'Address', icon: '📍' },
@@ -64,11 +63,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
     { id: 'photos', label: 'Photos', icon: '🖼️' },
     { id: 'documents', label: 'Documents', icon: '📄' },
     { id: 'accessibility', label: 'Accessibility', icon: '🔒' },
-    { id: 'co-brokers', label: 'Co-Brokers', icon: '👥' },
     { id: 'submit', label: 'Submit', icon: '✓' },
   ];
-  
-  // Refs for each section
+    // Refs for each section
   const sectionRefs = {
     'basic-information': useRef<HTMLDivElement>(null),
     'address': useRef<HTMLDivElement>(null),
@@ -77,8 +74,6 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
     'photos': useRef<HTMLDivElement>(null),
     'documents': useRef<HTMLDivElement>(null),
     'accessibility': useRef<HTMLDivElement>(null),
-    'co-brokers': useRef<HTMLDivElement>(null),
-    'submit': useRef<HTMLDivElement>(null),
     'submit': useRef<HTMLDivElement>(null),
   };
     // Track investment highlights
@@ -92,13 +87,13 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
   const [photos, setPhotos] = useState<File[]>(formData.photos || []);
   const [documents, setDocuments] = useState<File[]>(formData.documents || []);
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const documentInputRef = useRef<HTMLInputElement>(null);
-  // Scroll to section function
+  const documentInputRef = useRef<HTMLInputElement>(null);  // Scroll to section function
   const scrollToSection = (sectionId: string) => {
     const sectionRef = sectionRefs[sectionId as keyof typeof sectionRefs];
     if (sectionRef && sectionRef.current) {
+      const headerHeight = 56; // Height of the main header (3.5rem = 56px)
       const navHeight = 60; // Height of the sticky navigation
-      const yOffset = -navHeight - 10; // Offset from the top to account for sticky header
+      const yOffset = -(headerHeight + navHeight + 10); // Add extra margin to account for header and navigation
       const y = sectionRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
       
       window.scrollTo({
@@ -107,11 +102,13 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
       });
     }
   };
-    // Set up intersection observer to highlight active section during scrolling
+  // Set up intersection observer to highlight active section during scrolling
   useEffect(() => {
+    const headerHeight = 56; // Height of the main header (3.5rem = 56px)
     const navHeight = 60; // Height of the sticky navigation
+    const totalOffset = headerHeight + navHeight;
     const observerOptions = {
-      rootMargin: `-${navHeight}px 0px -70% 0px`,
+      rootMargin: `-${totalOffset + 10}px 0px -70% 0px`,
       threshold: 0
     };
     
@@ -251,9 +248,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
         }
       } as unknown as React.ChangeEvent<HTMLInputElement>;
       handleChange(event);
-    }
-  };  return (
-    <div className="space-y-8">
+    }  };  return (
+    <div className="space-y-8 pt-14">
       {/* Add the sub tab navigation at the top */}
       <SubTabNavigation 
         activeSection={activeSection}
@@ -261,9 +257,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
         scrollToSection={scrollToSection}
         sections={sections}
       />
-      
+
       {/* Basic Information Section */}
-      <div id="basic-information" ref={sectionRefs["basic-information"]} className="space-y-6 pt-4">
+      <div id="basic-information" ref={sectionRefs["basic-information"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800">Basic Information</h2>
 
         {/* Market Selection */}
@@ -394,7 +390,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
             </div>
           </div>        </div>
       </div>      {/* Address Section */}
-      <div id="address" ref={sectionRefs["address"]} className="space-y-6 pt-4">
+      <div id="address" ref={sectionRefs["address"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center">
           <span className="mr-2">📍</span> Address
         </h2>
@@ -646,7 +642,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
           </div>
         </div>
       </div>      {/* Details Section */}
-      <div id="details" ref={sectionRefs["details"]} className="space-y-6 pt-4">
+      <div id="details" ref={sectionRefs["details"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center">
           <span className="mr-2">📋</span> Details
         </h2>
@@ -707,7 +703,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
           <p>Any fields left <span className="font-semibold">blank</span> or <span className="font-semibold">zero</span> will be hidden.</p>
         </div>
       </div>      {/* Descriptions Section */}
-      <div id="descriptions" ref={sectionRefs["descriptions"]} className="space-y-6 pt-4">
+      <div id="descriptions" ref={sectionRefs["descriptions"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center">
           <span className="mr-2">📝</span> Descriptions
         </h2>
@@ -775,7 +771,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
           </button>
         </div>
       </div>      {/* Photos Section */}
-      <div id="photos" ref={sectionRefs["photos"]} className="space-y-6 pt-4">
+      <div id="photos" ref={sectionRefs["photos"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center">
           <span className="mr-2">🖼️</span> Photos
         </h2>
@@ -848,7 +844,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
           </div>
         </div>
       </div>      {/* Documents Section */}
-      <div id="documents" ref={sectionRefs["documents"]} className="space-y-6 pt-4">
+      <div id="documents" ref={sectionRefs["documents"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center">
           <span className="mr-2">📄</span> Documents
         </h2>
@@ -929,7 +925,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
           </button>
         </div>
       </div>      {/* Accessibility Section */}
-      <div id="accessibility" ref={sectionRefs["accessibility"]} className="space-y-6 pt-4">
+      <div id="accessibility" ref={sectionRefs["accessibility"]} className="space-y-6 pt-8">
         <h2 className="text-xl font-semibold text-gray-800 flex items-center">
           <span className="mr-2">🔒</span> Accessibility
         </h2>
@@ -1005,155 +1001,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({ formData, handleC
                   <strong>Only Lemara Commercial</strong>: Only visible within Lemara Commercial platform
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>      {/* Co-Brokers Section */}
-      <div id="co-brokers" ref={sectionRefs["co-brokers"]} className="space-y-6 pt-4">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-          <span className="mr-2">👥</span> Co-Brokers
-        </h2>
-        
-        <p className="text-sm text-gray-600">
-          Add team members and other brokers to your listing.
-        </p>
-        
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
-          {/* Table Header */}
-          <div className="grid grid-cols-5 bg-gray-50 border-b border-gray-200">
-            <div className="px-4 py-3 text-sm font-medium text-gray-700">
-              MEMBER
-            </div>
-            <div className="px-4 py-3 text-sm font-medium text-gray-700">
-              PERMISSION
-            </div>
-            <div className="px-4 py-3 text-sm font-medium text-gray-700 text-center">
-              SHOW ON LISTING
-            </div>
-            <div className="px-4 py-3 text-sm font-medium text-gray-700 text-center">
-              ADD TO DEALS
-            </div>
-            <div className="px-4 py-3 text-sm font-medium text-gray-700 text-center">
-              DELETE
-            </div>
-          </div>
-          
-          {/* Principal Broker Row */}
-          <div className="grid grid-cols-5 border-b border-gray-200 items-center">
-            <div className="px-4 py-3 flex items-center">
-              <div className="w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-200">
-                {formData.principalBrokerImage ? (
-                  <img 
-                    src={formData.principalBrokerImage} 
-                    alt="Principal Broker" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-500">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
-                    </svg>
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="text-sm font-medium">{formData.principalBrokerName || "Principal Broker"}</p>
-                <p className="text-xs text-gray-500">Principal Broker</p>
-              </div>
-            </div>
-            <div className="px-4 py-3">
-              <div className="bg-gray-100 px-3 py-2 rounded text-sm">
-                Listing Owner
-              </div>
-            </div>
-            <div className="px-4 py-3 text-center">
-              <svg className="w-6 h-6 mx-auto text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-              </svg>
-            </div>
-            <div className="px-4 py-3 text-center">
-              <svg className="w-6 h-6 mx-auto text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-              </svg>
-            </div>
-            <div className="px-4 py-3 text-center">
-              <svg className="w-6 h-6 mx-auto text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
-              </svg>
-            </div>
-          </div>
-          
-          {/* Add Co-Brokers Form */}
-          <div className="px-4 py-5">
-            <p className="text-sm font-medium text-gray-700 mb-3">Add Co-Brokers currently in Lemara Commercial.</p>
-            <div className="border border-gray-300 rounded-md mb-3">
-              <input 
-                type="text"
-                placeholder="Click or type the name of a member..."
-                className="w-full px-4 py-3 text-gray-700 focus:outline-none"
-              />
-            </div>
-            
-            <div className="flex items-center mb-3">
-              <input 
-                type="checkbox"
-                id="addToDeals"
-                name="addToDeals"
-                checked={isChecked(formData.addToDeals)}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="addToDeals" className="ml-2 text-sm text-gray-700">
-                Add To Existing Deals.
-              </label>
-            </div>
-            
-            <button 
-              type="button" 
-              className="inline-flex items-center px-4 py-2 border border-green-600 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              Add Co-Brokers
-            </button>
-          </div>
-          
-          {/* Invite Co-Brokers */}
-          <div className="px-4 py-5 border-t border-gray-200">
-            <p className="text-sm font-medium text-gray-700 mb-3">Invite Co-Brokers to Lemara Commercial and appear on this listing.</p>
-            <textarea
-              placeholder="Email separated by comma or new line"
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            ></textarea>
-            
-            <button 
-              type="button" 
-              className="inline-flex items-center px-4 py-2 mt-3 border border-green-600 rounded-md shadow-sm text-sm font-medium text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              Invite Co-Brokers
-            </button>
-            
-            <div className="mt-4 text-sm text-gray-600">
-              <p>If you need to add a co-broker that is not a part of your team/company please contact us <a href="mailto:support@brevitas.com" className="text-blue-600 hover:underline">support@brevitas.com</a>.</p>
-            </div>
-          </div>
-          
-          {/* Change Owner */}
-          <div className="px-4 py-5 border-t border-gray-200 bg-red-50">
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-3">Once you change the owner, they will be the primary broker on the listing.</p>
-              <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 mb-3"
-              >
-                <option value="">Select new owner</option>
-              </select>
-              
-              <button 
-                type="button" 
-                className="inline-flex items-center px-4 py-2 border border-red-600 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Change Owner
-              </button>            </div>
-          </div>
+            </div>          </div>
         </div>
       </div>
         {/* Submit Section */}

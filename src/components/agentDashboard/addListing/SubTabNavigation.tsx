@@ -20,7 +20,7 @@ const SubTabNavigation: React.FC<SubTabNavigationProps> = ({
   sections
 }) => {
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-800 px-4 py-3 flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <nav className="fixed top-14 left-75 right-0 z-50 bg-white dark:bg-gray-800 px-4 py-3 flex overflow-x-auto border-b border-gray-200 dark:border-gray-700 shadow-md">
       <div className="flex space-x-4">
         {sections.map((section) => (
           <button
