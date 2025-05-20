@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { isChecked } from './utils';
 
 // Define a proper FormData interface instead of using 'any'
 interface PropertyFormData {
@@ -79,6 +80,7 @@ interface PropertyFormData {
 interface PropertyDetailsTabProps {
   formData: PropertyFormData;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  getErrorMessage?: (fieldName: string) => string | null;
 }
 
 const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handleChange }) => {
@@ -377,12 +379,11 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
             Other Options
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center">
-              <input
+            <div className="flex items-center">              <input
                 type="checkbox"
                 id="absenteeOwnerOperation"
                 name="absenteeOwnerOperation"
-                checked={formData.absenteeOwnerOperation ?? false}
+                checked={isChecked(formData.absenteeOwnerOperation)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -396,7 +397,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="ownerOperated"
                 name="ownerOperated"
-                checked={formData.ownerOperated ?? false}
+                checked={isChecked(formData.ownerOperated)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -410,7 +411,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="semiAbsenteeOwner"
                 name="semiAbsenteeOwner"
-                checked={formData.semiAbsenteeOwner ?? false}
+                checked={isChecked(formData.semiAbsenteeOwner)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -424,7 +425,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="securitySystem"
                 name="securitySystem"
-                checked={formData.securitySystem ?? false}
+                checked={isChecked(formData.securitySystem)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -433,12 +434,11 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
               </label>
             </div>
             
-            <div className="flex items-center">
-              <input
+            <div className="flex items-center">              <input
                 type="checkbox"
                 id="multipleLocations"
                 name="multipleLocations"
-                checked={formData.multipleLocations ?? false}
+                checked={isChecked(formData.multipleLocations)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -452,7 +452,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="experienceNecessary"
                 name="experienceNecessary"
-                checked={formData.experienceNecessary ?? false}
+                checked={isChecked(formData.experienceNecessary)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -861,7 +861,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="realEstateIncluded"
                 name="realEstateIncluded"
-                checked={formData.realEstateIncluded ?? false}
+                checked={isChecked(formData.realEstateIncluded)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -951,7 +951,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="companyTypeIndividual"
                 name="companyTypeIndividual"
-                checked={formData.companyTypeIndividual ?? false}
+                checked={isChecked(formData.companyTypeIndividual)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -965,7 +965,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="companyTypePartnership"
                 name="companyTypePartnership"
-                checked={formData.companyTypePartnership ?? false}
+                checked={isChecked(formData.companyTypePartnership)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -979,7 +979,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="companyTypeLLC"
                 name="companyTypeLLC"
-                checked={formData.companyTypeLLC ?? false}
+                checked={isChecked(formData.companyTypeLLC)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -993,7 +993,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="companyTypeLLP"
                 name="companyTypeLLP"
-                checked={formData.companyTypeLLP ?? false}
+                checked={isChecked(formData.companyTypeLLP)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1007,7 +1007,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="companyTypeCorporation"
                 name="companyTypeCorporation"
-                checked={formData.companyTypeCorporation ?? false}
+                checked={isChecked(formData.companyTypeCorporation)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1021,7 +1021,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="companyTypeOther"
                 name="companyTypeOther"
-                checked={formData.companyTypeOther ?? false}
+                checked={isChecked(formData.companyTypeOther)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1043,7 +1043,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="ownershipTypeOwn"
                 name="ownershipTypeOwn"
-                checked={formData.ownershipTypeOwn ?? false}
+                checked={isChecked(formData.ownershipTypeOwn)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1057,7 +1057,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="ownershipTypeRent"
                 name="ownershipTypeRent"
-                checked={formData.ownershipTypeRent ?? false}
+                checked={isChecked(formData.ownershipTypeRent)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1071,7 +1071,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="ownershipTypeSubLease"
                 name="ownershipTypeSubLease"
-                checked={formData.ownershipTypeSubLease ?? false}
+                checked={isChecked(formData.ownershipTypeSubLease)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1085,7 +1085,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="ownershipTypeLease"
                 name="ownershipTypeLease"
-                checked={formData.ownershipTypeLease ?? false}
+                checked={isChecked(formData.ownershipTypeLease)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
@@ -1099,7 +1099,7 @@ const PropertyDetailsTab: React.FC<PropertyDetailsTabProps> = ({ formData, handl
                 type="checkbox"
                 id="ownershipTypeUnderContract"
                 name="ownershipTypeUnderContract"
-                checked={formData.ownershipTypeUnderContract ?? false}
+                checked={isChecked(formData.ownershipTypeUnderContract)}
                 onChange={handleChange}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />

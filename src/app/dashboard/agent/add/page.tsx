@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import AddListingForm from "@/components/agentDashboard/addListing";
+import AddListingFormNew from "@/components/agentDashboard/addListing/AddListingFormNew";
 
 const AddListingPage = () => {
-  return <AddListingForm />;
+  return <AddListingFormNew />;
 };
 
 export default AddListingPage;
