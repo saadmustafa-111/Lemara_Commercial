@@ -1,5 +1,5 @@
 "use client";
-
+import Link from 'next/link';
 import React, { useState } from 'react';
 
 interface Campaign {
@@ -49,7 +49,9 @@ const EmailCampaigns: React.FC = () => {
   const emailDeliveredTotal = 700;
   const emailOpenedTotal = 600;
   const emailClickedTotal = 678;
-
+  const handleClick = () => {
+    router.push('/dashboard/addemailcompaigns');
+  };
   return (
     <div>
       {/* Header with title and Create Campaign button */}
@@ -60,9 +62,11 @@ const EmailCampaigns: React.FC = () => {
           </svg>
           <h1 className="text-xl text-blue-500 font-bold">Email Campaigns</h1>
         </div>
-        <button className="bg-white text-black border border-gray-300 rounded-full px-4 py-2 font-medium">
-          Create a Campaign
-        </button>
+        <Link href="/dashboard/addemailcompaigns">
+    <div className="bg-white text-black border border-gray-300 rounded-full px-4 py-2 font-medium cursor-pointer text-center">
+      Create a Campaign
+    </div>
+  </Link>
       </div>
 
       {/* Campaign Count */}

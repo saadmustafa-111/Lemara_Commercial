@@ -19,12 +19,13 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   return (
     <div
       className={`flex flex-col items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 ${
-        fullScreen
-          ? "fixed inset-0"
-          : "absolute inset-0"
+        fullScreen ? "fixed inset-0" : "absolute inset-0"
       }`}
     >
-      <CircularLoader size="large" />
+      {/* Add animate-spin to make it rotate */}
+      <span className="animate-spin">
+        <CircularLoader size="large" />
+      </span>
       {text && (
         <p className="mt-4 text-sm font-medium text-gray-700 dark:text-gray-300">
           {text}

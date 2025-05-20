@@ -7,106 +7,6 @@ import axiosInstance from "@/lib/axios"
 const MyContacts = () => {
   const router = useRouter()
 
-  // Sample data for contacts
-  const contactsData = [
-    {
-      id: 1,
-      name: "John Doe",
-      title: "CEO",
-      phone: "(555) 123-4567",
-      email: "john.doe@example.com",
-      company: "Tech Innovations",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      title: "Marketing Director",
-      phone: "(555) 234-5678",
-      email: "jane.smith@example.com",
-      company: "Global Marketing",
-    },
-    {
-      id: 3,
-      name: "Robert Johnson",
-      title: "Sales Manager",
-      phone: "(555) 345-6789",
-      email: "robert.j@example.com",
-      company: "Sales Pro Inc.",
-    },
-    {
-      id: 4,
-      name: "Emily Davis",
-      title: "HR Specialist",
-      phone: "(555) 456-7890",
-      email: "emily.d@example.com",
-      company: "People First",
-    },
-    {
-      id: 5,
-      name: "Michael Brown",
-      title: "CTO",
-      phone: "(555) 567-8901",
-      email: "michael.b@example.com",
-      company: "Tech Solutions",
-    },
-    {
-      id: 6,
-      name: "Sarah Wilson",
-      title: "Product Manager",
-      phone: "(555) 678-9012",
-      email: "sarah.w@example.com",
-      company: "Product Experts",
-    },
-    {
-      id: 7,
-      name: "David Lee",
-      title: "Financial Analyst",
-      phone: "(555) 789-0123",
-      email: "david.l@example.com",
-      company: "Finance Plus",
-    },
-    {
-      id: 8,
-      name: "Lisa Taylor",
-      title: "Operations Director",
-      phone: "(555) 890-1234",
-      email: "lisa.t@example.com",
-      company: "Efficient Ops",
-    },
-    {
-      id: 9,
-      name: "Kevin Miller",
-      title: "IT Manager",
-      phone: "(555) 901-2345",
-      email: "kevin.m@example.com",
-      company: "IT Solutions",
-    },
-    {
-      id: 10,
-      name: "Amanda Clark",
-      title: "Customer Service",
-      phone: "(555) 012-3456",
-      email: "amanda.c@example.com",
-      company: "Support Masters",
-    },
-    {
-      id: 11,
-      name: "Thomas White",
-      title: "Research Lead",
-      phone: "(555) 234-5678",
-      email: "thomas.w@example.com",
-      company: "Innovation Labs",
-    },
-    {
-      id: 12,
-      name: "Jessica Brown",
-      title: "Design Manager",
-      phone: "(555) 345-6789",
-      email: "jessica.b@example.com",
-      company: "Creative Designs",
-    },
-  ]
-
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(5)
@@ -145,20 +45,18 @@ const MyContacts = () => {
   const [showDeleteContactModal, setShowDeleteContactModal] = useState(false)
   const [contactToDelete, setContactToDelete] = useState<number | null>(null)
 
-  // Filter contacts based on search and selected group
-  const filteredContacts = contactsData.filter((contact) => {
-    // First check if name or company contains search term
-    const matchesSearch =
-      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.company.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter contacts based on search
+  const filteredContacts = contacts.filter((contact) => {
+    if (!searchTerm.trim()) return true
 
-    // If a group is selected, only show contacts in that group
-    if (selectedGroup) {
-      const group = contactGroups.find((g) => g.id === selectedGroup)
-      return matchesSearch && group && group.contacts.includes(contact.id)
-    }
-
-    return matchesSearch
+    // Check if name, email, or company contains search term
+    const searchTermLower = searchTerm.toLowerCase()
+    return (
+      (contact.firstName && contact.firstName.toLowerCase().includes(searchTermLower)) ||
+      (contact.lastName && contact.lastName.toLowerCase().includes(searchTermLower)) ||
+      (contact.email && contact.email.toLowerCase().includes(searchTermLower)) ||
+      (contact.company && contact.company.toLowerCase().includes(searchTermLower))
+    )
   })
 
   // Calculate pagination
@@ -166,49 +64,74 @@ const MyContacts = () => {
   const indexOfFirstContact = indexOfLastContact - rowsPerPage
   const currentContacts = filteredContacts.slice(indexOfFirstContact, indexOfLastContact)
   const totalPages = Math.ceil(filteredContacts.length / rowsPerPage)
-  // / Add this useEffect to fetch groups when component mounts
+
+  // Add this useEffect to fetch groups when component mounts
   useEffect(() => {
     fetchGroups()
   }, [])
+
   useEffect(() => {
     fetchContacts()
   }, [])
+
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, selectedGroup])
+
   // Function to fetch groups from API
   const fetchGroups = async () => {
     setIsLoadingGroups(true)
     setApiError(null)
 
     try {
-      const response = await fetch("http://192.168.1.11:3000/contacts/group", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      })
-      const data = await response.json()
-      if (response.ok) {
+      const response = await axiosInstance.get("/contacts/group")
+      const data = response.data
+
+      if (response.status === 200) {
         const dataArray = Array.isArray(data) ? data : [data]
         const formattedGroups = dataArray.map((group) => ({
           id: group.id,
           title: group.name || "Untitled Group",
-          contacts: [],
+          contactCount: group.contactCount || 0, // Use contactCount from API
         }))
         setContactGroups(formattedGroups)
         console.log("Groups loaded:", formattedGroups)
+
+        // Update contact counts for each group
+        formattedGroups.forEach((group) => {
+          updateGroupContactCount(group.id)
+        })
       } else {
         setApiError(data.error || "Failed to Load Contacts")
       }
     } catch (error) {
+      console.error("Error fetching groups:", error)
       setApiError(error.message || "Failed to Load Contacts")
     } finally {
       setIsLoadingGroups(false)
     }
   }
+
+  // Function to update contact count for a specific group
+  const updateGroupContactCount = async (groupId) => {
+    try {
+      const response = await axiosInstance.get(`/contacts/bygroup/${groupId}`)
+      const data = response.data
+
+      if (response.status === 200) {
+        const contactsCount = Array.isArray(data) ? data.length : data ? 1 : 0
+
+        // Update the contact count in the contactGroups state
+        setContactGroups((prevGroups) =>
+          prevGroups.map((group) => (group.id === groupId ? { ...group, contactCount: contactsCount } : group)),
+        )
+      }
+    } catch (error) {
+      console.error(`Error fetching contact count for group ${groupId}:`, error)
+    }
+  }
+
   const fetchContacts = async () => {
     setIsLoadingContacts(true)
     setApiError(null)
@@ -234,7 +157,41 @@ const MyContacts = () => {
         setApiError(data.error || "Failed to load contacts")
       }
     } catch (error) {
+      console.error("Error fetching contacts:", error)
       setApiError(error.message || "Failed to load contacts")
+    } finally {
+      setIsLoadingContacts(false)
+    }
+  }
+
+  // Function to fetch contacts by group ID
+  const fetchContactsByGroup = async (groupId: number) => {
+    setIsLoadingContacts(true)
+    setApiError(null)
+
+    try {
+      const response = await axiosInstance.get(`/contacts/bygroup/${groupId}`)
+      const data = response.data
+
+      if (response.status === 200) {
+        const dataArray = Array.isArray(data) ? data : [data]
+        const formattedContacts = dataArray.map((contact) => ({
+          id: contact.id,
+          firstName: contact.firstName || "Unnamed Contact",
+          lastName: contact.lastName || "",
+          title: contact.title || "",
+          phone: contact.mobileNumber || "",
+          email: contact.email || "",
+          company: contact.companyTitle || "",
+        }))
+        setContacts(formattedContacts)
+        console.log("Group contacts loaded:", formattedContacts)
+      } else {
+        setApiError(data.error || "Failed to load contacts for this group")
+      }
+    } catch (error) {
+      console.error("Error fetching contacts by group:", error)
+      setApiError(error.message || "Failed to load contacts for this group")
     } finally {
       setIsLoadingContacts(false)
     }
@@ -272,23 +229,16 @@ const MyContacts = () => {
         type: "success",
       })
 
-      const response = await fetch(`http://192.168.1.14:3000/contacts/${contactToEdit.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({
-          firstName: contactToEdit.firstName,
-          lastName: contactToEdit.lastName,
-          title: contactToEdit.title,
-          mobileNumber: contactToEdit.phone,
-          email: contactToEdit.email,
-          companyTitle: contactToEdit.company,
-        }),
+      const response = await axiosInstance.patch(`/contacts/${contactToEdit.id}`, {
+        firstName: contactToEdit.firstName,
+        lastName: contactToEdit.lastName,
+        title: contactToEdit.title,
+        mobileNumber: contactToEdit.phone,
+        email: contactToEdit.email,
+        companyTitle: contactToEdit.company,
       })
 
-      if (response.ok) {
+      if (response.status === 200) {
         // Update the contact in the local state
         const updatedContacts = contacts.map((contact) => (contact.id === contactToEdit.id ? contactToEdit : contact))
         setContacts(updatedContacts)
@@ -302,10 +252,13 @@ const MyContacts = () => {
         })
 
         // Refresh contacts list
-        fetchContacts()
+        if (selectedGroup) {
+          fetchContactsByGroup(selectedGroup)
+        } else {
+          fetchContacts()
+        }
       } else {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to update contact")
+        throw new Error(response.data.message || "Failed to update contact")
       }
     } catch (error) {
       console.error("Error updating contact:", error)
@@ -333,14 +286,17 @@ const MyContacts = () => {
 
           // Add the new group to the local state
           const newGroup = {
-            id: contactGroups.length + 1,
+            id: data.id || contactGroups.length + 1,
             title: name,
-            contacts: [],
+            contactCount: 0,
           }
 
           setContactGroups([...contactGroups, newGroup])
           setname("")
           setShowGroupModal(false)
+
+          // Refresh groups to get updated contact counts
+          fetchGroups()
 
           // Show success notification
           setNotification({
@@ -387,25 +343,54 @@ const MyContacts = () => {
   }
 
   // Handle edit group
-  const handleEditGroup = () => {
+  const handleEditGroup = async () => {
     if (name.trim() && selectedGroupId) {
-      // In a real app, you would call an API to update the group
-      const updatedGroups = contactGroups.map((group) => {
-        if (group.id === selectedGroupId) {
-          return { ...group, title: name }
-        }
-        return group
-      })
+      try {
+        const response = await axiosInstance.patch(`/contacts/group/${selectedGroupId}`, {
+          name: name,
+        })
 
-      setContactGroups(updatedGroups)
-      setname("")
-      setSelectedGroupId(null)
-      setShowEditGroupModal(false)
+        if (response.status === 200) {
+          // Update the group in the local state
+          const updatedGroups = contactGroups.map((group) => {
+            if (group.id === selectedGroupId) {
+              return { ...group, title: name }
+            }
+            return group
+          })
+
+          setContactGroups(updatedGroups)
+          setname("")
+          setSelectedGroupId(null)
+          setShowEditGroupModal(false)
+
+          // Show success notification
+          setNotification({
+            show: true,
+            message: "Group updated successfully!",
+            type: "success",
+          })
+
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification({ show: false, message: "", type: "success" })
+          }, 3000)
+        } else {
+          throw new Error(response.data.message || "Failed to update group")
+        }
+      } catch (error) {
+        console.error("Error updating group:", error)
+        setNotification({
+          show: true,
+          message: error.message || "Error updating group. Please try again.",
+          type: "error",
+        })
+      }
     }
   }
 
   // Open edit group modal
-  const openEditGroupModal = (group: { id: number; title: string; contacts: number[] }) => {
+  const openEditGroupModal = (group: { id: number; title: string; contactCount: number }) => {
     setSelectedGroupId(group.id)
     setname(group.title)
     setShowEditGroupModal(true)
@@ -413,19 +398,47 @@ const MyContacts = () => {
   }
 
   // Handle delete group
-  const confirmDeleteGroup = () => {
+  const confirmDeleteGroup = async () => {
     if (groupToDelete) {
-      // In a real app, you would call an API to delete the group
-      const updatedGroups = contactGroups.filter((group) => group.id !== groupToDelete)
-      setContactGroups(updatedGroups)
+      try {
+        const response = await axiosInstance.delete(`/contacts/group/${groupToDelete}`)
 
-      // If the deleted group was selected, clear the selection
-      if (selectedGroup === groupToDelete) {
-        setSelectedGroup(null)
+        if (response.status === 200) {
+          // Remove the group from the local state
+          const updatedGroups = contactGroups.filter((group) => group.id !== groupToDelete)
+          setContactGroups(updatedGroups)
+
+          // If the deleted group was selected, clear the selection
+          if (selectedGroup === groupToDelete) {
+            setSelectedGroup(null)
+            fetchContacts() // Reset to show all contacts
+          }
+
+          setGroupToDelete(null)
+          setShowDeleteModal(false)
+
+          // Show success notification
+          setNotification({
+            show: true,
+            message: "Group deleted successfully!",
+            type: "success",
+          })
+
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification({ show: false, message: "", type: "success" })
+          }, 3000)
+        } else {
+          throw new Error(response.data.message || "Failed to delete group")
+        }
+      } catch (error) {
+        console.error("Error deleting group:", error)
+        setNotification({
+          show: true,
+          message: error.message || "Error deleting group. Please try again.",
+          type: "error",
+        })
       }
-
-      setGroupToDelete(null)
-      setShowDeleteModal(false)
     }
   }
 
@@ -439,15 +452,9 @@ const MyContacts = () => {
           type: "success",
         })
 
-        const response = await fetch(`http://192.168.1.14:3000/contacts/${contactToDelete}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        })
+        const response = await axiosInstance.delete(`/contacts/${contactToDelete}`)
 
-        if (response.ok) {
+        if (response.status === 200) {
           // Remove the contact from the local state
           const updatedContacts = contacts.filter((contact) => contact.id !== contactToDelete)
           setContacts(updatedContacts)
@@ -463,10 +470,19 @@ const MyContacts = () => {
           setShowDeleteContactModal(false)
 
           // Refresh contacts list
-          fetchContacts()
+          if (selectedGroup) {
+            fetchContactsByGroup(selectedGroup)
+            // Update the contact count for the selected group
+            updateGroupContactCount(selectedGroup)
+          } else {
+            fetchContacts()
+            // Update all group contact counts
+            contactGroups.forEach((group) => {
+              updateGroupContactCount(group.id)
+            })
+          }
         } else {
-          const errorData = await response.json()
-          throw new Error(errorData.message || "Failed to delete contact")
+          throw new Error(response.data.message || "Failed to delete contact")
         }
       } catch (error) {
         console.error("Error deleting contact:", error)
@@ -491,8 +507,10 @@ const MyContacts = () => {
     if (selectedGroup === groupId) {
       // If clicking the same group, clear selection
       setSelectedGroup(null)
+      fetchContacts() // Reset to show all contacts
     } else {
       setSelectedGroup(groupId)
+      fetchContactsByGroup(groupId) // Fetch contacts for this group
     }
   }
 
@@ -554,7 +572,7 @@ const MyContacts = () => {
             <Search className="text-[#06AED7] dark:text-[#00c1f5] mr-2 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by name or location"
+              placeholder="Search by name, email, or company"
               className="bg-transparent outline-none border-none text-sm w-full text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -653,41 +671,72 @@ const MyContacts = () => {
                 >
                   <Users size={16} />
                   {group.title}
-                  {selectedGroup === group.id && (
-                    <span className="ml-1 text-xs bg-white text-[#06AED7] dark:bg-gray-800 dark:text-[#00c1f5] rounded-full px-2 py-0.5">
-                      {group.contacts.length}
-                    </span>
-                  )}
+                  <span
+                    className={`ml-1 text-xs rounded-full px-2 py-0.5 ${
+                      selectedGroup === group.id
+                        ? "bg-white text-[#06AED7] dark:bg-gray-800 dark:text-[#00c1f5]"
+                        : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                    }`}
+                  >
+                    {group.contactCount || 0}
+                  </span>
                 </button>
               ))}
             </>
           )}
 
-          <button
-            onClick={() => setShowGroupModal(true)}
-            className="px-4 py-2 rounded-full border border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-[#06AED7] hover:text-[#06AED7] dark:hover:border-[#00c1f5] dark:hover:text-[#00c1f5] flex items-center gap-2 transition-colors"
-          >
-            <span>+</span> Create New Group
-          </button>
+          
         </div>
         {selectedGroup && (
           <div className="flex items-center mt-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Showing contacts in group:
-              <span className="font-medium ml-1 text-[#06AED7] dark:text-[#00c1f5]">
-                {contactGroups.find((g) => g.id === selectedGroup)?.title}
-              </span>
+              {isLoadingContacts ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Loading contacts...
+                </span>
+              ) : (
+                <>
+                  Showing contacts in group:
+                  <span className="font-medium ml-1 text-[#06AED7] dark:text-[#00c1f5]">
+                    {contactGroups.find((g) => g.id === selectedGroup)?.title}
+                  </span>
+                </>
+              )}
             </p>
             <button
-              onClick={() => setSelectedGroup(null)}
+              onClick={() => {
+                setSelectedGroup(null)
+                fetchContacts()
+              }}
               className="ml-2 text-sm text-[#06AED7] dark:text-[#00c1f5] hover:underline"
             >
               Clear filter
             </button>
           </div>
         )}
-
-        <div className="flex items-center gap-3.5 mt-2">
+         <div className="flex items-center gap-3.5 mt-2">
+<button
+            onClick={() => setShowGroupModal(true)}
+            className="flex gap-2 text-black dark:text-white bg-white dark:bg-gray-800 px-8 py-3 border border-black dark:border-gray-600 rounded-full transition-all duration-300 hover:bg-[#06AED7] dark:hover:bg-[#0590b3] hover:text-white hover:border-[#06AED7] dark:hover:border-[#0590b3]"
+          >
+            <span>+</span> Create New Group
+          </button>
           <button
             onClick={() => router.push("/dashboard/agent/addcontact")}
             className="text-black dark:text-white bg-white dark:bg-gray-800 px-8 py-3 border border-black dark:border-gray-600 rounded-full transition-all duration-300 hover:bg-[#06AED7] dark:hover:bg-[#0590b3] hover:text-white hover:border-[#06AED7] dark:hover:border-[#0590b3]"
@@ -747,7 +796,34 @@ const MyContacts = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {contacts.length > 0 ? (
+                {isLoadingContacts ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center">
+                      <div className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin h-6 w-6 mr-2 text-[#06AED7] dark:text-[#00c1f5]"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        <span className="text-gray-600 dark:text-gray-400">Loading contacts...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : contacts.length > 0 ? (
                   contacts.map((contact) => (
                     <tr key={contact.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
@@ -789,7 +865,7 @@ const MyContacts = () => {
                 ) : (
                   <tr>
                     <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                      No contacts found
+                      {selectedGroup ? "No contacts found in this group" : "No contacts found"}
                     </td>
                   </tr>
                 )}
@@ -798,7 +874,7 @@ const MyContacts = () => {
           </div>
 
           {/* Pagination controls */}
-          {currentContacts.length > 0 && (
+          {contacts.length > 0 && (
             <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
