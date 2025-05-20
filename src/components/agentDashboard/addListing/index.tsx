@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // Import Tab Components
-import TabNavigation from './TabNavigation';
+
 import PropertyBasicsTab from './PropertyBasicsTab';
 import PropertyDetailsTab from './PropertyDetailsTab';
 import SalesIncomeTab from './SalesIncomeTab';
@@ -14,14 +14,17 @@ import AdditionalInfoTab from './AdditionalInfoTab';
 import AccessibilityTab from './AccessibilityTab';
 import PhotosTab from './PhotosTab';
 import ActivitiesTab from './ActivitiesTab';
+import InitialListingForm from './InitialListingForm';
 
 // Import Utilities
 import usePhotoUpload from './usePhotoUpload';
-import { validatePropertyForm, formatFormData } from './formValidation';
+import { validatePropertyForm, formatFormData, PropertyFormData } from './formValidation';
 import { ValidationError } from './formValidation';
 
 const AddListingForm = () => {
   const router = useRouter();
+  const [showInitialForm, setShowInitialForm] = useState(true);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [activeTab, setActiveTab] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
@@ -29,18 +32,41 @@ const AddListingForm = () => {
   // Initialize photo upload hook
   const { photos, handleFileChange, removeImage, cleanupPreviews } = usePhotoUpload();
   
+  // Handle initial form submission
+  const handleInitialFormSubmit = (listingType: string, marketType: string) => {
+    setShowInitialForm(false);
+    
+    // Update form data with the selected values
+    setFormData(prevData => ({
+      ...prevData,
+      listingType,
+      marketType
+    }));
+    
+    // Show success message
+    setShowSuccessMessage(true);
+    
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 5000);
+  };
+  
   // Form state for all tabs
   const [formData, setFormData] = useState({
-    // Basics Tab
+    // Initial form fields
+    listingType: "",
+    marketType: "On Market",
+      // Basics Tab
     businessLegalName: "",
     propertyType: "Agriculture",
     propertySubtype: "Greenhouse With Processing Unit",
     dba: "",
     askingPrice: "",
     status: "Active",
-    showCounty: true,
-    showCity: true,
-    isFeatured: false,
+    showCounty: "true",
+    showCity: "true",
+    isFeatured: "false",
     
     // Owner Details
     ownerName1: "",
@@ -77,13 +103,12 @@ const AddListingForm = () => {
     employees: "",
     reasonForSelling: "",
     competitiveAdvantage: "",
-    
-    // Accessibility Tab
-    wheelchairAccessible: false,
-    elevatorAccess: false,
-    handicapParking: false,
-    brailleSignage: false,
-    accessibleRestrooms: false,
+      // Accessibility Tab
+    wheelchairAccessible: "false",
+    elevatorAccess: "false",
+    handicapParking: "false",
+    brailleSignage: "false",
+    accessibleRestrooms: "false",
     
     // Activities - empty array initially
     activities: [] as Array<{timestamp: string; message: string; user: string}>,
@@ -114,10 +139,9 @@ const AddListingForm = () => {
       });
     }
   };
-  
-  // Validate current tab before proceeding
+    // Validate current tab before proceeding
   const validateCurrentTab = (): boolean => {
-    const errors = validatePropertyForm(formData);
+    const errors = validatePropertyForm(formData as unknown as PropertyFormData);
     setValidationErrors(errors);
     
     // Filter errors relevant to the current tab
@@ -140,13 +164,12 @@ const AddListingForm = () => {
     
     return currentTabErrors.length === 0;
   };
-  
-  // Handle form submission
+    // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     // Validate all fields before submission
-    const errors = validatePropertyForm(formData);
+    const errors = validatePropertyForm(formData as unknown as PropertyFormData);
     setValidationErrors(errors);
     
     if (errors.length > 0) {
@@ -166,10 +189,9 @@ const AddListingForm = () => {
     
     setIsSubmitting(true);
     
-    try {
-      // Prepare data for submission
+    try {      // Prepare data for submission
       const submissionData = {
-        ...formatFormData(formData),
+        ...formatFormData(formData as unknown as PropertyFormData),
         photos: photos // You might need to convert these to form data or handle differently depending on your API
       };
       
@@ -213,132 +235,147 @@ const AddListingForm = () => {
   };
   
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Add getErrorMessage to the tab components */}
-          {/* Tab 1: Property Basics */}
-          {activeTab === 1 && (
-            <PropertyBasicsTab 
-              formData={formData} 
-              handleChange={handleChange} 
-              getErrorMessage={getErrorMessage} 
-            />
-          )}
-          
-          {/* Tab 2: Details */}
-          {activeTab === 2 && (
-            <PropertyDetailsTab 
-              formData={formData} 
-              handleChange={handleChange} 
-              getErrorMessage={getErrorMessage} 
-            />
-          )}
-          
-          {/* Tab 3: Sales / Income */}
-          {activeTab === 3 && (
-            <SalesIncomeTab formData={formData} handleChange={handleChange} />
-          )}
-          
-          {/* Tab 4: Expenses */}
-          {activeTab === 4 && (
-            <ExpensesTab formData={formData} handleChange={handleChange} />
-          )}
-          
-          {/* Tab 5: Additional Information */}
-          {activeTab === 5 && (
-            <AdditionalInfoTab formData={formData} handleChange={handleChange} />
-          )}
-          
-          {/* Tab 6: Accessibility Settings */}
-          {activeTab === 6 && (
-            <AccessibilityTab formData={formData} handleChange={handleChange} />
-          )}
-          
-          {/* Tab 7: Photos */}
-          {activeTab === 7 && (
-            <PhotosTab 
-              photos={photos} 
-              handleFileChange={handleFileChange} 
-              removeImage={removeImage} 
-            />
-          )}
-          
-          {/* Tab 8: Activities */}
-          {activeTab === 8 && (
-            <ActivitiesTab activities={formData.activities} />
-          )}
-
-          {/* Display validation errors */}
-          {validationErrors.length > 0 && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative dark:bg-red-900 dark:border-red-800 dark:text-red-100" role="alert">
-              <strong className="font-bold">Please fix the following errors:</strong>
-              <ul className="mt-1 list-disc list-inside">
-                {validationErrors.map((error, index) => (
-                  <li key={index}>{error.message}</li>
-                ))}
-              </ul>
+    <>
+      {showInitialForm ? (
+        <InitialListingForm onSubmit={handleInitialFormSubmit} />
+      ) : (
+        <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+          {/* Success Message */}
+          {showSuccessMessage && (
+            <div className="mb-4 p-4 border-l-4 border-green-500 bg-green-50 text-green-800">
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-medium">Listing created successfully!</span>
+              </div>
             </div>
           )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
-            <div>
-              {activeTab > 1 && (
-                <button
-                  type="button"
-                  onClick={handlePrevious}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                >
-                  Previous
-                </button>
-              )}
-            </div>
-            <div className="flex gap-3">
-              <Link
-                href="/dashboard/agent/listings"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                Cancel
-              </Link>
-              
-              {activeTab < 8 ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="px-4 py-2 bg-[#9A2236] text-white rounded-md hover:bg-[#8A1226] transition"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition disabled:bg-green-400"
-                >
-                  {isSubmitting ? "Submitting..." : "Submit Listing"}
-                </button>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Add getErrorMessage to the tab components */}
+              {/* Tab 1: Property Basics */}
+              {activeTab === 1 && (
+                <PropertyBasicsTab 
+                  formData={formData} 
+                  handleChange={handleChange} 
+                  getErrorMessage={getErrorMessage} 
+                />
               )}
               
-              {activeTab < 8 && (
-                <button
-                  type="button"
-                  className="px-4 py-2 text-[#9A2236] hover:underline"
-                  onClick={() => {
-                    // Save current form data
-                    console.log("Saving data...");
-                  }}
-                >
-                  Save & Continue
-                </button>
+              {/* Tab 2: Details */}
+              {activeTab === 2 && (
+                <PropertyDetailsTab 
+                  formData={formData} 
+                  handleChange={handleChange} 
+                  getErrorMessage={getErrorMessage} 
+                />
               )}
-            </div>
+              
+              {/* Tab 3: Sales / Income */}
+              {activeTab === 3 && (
+                <SalesIncomeTab formData={formData} handleChange={handleChange} />
+              )}
+              
+              {/* Tab 4: Expenses */}
+              {activeTab === 4 && (
+                <ExpensesTab formData={formData} handleChange={handleChange} />
+              )}
+              
+              {/* Tab 5: Additional Information */}
+              {activeTab === 5 && (
+                <AdditionalInfoTab formData={formData} handleChange={handleChange} />
+              )}
+              
+              {/* Tab 6: Accessibility Settings */}
+              {activeTab === 6 && (
+                <AccessibilityTab formData={formData} handleChange={handleChange} />
+              )}
+              
+              {/* Tab 7: Photos */}
+              {activeTab === 7 && (
+                <PhotosTab 
+                  photos={photos} 
+                  handleFileChange={handleFileChange} 
+                  removeImage={removeImage} 
+                />
+              )}
+              
+              {/* Tab 8: Activities */}
+              {activeTab === 8 && (
+                <ActivitiesTab activities={formData.activities} />
+              )}
+
+              {/* Display validation errors */}
+              {validationErrors.length > 0 && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative dark:bg-red-900 dark:border-red-800 dark:text-red-100" role="alert">
+                  <strong className="font-bold">Please fix the following errors:</strong>
+                  <ul className="mt-1 list-disc list-inside">
+                    {validationErrors.map((error, index) => (
+                      <li key={index}>{error.message}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between mt-8">
+                <div>
+                  {activeTab > 1 && (
+                    <button
+                      type="button"
+                      onClick={handlePrevious}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    >
+                      Previous
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-3">
+                  <Link
+                    href="/dashboard/agent/listings"
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                  >
+                    Cancel
+                  </Link>
+                  
+                  {activeTab < 8 ? (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="px-4 py-2 bg-[#9A2236] text-white rounded-md hover:bg-[#8A1226] transition"
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition disabled:bg-green-400"
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit Listing"}
+                    </button>
+                  )}
+                  
+                  {activeTab < 8 && (
+                    <button
+                      type="button"
+                      className="px-4 py-2 text-[#9A2236] hover:underline"
+                      onClick={() => {
+                        // Save current form data
+                        console.log("Saving data...");
+                      }}
+                    >
+                      Save & Continue
+                    </button>
+                  )}
+                </div>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

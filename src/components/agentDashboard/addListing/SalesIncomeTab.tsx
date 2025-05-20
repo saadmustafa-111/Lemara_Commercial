@@ -10,8 +10,10 @@ interface SalesIncomeFormData {
   annualRentalIncome?: string | number;
   regularSales?: string | number;
   regularSalesUnit?: string;
+  // Add specific property for activities
+  activities?: Array<{timestamp: string; message: string; user: string}>;
   // Add an index signature to allow for additional properties
-  [key: string]: string | number | boolean | undefined;
+  [key: string]: string | number | boolean | Array<any> | undefined;
 }
 
 interface SalesIncomeTabProps {
