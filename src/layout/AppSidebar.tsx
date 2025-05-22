@@ -123,35 +123,37 @@ const AppSidebar: React.FC = () => {
     navItems: NavItem[],
     menuType: "main" | "others"
   ) => (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col gap-2">
       {navItems.map((nav, index) => (
         <li key={nav.name}>
-          {nav.subItems ? (              <button
+          {nav.subItems ? (
+            <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group bg-transparent text-white dark:text-white ${
+              className={`menu-item group bg-transparent text-white dark:text-white transition-all duration-300 ease-in-out transform hover:scale-105 ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "bg-white/20 dark:bg-white/10"
-                  : "hover:bg-white/10 dark:hover:bg-white/5"
-              } cursor-pointer ${
+                  ? "bg-white/25 dark:bg-white/15 shadow-lg"
+                  : "hover:bg-white/15 dark:hover:bg-white/10 hover:shadow-md"
+              } cursor-pointer rounded-lg p-3 ${
                 !isExpanded && !isHovered
                   ? "lg:justify-center"
                   : "lg:justify-start"
               }`}
-            >                <span
-                className={`text-white ${
+            >
+              <span
+                className={`text-white transition-all duration-200 ${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "text-white"
-                    : "text-white"
+                    ? "text-white scale-110"
+                    : "text-white group-hover:scale-105"
                 }`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className={`menu-item-text`}>{nav.name}</span>
+                <span className={`menu-item-text font-medium text-sm tracking-wide transition-all duration-200 group-hover:font-semibold`}>{nav.name}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 text-white ${
+                  className={`ml-auto w-5 h-5 transition-all duration-300 ease-in-out text-white group-hover:scale-110 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
                       ? "rotate-180"
@@ -164,21 +166,23 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
-                className={`menu-item group bg-transparent text-white dark:text-white ${
-                  isActive(nav.path) ? "bg-white/20 dark:bg-white/10" : "hover:bg-white/10 dark:hover:bg-white/5"
+                className={`menu-item group bg-transparent text-white dark:text-white transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg p-3 ${
+                  isActive(nav.path) 
+                    ? "bg-white/25 dark:bg-white/15 shadow-lg" 
+                    : "hover:bg-white/15 dark:hover:bg-white/10 hover:shadow-md"
                 }`}
               >
                 <span
-                  className={`text-white ${
+                  className={`text-white transition-all duration-200 ${
                     isActive(nav.path)
-                      ? "text-white"
-                      : "text-white"
+                      ? "text-white scale-110"
+                      : "text-white group-hover:scale-105"
                   }`}
                 >
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`text-white`}>{nav.name}</span>
+                  <span className={`text-white font-medium text-sm tracking-wide transition-all duration-200 group-hover:font-semibold`}>{nav.name}</span>
                 )}
               </Link>
             )
@@ -188,7 +192,7 @@ const AppSidebar: React.FC = () => {
               ref={(el) => {
                 subMenuRefs.current[`${menuType}-${index}`] = el;
               }}
-              className="overflow-hidden transition-all duration-300"
+              className="overflow-hidden transition-all duration-300 ease-in-out"
               style={{
                 height:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
@@ -201,32 +205,32 @@ const AppSidebar: React.FC = () => {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
-                      className={`menu-dropdown-item ${
+                      className={`menu-dropdown-item transition-all duration-200 ease-in-out hover:scale-102 font-medium text-sm tracking-wide ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
+                          : "menu-dropdown-item-inactive hover:bg-white/10 hover:pl-4"
                       }`}
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`ml-auto ${
+                            className={`ml-auto transition-all duration-200 hover:scale-105 ${
                               isActive(subItem.path)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            } menu-dropdown-badge font-semibold text-xs`}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`ml-auto ${
+                            className={`ml-auto transition-all duration-200 hover:scale-105 ${
                               isActive(subItem.path)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            } menu-dropdown-badge font-semibold text-xs`}
                           >
                             pro
                           </span>
@@ -308,7 +312,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#00a0d1] dark:bg-gray-800 text-white h-screen transition-all duration-300 ease-in-out z-50  dark:border-gray-700 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-[#00a0d1] dark:bg-gray-800 text-white h-screen transition-all duration-300 ease-in-out z-50 dark:border-gray-700 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -322,22 +326,22 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-3 flex items-center bg-white border-b border-gray-200 dark:border-gray-900 dark:bg-gray-900 mx-[-20px] px-6 ${
+        className={`py-3 flex items-center bg-white border-b border-gray-200 dark:border-gray-900 dark:bg-gray-900 mx-[-20px] px-6 transition-all duration-300 ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-between"
         }`}
       >
-        <Link href="/">
+        <Link href="/" className="transition-transform duration-200 hover:scale-105">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <Image
-                className="dark:hidden"
+                className="dark:hidden transition-opacity duration-200 hover:opacity-90"
                 src="/images/logo/lemaraLogo.png"
                 alt="Logo"
                 width={140}
                 height={30}
               />
               <Image
-                className="hidden dark:block"
+                className="hidden dark:block transition-opacity duration-200 hover:opacity-90"
                 src="/images/logo/lemaraLogo.png"
                 alt="Logo"
                 width={140}
@@ -346,6 +350,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <Image
+              className="transition-transform duration-200 hover:scale-110"
               src="/images/logo/lemaraLogo.png"
               alt="Logo"
               width={40}
@@ -357,20 +362,7 @@ const AppSidebar: React.FC = () => {
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-white dark:text-gray-200 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
+            <div className="pt-4">
               {renderMenuItems(navItems, "main")}
             </div>
 

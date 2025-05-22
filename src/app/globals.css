@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 @custom-variant dark (&:is(.dark *));
 
 /* Add animations for the splash page */
@@ -808,4 +808,7 @@ span.flatpickr-weekday,
     0 1px 2px 0 rgba(16, 24, 40, 0.06);
   opacity: 0.8;
   cursor: grabbing; /* Changes the cursor to indicate dragging */
+}
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
 }
