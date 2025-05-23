@@ -23,6 +23,29 @@ enum ListingType {
   ASSETSALE = "assetsale",
 }
 
+// Backend data structure interface
+interface ListingFormData {
+  market: string
+  listingType: string
+  address: string
+  address2: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+  neighborhood: string
+  assessorsPArcelNumber: string
+  latitude: number
+  longitude: number
+  sellerFinancing: boolean
+  oppertunityZone: boolean
+  description: string
+  highlights: string[]
+  confidentiality: string
+  availableToBroker: boolean
+  visibility: boolean
+}
+
 // Modify the component interface to include onSubmit
 interface PropertyBasicsTabProps {
   formData: any
@@ -50,6 +73,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   // Track submission error
   const [submissionError, setSubmissionError] = useState<string | null>(null)
+  // Add a success message state after the existing state variables:
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Use the map coordinates hook to automatically update coordinates based on address
   const {
@@ -313,8 +338,11 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
   }
 
   // Validate form before submission
-  const validateForm = () => {
-    // Basic validation
+  const validateForm = (): boolean => {
+    // Reset error message
+    setSubmissionError(null)
+
+    // Required fields validation
     if (!formData.marketType) {
       setSubmissionError("Please select a market type")
       scrollToSection("basic-information")
@@ -339,11 +367,47 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
       return false
     }
 
-    if (!formData.streetAddress || !formData.city || !formData.stateProvince || !formData.country) {
-      setSubmissionError("Please complete the address information")
+    // Address validation
+    if (!formData.streetAddress) {
+      setSubmissionError("Street address is required")
       scrollToSection("address")
       return false
     }
+
+    if (!formData.city) {
+      setSubmissionError("City is required")
+      scrollToSection("address")
+      return false
+    }
+
+    if (!formData.stateProvince) {
+      setSubmissionError("State/Province is required")
+      scrollToSection("address")
+      return false
+    }
+
+    if (!formData.country) {
+      setSubmissionError("Country is required")
+      scrollToSection("address")
+      return false
+    }
+
+    // Description validation
+    if (!formData.completeDescription && !formData.description) {
+      setSubmissionError("Property description is required")
+      scrollToSection("descriptions")
+      return false
+    }
+
+    // Accessibility validation
+    if (!formData.confidentiality) {
+      setSubmissionError("Confidentiality setting is required")
+      scrollToSection("accessibility")
+      return false
+    }
+
+    // Remove the marketplace visibility validation check since it's causing issues
+    // The value is being set correctly in the form submission
 
     return true
   }
@@ -352,6 +416,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmissionError(null)
+    setSuccessMessage(null)
 
     // Validate form
     if (!validateForm()) {
@@ -397,9 +462,18 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           break
       }
 
+      // Type validation before appending to FormData
+      if (!marketTypeValue) {
+        throw new Error("Invalid market type")
+      }
+
+      if (!listingTypeValue) {
+        throw new Error("Invalid listing type")
+      }
+
       // Append all fields to FormData matching the API structure
-      formDataObj.append("market", marketTypeValue || "")
-      formDataObj.append("listingType", listingTypeValue || "")
+      formDataObj.append("market", marketTypeValue)
+      formDataObj.append("listingType", listingTypeValue)
       formDataObj.append("address", formData.streetAddress || formData.address || "")
       formDataObj.append("address2", formData.address2 || "")
       formDataObj.append("city", formData.city || "")
@@ -408,8 +482,13 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
       formDataObj.append("country", formData.country || "")
       formDataObj.append("neighborhood", formData.neighborhood || "")
       formDataObj.append("assessorsPArcelNumber", formData.parcelNumber || "")
+
+      // Ensure latitude and longitude are valid numbers
+      // Replace the latitude/longitude validation section with this:
       formDataObj.append("latitude", formData.latitude ? formData.latitude.toString() : "0")
       formDataObj.append("longitude", formData.longitude ? formData.longitude.toString() : "0")
+
+      // Convert string values to boolean for boolean fields
       formDataObj.append("sellerFinancing", formData.sellerFinancing === "Yes" ? "true" : "false")
       formDataObj.append("oppertunityZone", formData.opportunityZone === "Yes" ? "true" : "false")
       formDataObj.append("description", formData.completeDescription || formData.description || "")
@@ -428,12 +507,11 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
       if (formData.ownerName2) formDataObj.append("ownerName2", formData.ownerName2)
       if (formData.ownerEmail2) formDataObj.append("ownerEmail2", formData.ownerEmail2)
 
-      // Handle highlights array
+      // Handle highlights array - filter out empty highlights
       if (highlights && highlights.length > 0) {
-        highlights.forEach((highlight, index) => {
-          if (highlight.trim()) {
-            formDataObj.append(`highlights[${index}]`, highlight)
-          }
+        const validHighlights = highlights.filter((highlight) => highlight.trim() !== "")
+        validHighlights.forEach((highlight, index) => {
+          formDataObj.append(`highlights[${index}]`, highlight)
         })
       }
 
@@ -477,20 +555,57 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
       console.log("Submitting form data:", Object.fromEntries(formDataObj.entries()))
 
-      if (onSubmit) {
-        // Use the parent's onSubmit handler if provided
-        await onSubmit(formDataObj)
-      } else {
-        // Otherwise use the default implementation
-        const response = await axiosInstance.post("/listings", formDataObj)
+      // Make the API call
+      const response = await axiosInstance.post("/listings", formDataObj, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
 
-        // Handle successful response
-        console.log("Listing created successfully:", response.data)
-        alert("Listing created successfully!")
+      // Handle successful response
+      console.log("Listing created successfully:", response.data)
+
+      // Set success message with data from response if available
+      if (response.data && response.data.message) {
+        setSuccessMessage(response.data.message)
+      } else if (response.data && response.data.id) {
+        setSuccessMessage(`Listing created successfully! Listing ID: ${response.data.id}`)
+      } else {
+        setSuccessMessage("Listing created successfully!")
       }
-    } catch (error) {
+
+      // Scroll to the submit section to show the success message
+      scrollToSection("submit")
+
+      // If parent component provided an onSubmit handler, call it as well
+      if (onSubmit) {
+        await onSubmit(formDataObj)
+      }
+    } catch (error: any) {
       console.error("Error creating listing:", error)
-      setSubmissionError(error instanceof Error ? error.message : "Error creating listing. Please try again.")
+
+      // Handle different types of errors
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        const errorData = error.response.data
+        if (errorData && errorData.message) {
+          setSubmissionError(errorData.message)
+        } else if (errorData && errorData.error) {
+          setSubmissionError(errorData.error)
+        } else {
+          setSubmissionError(`Server error: ${error.response.status}`)
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        setSubmissionError("No response received from server. Please check your internet connection.")
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setSubmissionError(error.message || "Error creating listing. Please try again.")
+      }
+
+      // Scroll to the top to show the error message
+      window.scrollTo({ top: 0, behavior: "smooth" })
     } finally {
       setIsSubmitting(false)
     }
@@ -507,9 +622,18 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
       />
 
       {/* Display submission error if any */}
-      {submissionError && (        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-full mb-4">
+      {submissionError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-full mb-4">
           <p className="font-medium">Error:</p>
           <p>{submissionError}</p>
+        </div>
+      )}
+
+      {/* Display success message if any */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-full mb-4">
+          <p className="font-medium">Success:</p>
+          <p>{successMessage}</p>
         </div>
       )}
 
@@ -562,7 +686,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               Title
             </label>
             <span className="text-xs text-gray-500">{titleLength}/100</span>
-          </div>          <input
+          </div>{" "}
+          <input
             type="text"
             id="title"
             name="title"
@@ -585,7 +710,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
               <span className="text-gray-500">$</span>
-            </div>            <input
+            </div>{" "}
+            <input
               type="number"
               id="price"
               name="price"
@@ -616,7 +742,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <label htmlFor="listingSubType" className="block mb-2 text-sm font-medium text-gray-700">
             Listing Sub Type
           </label>
-          <div className="relative">            <select
+          <div className="relative">
+            {" "}
+            <select
               id="listingSubType"
               name="listingSubType"
               value={formData.listingSubType ?? ""}
@@ -647,7 +775,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
         </h2>
 
         {/* Street Address */}
-        <div>          <input
+        <div>
+          {" "}
+          <input
             type="text"
             id="streetAddress"
             name="streetAddress"
@@ -659,7 +789,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
         </div>
 
         {/* Address 2 */}
-        <div>          <input
+        <div>
+          {" "}
+          <input
             type="text"
             id="address2"
             name="address2"
@@ -672,7 +804,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         {/* City, State/Province, Postal Code in one row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>            <input
+          <div>
+            {" "}
+            <input
               type="text"
               id="city"
               name="city"
@@ -683,7 +817,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             />
           </div>
 
-          <div>            <input
+          <div>
+            {" "}
+            <input
               type="text"
               id="stateProvince"
               name="stateProvince"
@@ -694,7 +830,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             />
           </div>
 
-          <div>            <input
+          <div>
+            {" "}
+            <input
               type="text"
               id="postalCode"
               name="postalCode"
@@ -708,7 +846,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         {/* Country Dropdown */}
         <div>
-          <div className="relative">            <select
+          <div className="relative">
+            {" "}
+            <select
               id="country"
               name="country"
               value={formData.country ?? ""}
@@ -736,7 +876,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
         </div>
 
         {/* Neighborhood */}
-        <div>          <input
+        <div>
+          {" "}
+          <input
             type="text"
             id="neighborhood"
             name="neighborhood"
@@ -748,7 +890,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
         </div>
 
         {/* Assessor's Parcel Number */}
-        <div>          <input
+        <div>
+          {" "}
+          <input
             type="text"
             id="parcelNumber"
             name="parcelNumber"
@@ -834,7 +978,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <div>
             <label htmlFor="latitude" className="block mb-2 text-sm font-medium text-gray-700">
               Latitude {isLoadingMap && <span className="text-xs text-blue-500 ml-1">(updating...)</span>}
-            </label>            <input
+            </label>{" "}
+            <input
               type="text"
               id="latitude"
               name="latitude"
@@ -850,7 +995,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <div>
             <label htmlFor="longitude" className="block mb-2 text-sm font-medium text-gray-700">
               Longitude {isLoadingMap && <span className="text-xs text-blue-500 ml-1">(updating...)</span>}
-            </label>            <input
+            </label>{" "}
+            <input
               type="text"
               id="longitude"
               name="longitude"
@@ -906,7 +1052,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               Seller Financing
             </label>
             <div className="md:w-3/4">
-              <div className="relative">                <select
+              <div className="relative">
+                {" "}
+                <select
                   id="sellerFinancing"
                   name="sellerFinancing"
                   value={formData.sellerFinancing ?? ""}
@@ -931,7 +1079,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               Opportunity Zone
             </label>
             <div className="md:w-3/4">
-              <div className="relative">                <select
+              <div className="relative">
+                {" "}
+                <select
                   id="opportunityZone"
                   name="opportunityZone"
                   value={formData.opportunityZone ?? ""}
@@ -979,7 +1129,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               onChange={(e) => {
                 handleChange(e)
                 setDescriptionLength(e.target.value.length)
-              }}              rows={8}
+              }}
+              rows={8}
               maxLength={5000}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               placeholder="Enter a comprehensive description of the property..."
@@ -1046,7 +1197,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         <div className="space-y-2">
           <p className="text-sm text-gray-600">Upload high-resolution photos of your listing.</p>
-          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>          <div
+          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>{" "}
+          <div
             className="mt-4 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center flex flex-col items-center justify-center bg-gray-50 cursor-pointer hover:border-[#06AED7] transition-colors duration-300"
             onClick={() => photoInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
@@ -1128,7 +1280,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         <div className="space-y-2">
           <p className="text-sm text-gray-600">Upload documents for your listing.</p>
-          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>          <div
+          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>{" "}
+          <div
             className="mt-4 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center flex flex-col items-center justify-center bg-gray-50 cursor-pointer hover:border-[#06AED7] transition-colors duration-300"
             onClick={() => documentInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
@@ -1199,7 +1352,6 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               </>
             )}
           </div>
-
           <button
             type="button"
             className="flex items-center justify-center px-4 py-2 mt-4 bg-white border border-gray-300 rounded-full text-[#06AED7] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:ring-offset-2 w-full transition-all duration-300"
@@ -1232,7 +1384,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             <div className="relative">
               <select
                 id="confidentiality"
-                name="confidentiality"                value={formData.confidentiality || ""}
+                name="confidentiality"
+                value={formData.confidentiality || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
               >
@@ -1253,7 +1406,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             </label>
             <select
               id="availableToBrokers"
-              name="availableToBrokers"              value={formData.availableToBrokers || ""}
+              name="availableToBrokers"
+              value={formData.availableToBrokers || ""}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
             >
@@ -1272,7 +1426,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             <div className="relative">
               <select
                 id="marketplaceVisibility"
-                name="marketplaceVisibility"                value={formData.marketplaceVisibility || "visible"}
+                name="marketplaceVisibility"
+                value={formData.marketplaceVisibility || "visible"}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
               >
@@ -1325,11 +1480,11 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
           <button
             type="button"
-            onClick={() => {
+            onClick={(e) => {
               const termsAgreement = document.getElementById("termsAgreement") as HTMLInputElement
               if (termsAgreement && termsAgreement.checked) {
-                // Call the handleSubmit function
-                handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+                // Call the handleSubmit function with a proper event object
+                handleSubmit(e as unknown as React.FormEvent)
               } else {
                 alert("Please accept the terms of use.")
               }

@@ -113,10 +113,24 @@ const AddEmailModal: React.FC<AddEmailModalProps> = ({ isOpen, onClose, onAddEma
                 />
               </div>
             </div>
+          </div>
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/20">
+            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">Expected CSV Format:</h4>
+            <div className="text-xs text-blue-700 dark:text-blue-400 font-mono bg-white dark:bg-gray-800 p-2 rounded border">
+              <div className="border-b border-gray-200 dark:border-gray-700 pb-1 mb-1">email</div>
+              <div>alice@example.com</div>
+              <div>bob.smith@gmail.com</div>
+              {/* <div>charlie123@yahoo.com</div> */}
             </div>
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+              • First column should contain email addresses<br/>
+              • Header row is optional but recommended<br/>
+    
+            </p>
+          </div>
           <div className="mb-12">
             <a 
-              href="/files/sample_email_list.csv" 
+              href="/files/help.csv" 
               download="sample_email_list.csv" 
               className="text-[#00b9f1] text-sm hover:underline flex items-center"
             >
