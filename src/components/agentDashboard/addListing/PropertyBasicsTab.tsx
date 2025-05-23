@@ -507,8 +507,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
       />
 
       {/* Display submission error if any */}
-      {submissionError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+      {submissionError && (        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-full mb-4">
           <p className="font-medium">Error:</p>
           <p>{submissionError}</p>
         </div>
@@ -563,14 +562,13 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               Title
             </label>
             <span className="text-xs text-gray-500">{titleLength}/100</span>
-          </div>
-          <input
+          </div>          <input
             type="text"
             id="title"
             name="title"
             value={formData.title ?? ""}
             onChange={handleTitleChange}
-            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             placeholder="Enter listing title"
             maxLength={100}
           />
@@ -587,14 +585,13 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
               <span className="text-gray-500">$</span>
-            </div>
-            <input
+            </div>            <input
               type="number"
               id="price"
               name="price"
               value={formData.price ?? ""}
               onChange={handleChange}
-              className="w-full pl-8 pr-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               placeholder="0"
               min="0"
             />
@@ -619,13 +616,12 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <label htmlFor="listingSubType" className="block mb-2 text-sm font-medium text-gray-700">
             Listing Sub Type
           </label>
-          <div className="relative">
-            <select
+          <div className="relative">            <select
               id="listingSubType"
               name="listingSubType"
               value={formData.listingSubType ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
             >
               <option value="">Select a sub type</option>
               <option value="For Sale">For Sale</option>
@@ -651,65 +647,60 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
         </h2>
 
         {/* Street Address */}
-        <div>
-          <input
+        <div>          <input
             type="text"
             id="streetAddress"
             name="streetAddress"
             value={formData.streetAddress ?? ""}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             placeholder="Street Address"
           />
         </div>
 
         {/* Address 2 */}
-        <div>
-          <input
+        <div>          <input
             type="text"
             id="address2"
             name="address2"
             value={formData.address2 ?? ""}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             placeholder="Address 2"
           />
         </div>
 
         {/* City, State/Province, Postal Code in one row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <input
+          <div>            <input
               type="text"
               id="city"
               name="city"
               value={formData.city ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               placeholder="City"
             />
           </div>
 
-          <div>
-            <input
+          <div>            <input
               type="text"
               id="stateProvince"
               name="stateProvince"
               value={formData.stateProvince ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               placeholder="State/Province"
             />
           </div>
 
-          <div>
-            <input
+          <div>            <input
               type="text"
               id="postalCode"
               name="postalCode"
               value={formData.postalCode ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               placeholder="Postal Code"
             />
           </div>
@@ -717,13 +708,12 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         {/* Country Dropdown */}
         <div>
-          <div className="relative">
-            <select
+          <div className="relative">            <select
               id="country"
               name="country"
               value={formData.country ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
             >
               <option value="">Select Country</option>
               <option value="Pakistan">Pakistan</option>
@@ -746,27 +736,25 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
         </div>
 
         {/* Neighborhood */}
-        <div>
-          <input
+        <div>          <input
             type="text"
             id="neighborhood"
             name="neighborhood"
             value={formData.neighborhood ?? ""}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             placeholder="Neighborhood"
           />
         </div>
 
         {/* Assessor's Parcel Number */}
-        <div>
-          <input
+        <div>          <input
             type="text"
             id="parcelNumber"
             name="parcelNumber"
             value={formData.parcelNumber ?? ""}
             onChange={handleChange}
-            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             placeholder="Assessor's Parcel Number"
           />
         </div>
@@ -846,8 +834,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <div>
             <label htmlFor="latitude" className="block mb-2 text-sm font-medium text-gray-700">
               Latitude {isLoadingMap && <span className="text-xs text-blue-500 ml-1">(updating...)</span>}
-            </label>
-            <input
+            </label>            <input
               type="text"
               id="latitude"
               name="latitude"
@@ -856,15 +843,14 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 handleChange(e)
                 updateCoordinates({ latitude: e.target.value })
               }}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             />
           </div>
 
           <div>
             <label htmlFor="longitude" className="block mb-2 text-sm font-medium text-gray-700">
               Longitude {isLoadingMap && <span className="text-xs text-blue-500 ml-1">(updating...)</span>}
-            </label>
-            <input
+            </label>            <input
               type="text"
               id="longitude"
               name="longitude"
@@ -873,7 +859,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 handleChange(e)
                 updateCoordinates({ longitude: e.target.value })
               }}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             />
           </div>
         </div>
@@ -920,13 +906,12 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               Seller Financing
             </label>
             <div className="md:w-3/4">
-              <div className="relative">
-                <select
+              <div className="relative">                <select
                   id="sellerFinancing"
                   name="sellerFinancing"
                   value={formData.sellerFinancing ?? ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
                 >
                   <option value="">- Select Seller Financing -</option>
                   <option value="Yes">Yes</option>
@@ -946,13 +931,12 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               Opportunity Zone
             </label>
             <div className="md:w-3/4">
-              <div className="relative">
-                <select
+              <div className="relative">                <select
                   id="opportunityZone"
                   name="opportunityZone"
                   value={formData.opportunityZone ?? ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
                 >
                   <option value="">- Select Opportunity Zone -</option>
                   <option value="Yes">Yes</option>
@@ -995,10 +979,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               onChange={(e) => {
                 handleChange(e)
                 setDescriptionLength(e.target.value.length)
-              }}
-              rows={8}
+              }}              rows={8}
               maxLength={5000}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               placeholder="Enter a comprehensive description of the property..."
             ></textarea>
             <div className="absolute bottom-3 right-3 text-xs text-gray-500">
@@ -1019,7 +1002,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 type="text"
                 value={highlight}
                 onChange={(e) => handleHighlightChange(index, e.target.value)}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 placeholder={`Highlight #${index + 1}`}
               />
               <button
@@ -1041,7 +1024,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           <button
             type="button"
             onClick={addHighlight}
-            className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-green-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full"
+            className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-full text-[#06AED7] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:ring-offset-2 w-full transition-all duration-300"
           >
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -1063,10 +1046,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         <div className="space-y-2">
           <p className="text-sm text-gray-600">Upload high-resolution photos of your listing.</p>
-          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>
-
-          <div
-            className="mt-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center flex flex-col items-center justify-center bg-gray-50 cursor-pointer"
+          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>          <div
+            className="mt-4 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center flex flex-col items-center justify-center bg-gray-50 cursor-pointer hover:border-[#06AED7] transition-colors duration-300"
             onClick={() => photoInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handlePhotoDrop}
@@ -1147,10 +1128,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
         <div className="space-y-2">
           <p className="text-sm text-gray-600">Upload documents for your listing.</p>
-          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>
-
-          <div
-            className="mt-4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center flex flex-col items-center justify-center bg-gray-50 cursor-pointer"
+          <p className="text-sm text-gray-600">You can click and drag the numbers to re-arrange the order.</p>          <div
+            className="mt-4 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center flex flex-col items-center justify-center bg-gray-50 cursor-pointer hover:border-[#06AED7] transition-colors duration-300"
             onClick={() => documentInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDocumentDrop}
@@ -1169,7 +1148,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 {documents.map((doc, index) => (
                   <div
                     key={index}
-                    className="relative flex items-center bg-white p-3 rounded-lg border border-gray-200 group"
+                    className="relative flex items-center bg-white p-3 rounded-full border border-gray-200 group"
                   >
                     <div className="bg-gray-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 cursor-move">
                       {index + 1}
@@ -1223,7 +1202,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
           <button
             type="button"
-            className="flex items-center justify-center px-4 py-2 mt-4 bg-white border border-gray-300 rounded-lg text-green-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full"
+            className="flex items-center justify-center px-4 py-2 mt-4 bg-white border border-gray-300 rounded-full text-[#06AED7] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:ring-offset-2 w-full transition-all duration-300"
             onClick={() => documentInputRef.current?.click()}
           >
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -1253,10 +1232,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             <div className="relative">
               <select
                 id="confidentiality"
-                name="confidentiality"
-                value={formData.confidentiality || ""}
+                name="confidentiality"                value={formData.confidentiality || ""}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
               >
                 <option value="noCA">No CA</option>
                 <option value="mutualCA">Mutual CA</option>
@@ -1275,10 +1253,9 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             </label>
             <select
               id="availableToBrokers"
-              name="availableToBrokers"
-              value={formData.availableToBrokers || ""}
+              name="availableToBrokers"              value={formData.availableToBrokers || ""}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
             >
               <option value="">Select option</option>
               <option value="Yes">Yes</option>
@@ -1295,16 +1272,15 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             <div className="relative">
               <select
                 id="marketplaceVisibility"
-                name="marketplaceVisibility"
-                value={formData.marketplaceVisibility || "visible"}
+                name="marketplaceVisibility"                value={formData.marketplaceVisibility || "visible"}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
               >
                 <option value="visible">Yes</option>
                 <option value="hidden">No</option>
               </select>
 
-              <div className="mt-3 p-3 bg-blue-50 rounded-md">
+              <div className="mt-3 p-3 bg-blue-50 rounded-xl">
                 <p className="text-sm text-blue-800">
                   <strong>Visible</strong>: Listing will be visible on the marketplace
                 </p>
@@ -1363,7 +1339,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               isSubmitting
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-green-100 text-green-800 hover:bg-green-200"
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 rounded-md text-sm font-medium flex items-center justify-center`}
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06AED7] transition-colors duration-300 rounded-full text-sm font-medium flex items-center justify-center`}
           >
             {isSubmitting ? (
               <>
