@@ -33,29 +33,29 @@ export const validatePropertyForm = (formData: PropertyFormData): ValidationErro
   const errors: ValidationError[] = [];
 
   // Basic Tab Validation
-  if (!formData.businessLegalName) {
-    errors.push({
-      field: 'businessLegalName',
-      message: 'Business legal name is required'
-    });
-  } else if (String(formData.businessLegalName).length > 50) {
-    errors.push({
-      field: 'businessLegalName',
-      message: 'Business legal name must be less than 50 characters'
-    });
-  }
+  // if (!formData.businessLegalName) {
+  //   errors.push({
+  //     field: 'businessLegalName',
+  //     message: 'Business legal name is required'
+  //   });
+  // } else if (String(formData.businessLegalName).length > 50) {
+  //   errors.push({
+  //     field: 'businessLegalName',
+  //     message: 'Business legal name must be less than 50 characters'
+  //   });
+  // }
 
-  if (!formData.askingPrice) {
-    errors.push({
-      field: 'askingPrice',
-      message: 'Asking price is required'
-    });
-  } else if (isNaN(Number(formData.askingPrice)) || Number(formData.askingPrice) <= 0) {
-    errors.push({
-      field: 'askingPrice',
-      message: 'Asking price must be a positive number'
-    });
-  }
+  // if (!formData.askingPrice) {
+  //   errors.push({
+  //     field: 'askingPrice',
+  //     message: 'Asking price is required'
+  //   });
+  // } else if (isNaN(Number(formData.askingPrice)) || Number(formData.askingPrice) <= 0) {
+  //   errors.push({
+  //     field: 'askingPrice',
+  //     message: 'Asking price must be a positive number'
+  //   });
+  // }
 
   // Email validation for owner emails
   if (formData.ownerEmail1 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(formData.ownerEmail1))) {
