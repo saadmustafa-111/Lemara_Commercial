@@ -4,7 +4,7 @@ import axios from 'axios';
  * Configuration constants for Google Maps
  */
 export const GOOGLE_MAPS_CONFIG = {
-  API_KEY: 'AIzaSyDJoz4v__2hk1k2npCct2wj-aLgsBBZ9Ro',
+  API_KEY: 'AIzaSyCOBUS_ENB_ZGlNqNdRojb05EMne_V8-7o',
   MAP_ID: 'a30bb137b25482b3',
   REQUIRED_APIS: [
     'Maps JavaScript API',

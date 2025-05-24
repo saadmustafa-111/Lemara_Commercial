@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -123,10 +123,38 @@ const AddListingForm = () => {
       cleanupPreviews()
     }
   }, [])
+  // Use ref for tracking updates to prevent infinite loops
+  const coordinateUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const updateInProgressRef = useRef<boolean>(false);
 
   // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
+    
+    // Special handling for latitude/longitude fields to prevent update cycles
+    if (name === "latitude" || name === "longitude") {
+      // Clear any existing timeout for coordinate updates
+      if (coordinateUpdateTimeoutRef.current) {
+        clearTimeout(coordinateUpdateTimeoutRef.current);
+      }
+      
+      // Skip if update is already in progress
+      if (updateInProgressRef.current) return;
+      
+      // Set update in progress flag
+      updateInProgressRef.current = true;
+      
+      // Debounce coordinate updates to prevent update cycles
+      coordinateUpdateTimeoutRef.current = setTimeout(() => {
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          [name]: value,
+        }))
+        updateInProgressRef.current = false;
+      }, 200);
+      
+      return;
+    }
 
     // Handle checkboxes
     if (type === "checkbox") {

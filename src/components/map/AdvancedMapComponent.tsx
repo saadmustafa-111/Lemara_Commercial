@@ -150,9 +150,8 @@ const AdvancedMapComponent: React.FC<AdvancedMapComponentProps> = ({
   }, [latitude, longitude, mapInstance, marker, streetViewPanorama, isLoaded]);
 
   return (
-    <>
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=AIzaSyDJoz4v__2hk1k2npCct2wj-aLgsBBZ9Ro&libraries=places&v=weekly&map_ids=${mapId}`}
+    <>      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=AIzaSyCOBUS_ENB_ZGlNqNdRojb05EMne_V8-7o&libraries=places&v=weekly&map_ids=${mapId}`}
         onLoad={() => {
           setIsLoaded(true);
           window.initMap = initMap;

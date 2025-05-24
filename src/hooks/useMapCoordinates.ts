@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { geocodeAddress } from '@/lib/maps';
 
 interface AddressComponents {
@@ -29,6 +29,11 @@ export function useMapCoordinates(
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  
+  // Use refs to track previous values and prevent unnecessary updates
+  const prevAddressRef = useRef<string>('');
+  const updateInProgressRef = useRef<boolean>(false);
+  
   // Update coordinates when address components change
   useEffect(() => {
     // Only proceed if we have enough address info to geocode
@@ -44,18 +49,28 @@ export function useMapCoordinates(
     // Skip geocoding if the address string is too short
     if (addressStr.length < 5) return;
     
-    // Skip if we already have valid coordinates in state
+    // Skip if address hasn't changed
+    if (addressStr === prevAddressRef.current) return;
+    
+    // Skip if an update is already in progress
+    if (updateInProgressRef.current) return;
+
+    // Skip if we already have valid coordinates in state for the current address
     if (coordinates.latitude && coordinates.longitude) {
       const lat = parseFloat(coordinates.latitude);
       const lng = parseFloat(coordinates.longitude);
       
-      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-        // Skip geocoding if coordinates are already valid
+      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0 && prevAddressRef.current === addressStr) {
+        // Skip geocoding if coordinates are already valid for this address
         return;
       }
     }
     
+    // Update the previous address ref
+    prevAddressRef.current = addressStr;
+    
     const fetchCoordinates = async () => {
+      updateInProgressRef.current = true;
       setIsLoading(true);
       setError(null);
       
@@ -83,6 +98,10 @@ export function useMapCoordinates(
         setError(err instanceof Error ? err : new Error(`Geocoding failed for "${addressStr}"`));
       } finally {
         setIsLoading(false);
+        // Allow time for React to process state updates before allowing new ones
+        setTimeout(() => {
+          updateInProgressRef.current = false;
+        }, 100);
       }
     };
 

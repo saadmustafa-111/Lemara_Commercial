@@ -94,9 +94,31 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
     },
   )
 
+  // Store previous coordinates to avoid unnecessary updates
+  const prevCoordinatesRef = useRef({ latitude: '', longitude: '' });
+  const updateInProgressRef = useRef(false);
   // Update formData when coordinates change
   useEffect(() => {
-    if (coordinates.latitude && coordinates.longitude) {
+    // Skip if no coordinates
+    if (!coordinates.latitude || !coordinates.longitude) return;
+    
+    // Skip if coordinates haven't changed
+    if (prevCoordinatesRef.current.latitude === coordinates.latitude &&
+        prevCoordinatesRef.current.longitude === coordinates.longitude) {
+      return;
+    }
+    
+    // Skip if an update is already in progress
+    if (updateInProgressRef.current) return;
+    
+    // Update prev coordinates
+    prevCoordinatesRef.current = { ...coordinates };
+    
+    // Prevent concurrent updates
+    updateInProgressRef.current = true;
+    
+    // Use setTimeout to break the potential update cycle
+    setTimeout(() => {
       // Create synthetic events to update form data
       const latEvent = {
         target: {
@@ -111,11 +133,43 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
           value: coordinates.longitude,
         },
       } as React.ChangeEvent<HTMLInputElement>
+      
+      // Calculate new zoom based on location type
+      // City/town gets zoom 10, specific address gets zoom 15
+      const hasStreetAddress = !!formData.streetAddress?.trim();
+      const zoomEvent = {
+        target: {
+          name: "zoom",
+          value: hasStreetAddress ? "15.0" : "10.0",
+        }
+      } as React.ChangeEvent<HTMLInputElement>
+      
+      // Set default pitch for street view
+      const pitchEvent = {
+        target: {
+          name: "pitch",
+          value: "5.0",
+        }
+      } as React.ChangeEvent<HTMLInputElement>
+      
+      // Set default heading for street view
+      const headingEvent = {
+        target: {
+          name: "heading", 
+          value: "0.0",
+        }
+      } as React.ChangeEvent<HTMLInputElement>
 
       handleChange(latEvent)
       handleChange(lngEvent)
-    }
-  }, [coordinates, handleChange])
+      handleChange(zoomEvent)
+      handleChange(pitchEvent)
+      handleChange(headingEvent)
+      
+      // Reset the update flag
+      updateInProgressRef.current = false;
+    }, 0);
+  }, [coordinates, handleChange, formData.streetAddress])
 
   // Expose the submit handler to the parent component
   useEffect(() => {
@@ -901,9 +955,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
             placeholder="Assessor's Parcel Number"
           />
-        </div>
-
-        {/* Map and Street View */}
+        </div>        {/* Map and Street View */}
         <div className="space-y-2">
           {isLoadingMap && (
             <div className="text-center text-sm text-blue-600 py-2">Loading map coordinates based on address...</div>
@@ -971,73 +1023,7 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               handleChange(event)
             }}
           />
-        </div>
-
-        {/* Latitude, Longitude and Map Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="latitude" className="block mb-2 text-sm font-medium text-gray-700">
-              Latitude {isLoadingMap && <span className="text-xs text-blue-500 ml-1">(updating...)</span>}
-            </label>{" "}
-            <input
-              type="text"
-              id="latitude"
-              name="latitude"
-              value={formData.latitude ?? "34.1809281"}
-              onChange={(e) => {
-                handleChange(e)
-                updateCoordinates({ latitude: e.target.value })
-              }}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="longitude" className="block mb-2 text-sm font-medium text-gray-700">
-              Longitude {isLoadingMap && <span className="text-xs text-blue-500 ml-1">(updating...)</span>}
-            </label>{" "}
-            <input
-              type="text"
-              id="longitude"
-              name="longitude"
-              value={formData.longitude ?? "73.2783251"}
-              onChange={(e) => {
-                handleChange(e)
-                updateCoordinates({ longitude: e.target.value })
-              }}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            />
-          </div>
-        </div>
-
-        <div className="text-sm text-gray-500">
-          If latitude/longitude is incorrect please update with the Decimal Degrees format i.e. 37.778659, -122.40809
-          <br />
-          <span className="text-xs text-blue-600">
-            Coordinates will automatically update when you enter a valid address
-          </span>
-        </div>
-
-        {/* Map Information (Heading, Pitch, Zoom) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Heading: {formData.heading ?? "341.31519935292244"}
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Pitch: {formData.pitch ?? "5.058408794219417"}
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Zoom: {formData.zoom ?? "3.7450835433590273"}
-            </label>
-          </div>
-        </div>
+        </div> 
       </div>
 
       {/* Details Section */}

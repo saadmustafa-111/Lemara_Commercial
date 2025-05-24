@@ -79,10 +79,9 @@ const EnhancedMapViewer: React.FC<EnhancedMapViewerProps> = ({
                 </button>
               </div>
             </div>
-            
-            {/* Google Map */}
+              {/* Google Map */}
             <iframe 
-              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyDJoz4v__2hk1k2npCct2wj-aLgsBBZ9Ro&q=${latitude},${longitude}&center=${latitude},${longitude}&zoom=${zoom}&maptype=${mapType}`}
+              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyCOBUS_ENB_ZGlNqNdRojb05EMne_V8-7o&q=${latitude},${longitude}&center=${latitude},${longitude}&zoom=${zoom}&maptype=${mapType}`}
               title="Map View"
               width="100%"
               height="100%"
@@ -107,9 +106,8 @@ const EnhancedMapViewer: React.FC<EnhancedMapViewerProps> = ({
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
-            <div className="absolute top-2 left-2 bg-white px-2 py-1 rounded-md shadow-sm z-10">
-              <div className="text-sm">
-                <span>{address.city || 'Abbottabad township'}</span>
+            <div className="absolute top-2 left-2 bg-white px-2 py-1 rounded-md shadow-sm z-10">              <div className="text-sm">
+                <span>{addressString || address.city || address.stateProvince || address.country || 'Location'}</span>
               </div>
               <div className="text-xs text-blue-600">
                 <a                  href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}&heading=${currentHeading}&pitch=${currentPitch}`} 
