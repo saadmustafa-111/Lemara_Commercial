@@ -55,6 +55,14 @@ const PREDEFINED_USERS = [
     firstName: "AJ",
     lastName: "Rana",
     role: "agent"
+  },
+  {
+    id: 4,
+    email: "admin@lemaraconstruction.com",
+    password: "admin123",
+    firstName: "Lemara",
+    lastName: "Admin",
+    role: "admin"
   }
 ];
 

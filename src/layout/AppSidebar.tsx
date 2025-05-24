@@ -39,8 +39,43 @@ const adminNavItems: NavItem[] = [
       { name: "Admin Overview", path: "/dashboard/admin", pro: false },
       { name: "Analytics", path: "/dashboard/admin/analytics", pro: false },
     ],
-  }
- 
+  },
+  {
+    name: "Properties",
+    icon: <ListIcon />,
+    subItems: [
+      { name: "All Properties", path: "/dashboard/admin/properties", pro: false },
+      { name: "Add Property", path: "/dashboard/admin/properties/add", pro: false },
+    ],
+  },
+  {
+    name: "Agents",
+    icon: <UserCircleIcon />,
+    subItems: [
+      { name: "All Agents", path: "/dashboard/admin/agents", pro: false },
+      { name: "Add Agent", path: "/dashboard/admin/agents/add", pro: false },
+    ],
+  },
+  {
+    name: "Reports",
+    icon: <TableIcon />,
+    path: "/dashboard/admin/reports",
+  },
+  {
+    name: "Email Lists",
+    icon: <EnvelopeListIcon />,
+    path: "/dashboard/email-lists",
+  },
+  {
+    name: "Email Campaigns",
+    icon: <PaperPlaneIcon />,
+    path: "/dashboard/email-campaigns",
+  },
+  {
+    name: "Settings",
+    icon: <Contact />,
+    path: "/dashboard/admin/settings",
+  },
 ];
 
 // Teacher-specific navigation items

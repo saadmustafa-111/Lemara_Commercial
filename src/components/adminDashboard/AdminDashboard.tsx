@@ -1,8 +1,17 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+<<<<<<< Updated upstream
 import { BarChart3, Users, Building, TrendingUp, MapPin, Eye, Edit, Trash2, Plus, Search, Filter, Bell, Settings, User } from 'lucide-react';
 
 // Define types for our dashboard data
+=======
+import { BarChart3, Users, Building, TrendingUp, MapPin, Eye, Edit, Trash2, Plus, Search, Filter, Bell, Settings } from 'lucide-react';
+import Link from 'next/link';
+import Badge from '@/components/ui/badge/Badge';
+import useLoading from '@/hooks/useLoading';
+
+// Define types for our real estate dashboard data
+>>>>>>> Stashed changes
 interface Property {
   id: number;
   title: string;
@@ -44,7 +53,13 @@ interface DashboardData {
 }
 
 export default function RealEstateAdminDashboard() {
+<<<<<<< Updated upstream
   const [isLoading, setIsLoading] = useState(true);
+=======
+  const { isLoading, withLoading } = useLoading(true);
+  
+  // Mock data for the real estate dashboard with proper typing
+>>>>>>> Stashed changes
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     adminStats: {
       totalProperties: 0,
@@ -62,6 +77,7 @@ export default function RealEstateAdminDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+<<<<<<< Updated upstream
         setTimeout(() => {
           setDashboardData({
             adminStats: {
@@ -169,6 +185,135 @@ export default function RealEstateAdminDashboard() {
           });
           setIsLoading(false);
         }, 1500);
+=======
+        // Simulate API call with delay
+        await withLoading(
+          new Promise<void>((resolve) => {
+            setTimeout(() => {
+              setDashboardData({
+                adminStats: {
+                  totalProperties: 178,
+                  totalAgents: 24,
+                  totalSales: 48,
+                  activeListings: 94,
+                  monthlyRevenue: 425000,
+                  avgPrice: 875000
+                },
+                recentProperties: [
+                  {
+                    id: 100079,
+                    title: "520 ACR MIXED LICENSED GRN HS & OUTDR",
+                    type: "Land",
+                    price: 9990000,
+                    location: "Lake Nacimiento",
+                    image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&h=300&fit=crop",
+                    status: "active",
+                    agent: "AJ Rana",
+                    created: "7/23/2019",
+                    views: 542,
+                    bedrooms: 0,
+                    bathrooms: 0,
+                    area: 520
+                  },
+                  {
+                    id: 100100,
+                    title: "LICENSED GREEN-HOUSE CANNABIS FARM",
+                    type: "Farm",
+                    price: 7750000,
+                    location: "Salinas",
+                    image: "https://images.unsplash.com/photo-1605146768851-eda79da39897?w=400&h=300&fit=crop",
+                    status: "sold",
+                    agent: "AJ Rana",
+                    created: "8/19/2019",
+                    views: 868,
+                    bedrooms: 0,
+                    bathrooms: 0,
+                    area: 0
+                  },
+                  {
+                    id: 100104,
+                    title: "ESTABLISHED DELI CAFE AND GYRO",
+                    type: "Commercial",
+                    price: 89000,
+                    location: "Newark",
+                    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop",
+                    status: "active",
+                    agent: "AJ Rana",
+                    created: "8/22/2019",
+                    views: 866,
+                    bedrooms: 0,
+                    bathrooms: 0,
+                    area: 0
+                  },
+                  {
+                    id: 100135,
+                    title: "SUCCESSFUL ASSISTED LIVING FACILITY",
+                    type: "Commercial",
+                    price: 9750000,
+                    location: "Sacramento",
+                    image: "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=400&h=300&fit=crop",
+                    status: "active",
+                    agent: "AJ Rana",
+                    created: "8/27/2019",
+                    views: 9,
+                    bedrooms: 0,
+                    bathrooms: 0,
+                    area: 0
+                  },
+                  {
+                    id: 100238,
+                    title: "OPPORTUNITY TO BUY MULTI-FAMILY BUILDING",
+                    type: "Multi-Family",
+                    price: 35449230,
+                    location: "San Francisco",
+                    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop",
+                    status: "active",
+                    agent: "AJ Rana",
+                    created: "2/2/2020",
+                    views: 0,
+                    bedrooms: 24,
+                    bathrooms: 18,
+                    area: 14500
+                  }
+                ],
+                topAgents: [
+                  { 
+                    id: 1, 
+                    name: "AJ Rana", 
+                    email: "agent@lemaraconstruction.com", 
+                    avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=60&h=60&fit=crop&crop=face", 
+                    properties: 42,
+                    sales: 18,
+                    joined: "Jul 2019",
+                    status: "active"
+                  },
+                  { 
+                    id: 2, 
+                    name: "Abdul Shah", 
+                    email: "ashah@lemaraconstruction.com", 
+                    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=60&h=60&fit=crop&crop=face", 
+                    properties: 2,
+                    sales: 1,
+                    joined: "May 2022",
+                    status: "active"
+                  },
+                  { 
+                    id: 3, 
+                    name: "Sarah Johnson", 
+                    email: "sjohnson@lemaraconstruction.com", 
+                    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face", 
+                    properties: 0,
+                    sales: 0,
+                    joined: "Mar 2022",
+                    status: "active"
+                  }
+                ]
+              });
+              resolve();
+            }, 1500);
+          })
+        );
+>>>>>>> Stashed changes
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         setIsLoading(false);
@@ -221,7 +366,11 @@ export default function RealEstateAdminDashboard() {
                   <Building className="w-6 h-6 text-white" />
                 </div>
                 <div>
+<<<<<<< Updated upstream
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Real Estate Admin</h1>
+=======
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Lemara Commercial</h1>
+>>>>>>> Stashed changes
                   <p className="text-sm text-gray-500 dark:text-gray-400">Property Management Dashboard</p>
                 </div>
               </div>
@@ -252,7 +401,11 @@ export default function RealEstateAdminDashboard() {
                   alt="Admin"
                   className="w-8 h-8 rounded-full"
                 />
+<<<<<<< Updated upstream
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Admin User</span>
+=======
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Lemara Admin</span>
+>>>>>>> Stashed changes
               </div>
             </div>
           </div>
@@ -375,9 +528,16 @@ export default function RealEstateAdminDashboard() {
                               <span className="text-sm text-gray-600 dark:text-gray-400">{property.location}</span>
                             </div>
                             <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+<<<<<<< Updated upstream
                               <span>{property.bedrooms} beds</span>
                               <span>{property.bathrooms} baths</span>
                               <span>{property.area.toLocaleString()} sqft</span>
+=======
+                              {property.bedrooms > 0 && <span>{property.bedrooms} beds</span>}
+                              {property.bathrooms > 0 && <span>{property.bathrooms} baths</span>}
+                              {property.area > 0 && <span>{property.area.toLocaleString()} sqft</span>}
+                              {property.type && <span>{property.type}</span>}
+>>>>>>> Stashed changes
                             </div>
                           </div>
                           
@@ -460,6 +620,7 @@ export default function RealEstateAdminDashboard() {
               
               <div className="p-6">
                 <div className="grid grid-cols-2 gap-3">
+<<<<<<< Updated upstream
                   <button className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
                     <Plus className="w-5 h-5 text-blue-600 mb-2" />
                     <div className="text-sm font-medium text-gray-900 dark:text-white">Add Property</div>
@@ -479,6 +640,27 @@ export default function RealEstateAdminDashboard() {
                     <Settings className="w-5 h-5 text-orange-600 mb-2" />
                     <div className="text-sm font-medium text-gray-900 dark:text-white">Settings</div>
                   </button>
+=======
+                  <Link href="/dashboard/admin/properties/add" className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                    <Plus className="w-5 h-5 text-blue-600 mb-2" />
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Add Property</div>
+                  </Link>
+                  
+                  <Link href="/dashboard/admin/agents/add" className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                    <Users className="w-5 h-5 text-green-600 mb-2" />
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Add Agent</div>
+                  </Link>
+                  
+                  <Link href="/dashboard/admin/reports" className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                    <BarChart3 className="w-5 h-5 text-purple-600 mb-2" />
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">View Reports</div>
+                  </Link>
+                  
+                  <Link href="/dashboard/admin/settings" className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
+                    <Settings className="w-5 h-5 text-orange-600 mb-2" />
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Settings</div>
+                  </Link>
+>>>>>>> Stashed changes
                 </div>
               </div>
             </div>
