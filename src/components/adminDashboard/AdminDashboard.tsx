@@ -1,17 +1,11 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-<<<<<<< Updated upstream
-import { BarChart3, Users, Building, TrendingUp, MapPin, Eye, Edit, Trash2, Plus, Search, Filter, Bell, Settings, User } from 'lucide-react';
-
-// Define types for our dashboard data
-=======
 import { BarChart3, Users, Building, TrendingUp, MapPin, Eye, Edit, Trash2, Plus, Search, Filter, Bell, Settings } from 'lucide-react';
 import Link from 'next/link';
 import Badge from '@/components/ui/badge/Badge';
 import useLoading from '@/hooks/useLoading';
 
 // Define types for our real estate dashboard data
->>>>>>> Stashed changes
 interface Property {
   id: number;
   title: string;
@@ -53,13 +47,9 @@ interface DashboardData {
 }
 
 export default function RealEstateAdminDashboard() {
-<<<<<<< Updated upstream
-  const [isLoading, setIsLoading] = useState(true);
-=======
   const { isLoading, withLoading } = useLoading(true);
   
   // Mock data for the real estate dashboard with proper typing
->>>>>>> Stashed changes
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     adminStats: {
       totalProperties: 0,
@@ -77,115 +67,6 @@ export default function RealEstateAdminDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-<<<<<<< Updated upstream
-        setTimeout(() => {
-          setDashboardData({
-            adminStats: {
-              totalProperties: 1247,
-              totalAgents: 34,
-              totalSales: 156,
-              activeListings: 892,
-              monthlyRevenue: 2840000,
-              avgPrice: 750000
-            },
-            recentProperties: [
-              {
-                id: 1,
-                title: "Modern Downtown Apartment",
-                type: "Apartment",
-                price: 450000,
-                location: "Downtown, NYC",
-                image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop",
-                status: "active",
-                agent: "Sarah Johnson",
-                created: "2 days ago",
-                views: 247,
-                bedrooms: 2,
-                bathrooms: 2,
-                area: 1200
-              },
-              {
-                id: 2,
-                title: "Luxury Villa with Pool",
-                type: "Villa",
-                price: 1200000,
-                location: "Beverly Hills, CA",
-                image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop",
-                status: "pending",
-                agent: "Michael Brown",
-                created: "1 week ago",
-                views: 892,
-                bedrooms: 5,
-                bathrooms: 4,
-                area: 3500
-              },
-              {
-                id: 3,
-                title: "Cozy Suburban House",
-                type: "House",
-                price: 680000,
-                location: "Suburbs, TX",
-                image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop",
-                status: "sold",
-                agent: "Emma Wilson",
-                created: "3 days ago",
-                views: 156,
-                bedrooms: 3,
-                bathrooms: 2,
-                area: 2100
-              },
-              {
-                id: 4,
-                title: "Penthouse with City View",
-                type: "Penthouse",
-                price: 2500000,
-                location: "Manhattan, NYC",
-                image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop",
-                status: "active",
-                agent: "David Chen",
-                created: "5 days ago",
-                views: 1247,
-                bedrooms: 4,
-                bathrooms: 3,
-                area: 2800
-              }
-            ],
-            topAgents: [
-              { 
-                id: 1, 
-                name: "Sarah Johnson", 
-                email: "sarah.johnson@realestate.com", 
-                avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face", 
-                properties: 28,
-                sales: 12,
-                joined: "Jan 2023",
-                status: "active"
-              },
-              { 
-                id: 2, 
-                name: "Michael Brown", 
-                email: "michael.brown@realestate.com", 
-                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face", 
-                properties: 34,
-                sales: 18,
-                joined: "Mar 2022",
-                status: "active"
-              },
-              { 
-                id: 3, 
-                name: "Emma Wilson", 
-                email: "emma.wilson@realestate.com", 
-                avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face", 
-                properties: 22,
-                sales: 9,
-                joined: "Aug 2023",
-                status: "active"
-              }
-            ]
-          });
-          setIsLoading(false);
-        }, 1500);
-=======
         // Simulate API call with delay
         await withLoading(
           new Promise<void>((resolve) => {
@@ -313,7 +194,6 @@ export default function RealEstateAdminDashboard() {
             }, 1500);
           })
         );
->>>>>>> Stashed changes
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         setIsLoading(false);
@@ -366,11 +246,7 @@ export default function RealEstateAdminDashboard() {
                   <Building className="w-6 h-6 text-white" />
                 </div>
                 <div>
-<<<<<<< Updated upstream
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Real Estate Admin</h1>
-=======
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Lemara Commercial</h1>
->>>>>>> Stashed changes
                   <p className="text-sm text-gray-500 dark:text-gray-400">Property Management Dashboard</p>
                 </div>
               </div>
@@ -401,11 +277,7 @@ export default function RealEstateAdminDashboard() {
                   alt="Admin"
                   className="w-8 h-8 rounded-full"
                 />
-<<<<<<< Updated upstream
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Admin User</span>
-=======
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Lemara Admin</span>
->>>>>>> Stashed changes
               </div>
             </div>
           </div>
@@ -528,16 +400,10 @@ export default function RealEstateAdminDashboard() {
                               <span className="text-sm text-gray-600 dark:text-gray-400">{property.location}</span>
                             </div>
                             <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
-<<<<<<< Updated upstream
-                              <span>{property.bedrooms} beds</span>
-                              <span>{property.bathrooms} baths</span>
-                              <span>{property.area.toLocaleString()} sqft</span>
-=======
                               {property.bedrooms > 0 && <span>{property.bedrooms} beds</span>}
                               {property.bathrooms > 0 && <span>{property.bathrooms} baths</span>}
                               {property.area > 0 && <span>{property.area.toLocaleString()} sqft</span>}
                               {property.type && <span>{property.type}</span>}
->>>>>>> Stashed changes
                             </div>
                           </div>
                           
@@ -620,27 +486,6 @@ export default function RealEstateAdminDashboard() {
               
               <div className="p-6">
                 <div className="grid grid-cols-2 gap-3">
-<<<<<<< Updated upstream
-                  <button className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
-                    <Plus className="w-5 h-5 text-blue-600 mb-2" />
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">Add Property</div>
-                  </button>
-                  
-                  <button className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
-                    <Users className="w-5 h-5 text-green-600 mb-2" />
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">Add Agent</div>
-                  </button>
-                  
-                  <button className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
-                    <BarChart3 className="w-5 h-5 text-purple-600 mb-2" />
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">View Reports</div>
-                  </button>
-                  
-                  <button className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
-                    <Settings className="w-5 h-5 text-orange-600 mb-2" />
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">Settings</div>
-                  </button>
-=======
                   <Link href="/dashboard/admin/properties/add" className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow">
                     <Plus className="w-5 h-5 text-blue-600 mb-2" />
                     <div className="text-sm font-medium text-gray-900 dark:text-white">Add Property</div>
@@ -660,7 +505,6 @@ export default function RealEstateAdminDashboard() {
                     <Settings className="w-5 h-5 text-orange-600 mb-2" />
                     <div className="text-sm font-medium text-gray-900 dark:text-white">Settings</div>
                   </Link>
->>>>>>> Stashed changes
                 </div>
               </div>
             </div>
