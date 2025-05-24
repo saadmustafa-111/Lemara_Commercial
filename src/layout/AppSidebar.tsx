@@ -62,12 +62,12 @@ const adminNavItems: NavItem[] = [
     path: "/dashboard/admin/reports",
   },
   {
-    name: "Email Lists",
+    name: "Commercial Listing",
     icon: <EnvelopeListIcon />,
     path: "/dashboard/email-lists",
   },
   {
-    name: "Email Campaigns",
+    name: "Clients",
     icon: <PaperPlaneIcon />,
     path: "/dashboard/email-campaigns",
   },
