@@ -316,7 +316,7 @@ const AddListingForm = () => {
 
       // Redirect after successful submission
       setTimeout(() => {
-        router.push("/dashboard/agent/listings")
+        router.push("/dashboard/listings")
       }, 2000)
     } catch (error) {
       console.error("Error submitting form:", error)

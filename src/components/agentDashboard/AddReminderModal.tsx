@@ -50,9 +50,9 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
   // Effect to handle populating form when editing a reminder
   useEffect(() => {
     if (reminderToEdit) {
-      setTitle(reminderToEdit.title)
-      setDate(reminderToEdit.date)
-      setPriority(reminderToEdit.priority)
+      setTitle(reminderToEdit.title || "")
+      setDate(reminderToEdit.date || "01/01/1900")
+      setPriority(reminderToEdit.priority || "Low")
       setReminderId(reminderToEdit.id)
       setEditMode(true)
     } else {
@@ -70,12 +70,39 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
   // Function to convert MM/DD/YYYY format to a valid ISO date string
   const formatDateTimeToISO = (dateStr: string, timeObj: { hour: string; minute: string; ampm: string }): string => {
     try {
+      // Check if dateStr is valid and not empty
+      if (!dateStr || typeof dateStr !== "string" || dateStr.trim() === "") {
+        console.warn("Invalid date string provided, using current date as fallback")
+        return new Date().toISOString()
+      }
+
       // Parse the date parts
-      const [month, day, year] = dateStr.split("/").map((part) => Number.parseInt(part, 10))
+      const dateParts = dateStr.split("/")
+      if (dateParts.length !== 3) {
+        console.warn("Date string format is invalid, expected MM/DD/YYYY format")
+        return new Date().toISOString()
+      }
+
+      const [month, day, year] = dateParts.map((part) => {
+        const parsed = Number.parseInt(part, 10)
+        return isNaN(parsed) ? 0 : parsed
+      })
+
+      // Validate date parts
+      if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900) {
+        console.warn("Invalid date values provided")
+        return new Date().toISOString()
+      }
 
       // Convert 12-hour format to 24-hour format
       let hour = Number.parseInt(timeObj.hour, 10)
       const minute = Number.parseInt(timeObj.minute, 10)
+
+      // Validate time values
+      if (isNaN(hour) || isNaN(minute) || hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+        console.warn("Invalid time values provided")
+        hour = 12
+      }
 
       // Adjust hour for PM
       if (timeObj.ampm === "PM" && hour < 12) {
@@ -87,7 +114,13 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
       }
 
       // Create a valid date object
-      const dateObj = new Date(year, month - 1, day, hour, minute, 0)
+      const dateObj = new Date(year, month - 1, day, hour, minute || 0, 0)
+
+      // Check if the created date is valid
+      if (isNaN(dateObj.getTime())) {
+        console.warn("Created date object is invalid")
+        return new Date().toISOString()
+      }
 
       // Return ISO string
       return dateObj.toISOString()
@@ -126,7 +159,7 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
 
       if (editMode && reminderId) {
         // Update existing reminder
-        await axiosInstance.put(`/reminders/${reminderId}`, reminderData)
+        await axiosInstance.patch(`/reminders/${reminderId}`, reminderData)
       } else {
         // Create new reminder
         await axiosInstance.post("/reminders", reminderData)
@@ -169,6 +202,9 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
     setNotificationType(["EMAIL"])
     setError(null)
   }
+
+  // Ensure date is always a string
+  const safeDate = date || "01/01/1900"
 
   if (!isOpen) return null
   return (
@@ -282,8 +318,8 @@ export default function AddReminderModal({ isOpen, onClose, onSave, reminderToEd
                     ref={dateInputRef}
                     type="text"
                     placeholder="mm/dd/yyyy"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    value={safeDate}
+                    onChange={(e) => setDate(e.target.value || "01/01/1900")}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                   />
                   <button
