@@ -49,11 +49,9 @@ const EmailCampaigns: React.FC = () => {
   const emailDeliveredTotal = 700;
   const emailOpenedTotal = 600;
   const emailClickedTotal = 678;
-  const handleClick = () => {
-    router.push('/dashboard/addemailcompaigns');
-  };
+
   return (
-    <div>
+    <div className="w-full">
       {/* Header with title and Create Campaign button */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
@@ -63,10 +61,10 @@ const EmailCampaigns: React.FC = () => {
           <h1 className="text-xl text-blue-500 font-bold">Email Campaigns</h1>
         </div>
         <Link href="/dashboard/addemailcompaigns">
-    <div className="bg-white text-black border border-gray-300 rounded-full px-4 py-2 font-medium cursor-pointer text-center">
-      Create a Campaign
-    </div>
-  </Link>
+          <div className="bg-white text-black border border-gray-300 rounded-full px-4 py-2 font-medium cursor-pointer text-center">
+            Create a Campaign
+          </div>
+        </Link>
       </div>
 
       {/* Campaign Count */}
@@ -75,7 +73,7 @@ const EmailCampaigns: React.FC = () => {
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Chart 1: Email Sent & Delivered */}
         <div className="flex items-center justify-center">
           <div className="relative w-40 h-40">
@@ -195,11 +193,11 @@ const EmailCampaigns: React.FC = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex space-x-2 mb-4">
-        <div className="relative">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
+        <div className="relative flex-1 max-w-96">
           <input 
             type="text" 
-            className="pl-10 pr-4 py-2 border rounded-md w-96" 
+            className="pl-10 pr-4 py-2 border rounded-md w-full" 
             placeholder="Search by Name, Location or Brokerage"
           />
           <span className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -208,89 +206,93 @@ const EmailCampaigns: React.FC = () => {
             </svg>
           </span>
         </div>
-        <div>
-          <select className="border rounded-md py-2 px-3">
+        <div className="flex-shrink-0">
+          <select className="border rounded-md py-2 px-3 w-full sm:w-auto">
             <option>All Campaigns</option>
           </select>
         </div>
-      </div>      {/* Campaign Table */}
+      </div>
+
+      {/* Campaign Table - No Scroll */}
       <div className="bg-white rounded-md shadow mb-4">
-        <div className="overflow-x-auto" style={{ minWidth: '100%' }}>
-          <table className="w-full table-auto divide-y divide-gray-200">
+        <div className="w-full">
+          <table className="w-full table-fixed divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">CAMPAIGN</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">EMAIL REQUESTED</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Sent<br/>
-                  % of Requested
+                <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '20%'}}>CAMPAIGN</th>
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '9%'}}>
+                  EMAIL REQ
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Delivered<br/>
-                  % of Sent
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '9%'}}>
+                  SENT<br/>
+                  <span className="text-[10px]">% REQ</span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Opened<br/>
-                  % of Delivered
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '9%'}}>
+                  DELIVERED<br/>
+                  <span className="text-[10px]">% SENT</span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Clicked<br/>
-                  % of Opened
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '9%'}}>
+                  OPENED<br/>
+                  <span className="text-[10px]">% DEL</span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Clicked Property<br/>
-                  % of Opened
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '9%'}}>
+                  CLICKED<br/>
+                  <span className="text-[10px]">% OPEN</span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Clicked OM / Flyer<br/>
-                  % of Opened
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '11%'}}>
+                  PROPERTY<br/>
+                  <span className="text-[10px]">% OPEN</span>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  Clicked DD<br/>
-                  % of Opened
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '12%'}}>
+                  OM/FLYER<br/>
+                  <span className="text-[10px]">% OPEN</span>
+                </th>
+                <th className="px-1 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style={{width: '12%'}}>
+                  DD<br/>
+                  <span className="text-[10px]">% OPEN</span>
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {campaigns.map((campaign) => (
                 <tr key={campaign.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
+                  <td className="px-2 py-4" style={{width: '20%'}}>
+                    <div className="truncate text-sm font-medium mb-1" title={campaign.name}>
                       {campaign.name}
-                      <div className="space-x-2 mt-2">
-                        <button className="text-xs border border-gray-300 rounded-md px-3 py-1">View Details</button>
-                        <button className="text-xs border border-gray-300 rounded-md px-3 py-1">Download Report</button>
-                      </div>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                      <button className="text-[10px] border border-gray-300 rounded px-2 py-1 w-fit">Details</button>
+                      <button className="text-[10px] border border-gray-300 rounded px-2 py-1 w-fit">Report</button>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">{campaign.emailRequested}</td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '9%'}}>{campaign.emailRequested}</td>
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '9%'}}>
                     {campaign.sent}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '9%'}}>
                     {campaign.delivered}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '9%'}}>
                     {campaign.opened}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '9%'}}>
                     {campaign.clicked}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '11%'}}>
                     {campaign.clickedProperty}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '12%'}}>
                     {campaign.clickedOM}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
+                  <td className="px-1 py-4 text-center text-sm" style={{width: '12%'}}>
                     {campaign.clickedDD}
-                    <div className="text-xs text-gray-500">0%</div>
+                    <div className="text-[10px] text-gray-500">0%</div>
                   </td>
                 </tr>
               ))}
@@ -300,7 +302,7 @@ const EmailCampaigns: React.FC = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
         <div className="flex items-center">
           <span className="mr-2">Rows per page:</span>
           <select className="border rounded px-2 py-1 text-sm">
