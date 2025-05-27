@@ -1504,29 +1504,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             )}
           </button>
 
-          <div className="space-y-4 mt-8">
-            <h3 className="text-lg font-medium text-gray-800">What's next?</h3>
-            <p className="text-sm text-gray-600">
-              After you submit your listing, our team will review your submission to ensure its accuracy and completion.
-            </p>
-            <p className="text-sm text-gray-600">Please allow 2-3 business hours for your submission to be approved.</p>
-            <p className="text-sm text-gray-600">
-              Thank You,
-              <br />
-              The Brevitas Team
-            </p>
-          </div>
+         
 
-          <div className="space-y-2 mt-8">
-            <h3 className="text-lg font-medium text-gray-800">Further Assistance</h3>
-            <p className="text-sm text-gray-600">
-              If you need assistance with this process, feel free to contact our team at the number or e-mail below.
-            </p>
-            <div className="text-sm">
-              <p className="text-blue-600 font-medium">415-993-8886</p>
-              <p className="text-blue-600 font-medium">support@brevitas.com</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
