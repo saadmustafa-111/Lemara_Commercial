@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import {
   Users,
   Building,
-  MapPin,
   Eye,
   Edit,
   DollarSign,
@@ -60,6 +59,197 @@ interface DashboardData {
     status: string
     type: string
   }>
+}
+
+// Vector Map Component
+function VectorMap({ locationData }: { locationData: DashboardData["locationData"] }) {
+  const [hoveredLocation, setHoveredLocation] = useState<string | null>(null)
+
+  // More accurate California bounds
+  const mapBounds = {
+    minLat: 32.0,
+    maxLat: 42.0,
+    minLng: -125.0,
+    maxLng: -114.0,
+  }
+
+  // Convert coordinates to SVG positions with better accuracy
+  const coordToSVG = (lat: number, lng: number) => {
+    const x = ((lng - mapBounds.minLng) / (mapBounds.maxLng - mapBounds.minLng)) * 100
+    const y = ((mapBounds.maxLat - lat) / (mapBounds.maxLat - mapBounds.minLat)) * 100
+    return { x, y }
+  }
+
+  // Get smaller, more realistic dot size based on sales volume
+  const getDotSize = (sales: number) => {
+    const maxSales = Math.max(...locationData.map((l) => l.sales))
+    const minSize = 3
+    const maxSize = 8
+    return minSize + (sales / maxSales) * (maxSize - minSize)
+  }
+
+  // Get dot color based on sales volume with better color scheme
+  const getDotColor = (sales: number) => {
+    const maxSales = Math.max(...locationData.map((l) => l.sales))
+    const intensity = sales / maxSales
+    if (intensity > 0.8) return "#dc2626" // Red for highest
+    if (intensity > 0.6) return "#ea580c" // Orange
+    if (intensity > 0.4) return "#ca8a04" // Yellow
+    if (intensity > 0.2) return "#16a34a" // Green
+    return "#2563eb" // Blue for lowest
+  }
+
+  const formatPrice = (price: number) => {
+    if (price >= 1000000) {
+      return `$${(price / 1000000).toFixed(1)}M`
+    }
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
+  return (
+    <div className="relative w-full h-64 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg overflow-hidden border border-slate-300">
+      {/* California map SVG */}
+      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+        {/* More detailed California outline */}
+        <defs>
+          <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f8fafc" />
+            <stop offset="100%" stopColor="#e2e8f0" />
+          </linearGradient>
+          <filter id="mapShadow">
+            <feDropShadow dx="0.5" dy="0.5" stdDeviation="0.5" floodColor="#64748b" floodOpacity="0.3" />
+          </filter>
+        </defs>
+
+        {/* Detailed California outline */}
+        <path
+          d="M20,15 L25,12 L30,10 L35,9 L40,8.5 L45,9 L50,10 L55,12 L60,15 L65,18 L70,22 L75,27 L80,33 L83,40 L85,47 L86,54 L85,61 L83,68 L80,74 L76,79 L71,83 L65,86 L58,88 L50,89 L42,88 L35,86 L28,83 L22,79 L17,74 L14,68 L12,61 L11,54 L12,47 L14,40 L16,33 L18,27 L20,21 Z"
+          fill="url(#mapGradient)"
+          stroke="#64748b"
+          strokeWidth="0.8"
+          filter="url(#mapShadow)"
+        />
+
+        {/* State border details */}
+        <path d="M20,15 L85,47" stroke="#94a3b8" strokeWidth="0.2" opacity="0.3" strokeDasharray="1,1" />
+
+        {/* Location dots */}
+        {locationData.map((location) => {
+          const { x, y } = coordToSVG(location.coordinates[1], location.coordinates[0])
+          const dotSize = getDotSize(location.sales)
+          const dotColor = getDotColor(location.sales)
+
+          return (
+            <g key={location.city}>
+              {/* Subtle glow effect */}
+              <circle cx={x} cy={y} r={dotSize + 1} fill={dotColor} opacity="0.2" className="animate-pulse" />
+              {/* Main dot */}
+              <circle
+                cx={x}
+                cy={y}
+                r={dotSize}
+                fill={dotColor}
+                stroke="white"
+                strokeWidth="1"
+                className="cursor-pointer transition-all duration-200 hover:scale-150 drop-shadow-sm"
+                onMouseEnter={() => setHoveredLocation(location.city)}
+                onMouseLeave={() => setHoveredLocation(null)}
+              />
+              {/* City label for major cities */}
+              {location.sales > 100 && (
+                <text
+                  x={x + dotSize + 2}
+                  y={y + 1}
+                  fontSize="2.5"
+                  fill="#374151"
+                  className="font-medium pointer-events-none"
+                  style={{ textShadow: "0 0 2px white" }}
+                >
+                  {location.city.split(" ")[0]}
+                </text>
+              )}
+            </g>
+          )
+        })}
+
+        {/* Map grid lines for reference */}
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#e2e8f0" strokeWidth="0.2" opacity="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100" height="100" fill="url(#grid)" />
+      </svg>
+
+      {/* Enhanced tooltip */}
+      {hoveredLocation && (
+        <div className="absolute top-4 left-4 bg-white rounded-lg shadow-xl p-4 border border-gray-200 z-10 min-w-[180px]">
+          {(() => {
+            const location = locationData.find((l) => l.city === hoveredLocation)
+            if (!location) return null
+            return (
+              <div className="text-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-bold text-gray-900 text-base">{location.city}</p>
+                  <div
+                    className="w-3 h-3 rounded-full border border-white shadow-sm"
+                    style={{ backgroundColor: getDotColor(location.sales) }}
+                  ></div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Sales:</span>
+                    <span className="font-semibold text-gray-900">{location.sales}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Value:</span>
+                    <span className="font-semibold text-gray-900">{formatPrice(location.value)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Avg/Sale:</span>
+                    <span className="font-semibold text-gray-900">{formatPrice(location.value / location.sales)}</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+      )}
+
+      {/* Enhanced legend */}
+      <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-3 border border-gray-200">
+        <p className="text-xs font-bold text-gray-900 mb-2">Sales Volume</p>
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2 text-xs">
+            <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+            <span className="text-gray-600">Low (50-70)</span>
+          </div>
+          <div className="flex items-center space-x-2 text-xs">
+            <div className="w-3 h-3 rounded-full bg-green-600"></div>
+            <span className="text-gray-600">Med (70-100)</span>
+          </div>
+          <div className="flex items-center space-x-2 text-xs">
+            <div className="w-4 h-4 rounded-full bg-orange-600"></div>
+            <span className="text-gray-600">High (100-130)</span>
+          </div>
+          <div className="flex items-center space-x-2 text-xs">
+            <div className="w-5 h-5 rounded-full bg-red-600"></div>
+            <span className="text-gray-600">Very High (130+)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Map title */}
+      <div className="absolute top-4 right-4 bg-white/90 rounded-lg px-3 py-1 border border-gray-200">
+        <p className="text-xs font-semibold text-gray-700">California Sales Map</p>
+      </div>
+    </div>
+  )
 }
 
 export default function AdminDashboard() {
@@ -453,13 +643,7 @@ export default function AdminDashboard() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 h-64 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg font-semibold">Interactive Map</p>
-                <p className="text-gray-500">Sales locations visualization</p>
-              </div>
-            </div>
+            <VectorMap locationData={dashboardData.locationData} />
           </div>
           <div className="space-y-3">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Cities</h4>

@@ -48,10 +48,8 @@ const adminNavItems: NavItem[] = [
   {
     icon: <LayoutGrid size={20} />,
     name: "Dashboard",
-    subItems: [
-      { name: "Admin Overview", path: "/dashboard/admin", pro: false },
-      { name: "Analytics", path: "/dashboard/admin/analytics", pro: false },
-    ],
+    path:'/dashboard/admin',
+
   },
   {
     name: "Commercial Listings",
