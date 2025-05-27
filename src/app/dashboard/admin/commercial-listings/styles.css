@@ -1,0 +1,75 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+/* Table styles for commercial listings */
+.commercial-listings-table th {
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.commercial-listings-table td {
+  padding: 0.75rem 1rem;
+}
+
+.commercial-listings-table tr:hover {
+  background-color: rgba(0, 160, 209, 0.05);
+}
+
+/* Filter button styles */
+.filter-btn {
+  transition: all 0.3s ease;
+}
+
+.filter-btn.active {
+  background-color: #00a0d1;
+  color: white;
+  font-weight: 500;
+}
+
+.filter-btn:hover:not(.active) {
+  background-color: #e5e7eb;
+}
+
+/* Dropdown button styles */
+.dropdown-btn {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 12rem;
+  z-index: 10;
+}
