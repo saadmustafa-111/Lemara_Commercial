@@ -3,451 +3,169 @@ import { useEffect, useState } from "react"
 import {
   Users,
   Building,
-  TrendingUp,
   MapPin,
   Eye,
   Edit,
-  Plus,
-  Filter,
   DollarSign,
-  Star,
-  Mail,
-  Home,
-  Briefcase,
-  Factory,
-  TreePine,
-  ChevronRight,
-  Activity,
-  Target,
   ArrowUpRight,
-  Clock,
-  CheckCircle,
   MoreHorizontal,
   Download,
-  FileText,
-  Phone,
-  Calendar,
   UserCheck,
-  MessageSquare,
-  Search,
-  Bell,
-  Settings,
   BarChart3,
+  CreditCard,
+  PieChart,
+  Globe,
 } from "lucide-react"
-
-// Define types for our real estate dashboard data
-interface Property {
-  id: number
-  title: string
-  type: string
-  price: number
-  location: string
-  image: string
-  status: string
-  agent: string
-  created: string
-  views: number
-  bedrooms: number
-  bathrooms: number
-  area: number
-  featured?: boolean
-  commission: number
-}
-
-interface Agent {
-  id: number
-  name: string
-  email: string
-  phone: string
-  avatar: string
-  properties: number
-  sales: number
-  revenue: number
-  joined: string
-  status: string
-  rating: number
-  commission: number
-  specialization: string
-  experience: number
-  closingRate: number
-}
-
-interface Client {
-  id: number
-  name: string
-  email: string
-  phone: string
-  avatar: string
-  type: string
-  budget: number
-  location: string
-  requirements: string
-  status: string
-  assignedAgent: string
-  lastContact: string
-  priority: string
-  propertiesViewed: number
-  source: string
-}
+import {
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Bar,
+  PieChart as RechartsPieChart,
+  Cell,
+  ComposedChart,
+} from "recharts"
 
 interface DashboardData {
   adminStats: {
     totalProperties: number
-    totalAgents: number
-    totalSales: number
-    activeListings: number
-    monthlyRevenue: number
-    avgPrice: number
-    pendingDeals: number
-    viewsThisMonth: number
     totalClients: number
-    activeClients: number
+    totalAgents: number
+    monthlyRevenue: number
+    commercialLoans: number
   }
-  recentProperties: Property[]
-  topAgents: Agent[]
-  recentClients: Client[]
-  recentActivity: Array<{
-    id: number
+  salesData: Array<{
+    month: string
+    sales: number
+    revenue: number
+    year: number
+  }>
+  locationData: Array<{
+    city: string
+    sales: number
+    value: number
+    coordinates: [number, number]
+  }>
+  recentTransactions: Array<{
+    id: string
+    property: string
+    client: string
+    agent: string
+    amount: number
+    date: string
+    status: string
     type: string
-    message: string
-    time: string
-    user: string
   }>
 }
 
-export default function EnhancedRealEstateAdminDashboard() {
+export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("overview")
-
-  // Mock data for the real estate dashboard with proper typing
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     adminStats: {
       totalProperties: 0,
-      totalAgents: 0,
-      totalSales: 0,
-      activeListings: 0,
-      monthlyRevenue: 0,
-      avgPrice: 0,
-      pendingDeals: 0,
-      viewsThisMonth: 0,
       totalClients: 0,
-      activeClients: 0,
+      totalAgents: 0,
+      monthlyRevenue: 0,
+      commercialLoans: 0,
     },
-    recentProperties: [],
-    topAgents: [],
-    recentClients: [],
-    recentActivity: [],
+    salesData: [],
+    locationData: [],
+    recentTransactions: [],
   })
 
-  // Simulate fetching data from API
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setTimeout(() => {
           setDashboardData({
             adminStats: {
-              totalProperties: 178,
-              totalAgents: 24,
-              totalSales: 48,
-              activeListings: 94,
-              monthlyRevenue: 425000,
-              avgPrice: 875000,
-              pendingDeals: 12,
-              viewsThisMonth: 15420,
-              totalClients: 156,
-              activeClients: 89,
+              totalProperties: 847,
+              totalClients: 1234,
+              totalAgents: 67,
+              monthlyRevenue: 2850000,
+              commercialLoans: 45,
             },
-            recentProperties: [
-              {
-                id: 100079,
-                title: "520 ACR Mixed Licensed Greenhouse",
-                type: "Land",
-                price: 9990000,
-                location: "Lake Nacimiento, CA",
-                image: "/placeholder.svg?height=80&width=120",
-                status: "active",
-                agent: "AJ Rana",
-                created: "2024-01-15",
-                views: 542,
-                bedrooms: 0,
-                bathrooms: 0,
-                area: 520,
-                featured: true,
-                commission: 299700,
-              },
-              {
-                id: 100100,
-                title: "Licensed Cannabis Farm Facility",
-                type: "Farm",
-                price: 7750000,
-                location: "Salinas, CA",
-                image: "/placeholder.svg?height=80&width=120",
-                status: "sold",
-                agent: "AJ Rana",
-                created: "2024-01-10",
-                views: 868,
-                bedrooms: 0,
-                bathrooms: 0,
-                area: 0,
-                commission: 232500,
-              },
-              {
-                id: 100104,
-                title: "Established Deli Cafe Business",
-                type: "Commercial",
-                price: 89000,
-                location: "Newark, CA",
-                image: "/placeholder.svg?height=80&width=120",
-                status: "active",
-                agent: "Sarah Johnson",
-                created: "2024-01-08",
-                views: 866,
-                bedrooms: 0,
-                bathrooms: 0,
-                area: 0,
-                commission: 2670,
-              },
-              {
-                id: 100135,
-                title: "Assisted Living Facility",
-                type: "Commercial",
-                price: 9750000,
-                location: "Sacramento, CA",
-                image: "/placeholder.svg?height=80&width=120",
-                status: "pending",
-                agent: "Abdul Shah",
-                created: "2024-01-05",
-                views: 234,
-                bedrooms: 0,
-                bathrooms: 0,
-                area: 0,
-                commission: 292500,
-              },
-              {
-                id: 100238,
-                title: "Multi-Family Investment Property",
-                type: "Multi-Family",
-                price: 35449230,
-                location: "San Francisco, CA",
-                image: "/placeholder.svg?height=80&width=120",
-                status: "active",
-                agent: "AJ Rana",
-                created: "2024-01-01",
-                views: 1205,
-                bedrooms: 24,
-                bathrooms: 18,
-                area: 14500,
-                featured: true,
-                commission: 1063477,
-              },
+            salesData: [
+              { month: "Jan", sales: 45, revenue: 2100000, year: 2024 },
+              { month: "Feb", sales: 52, revenue: 2450000, year: 2024 },
+              { month: "Mar", sales: 48, revenue: 2200000, year: 2024 },
+              { month: "Apr", sales: 61, revenue: 2800000, year: 2024 },
+              { month: "May", sales: 55, revenue: 2650000, year: 2024 },
+              { month: "Jun", sales: 67, revenue: 3100000, year: 2024 },
+              { month: "Jul", sales: 72, revenue: 3350000, year: 2024 },
+              { month: "Aug", sales: 68, revenue: 3200000, year: 2024 },
+              { month: "Sep", sales: 58, revenue: 2750000, year: 2024 },
+              { month: "Oct", sales: 74, revenue: 3450000, year: 2024 },
+              { month: "Nov", sales: 81, revenue: 3800000, year: 2024 },
+              { month: "Dec", sales: 79, revenue: 3650000, year: 2024 },
             ],
-            topAgents: [
-              {
-                id: 1,
-                name: "AJ Rana",
-                email: "aj.rana@lemara.com",
-                phone: "(555) 123-4567",
-                avatar: "/placeholder.svg?height=40&width=40",
-                properties: 42,
-                sales: 18,
-                revenue: 2450000,
-                joined: "2019-07-15",
-                status: "active",
-                rating: 4.9,
-                commission: 73500,
-                specialization: "Commercial & Industrial",
-                experience: 8,
-                closingRate: 85,
-              },
-              {
-                id: 2,
-                name: "Sarah Johnson",
-                email: "sarah.j@lemara.com",
-                phone: "(555) 234-5678",
-                avatar: "/placeholder.svg?height=40&width=40",
-                properties: 28,
-                sales: 12,
-                revenue: 1890000,
-                joined: "2022-03-10",
-                status: "active",
-                rating: 4.8,
-                commission: 56700,
-                specialization: "Luxury Residential",
-                experience: 5,
-                closingRate: 78,
-              },
-              {
-                id: 3,
-                name: "Abdul Shah",
-                email: "abdul.s@lemara.com",
-                phone: "(555) 345-6789",
-                avatar: "/placeholder.svg?height=40&width=40",
-                properties: 15,
-                sales: 8,
-                revenue: 1250000,
-                joined: "2022-05-20",
-                status: "active",
-                rating: 4.7,
-                commission: 37500,
-                specialization: "Investment Properties",
-                experience: 6,
-                closingRate: 82,
-              },
-              {
-                id: 4,
-                name: "Michael Chen",
-                email: "michael.c@lemara.com",
-                phone: "(555) 456-7890",
-                avatar: "/placeholder.svg?height=40&width=40",
-                properties: 22,
-                sales: 10,
-                revenue: 1680000,
-                joined: "2021-11-05",
-                status: "active",
-                rating: 4.6,
-                commission: 50400,
-                specialization: "Multi-Family",
-                experience: 7,
-                closingRate: 75,
-              },
+            locationData: [
+              { city: "Los Angeles", sales: 145, value: 12500000, coordinates: [-118.2437, 34.0522] },
+              { city: "San Francisco", sales: 123, value: 18700000, coordinates: [-122.4194, 37.7749] },
+              { city: "San Diego", sales: 98, value: 8900000, coordinates: [-117.1611, 32.7157] },
+              { city: "Sacramento", sales: 87, value: 6200000, coordinates: [-121.4944, 38.5816] },
+              { city: "Oakland", sales: 76, value: 7800000, coordinates: [-122.2711, 37.8044] },
+              { city: "Fresno", sales: 54, value: 4100000, coordinates: [-119.7871, 36.7378] },
             ],
-            recentClients: [
+            recentTransactions: [
               {
-                id: 1,
-                name: "Robert Martinez",
-                email: "robert.m@email.com",
-                phone: "(555) 987-6543",
-                avatar: "/placeholder.svg?height=40&width=40",
-                type: "Buyer",
-                budget: 2500000,
-                location: "San Francisco, CA",
-                requirements: "Commercial office space, downtown area",
-                status: "active",
-                assignedAgent: "AJ Rana",
-                lastContact: "2024-01-20",
-                priority: "high",
-                propertiesViewed: 8,
-                source: "Website",
-              },
-              {
-                id: 2,
-                name: "Jennifer Wilson",
-                email: "jennifer.w@email.com",
-                phone: "(555) 876-5432",
-                avatar: "/placeholder.svg?height=40&width=40",
-                type: "Seller",
-                budget: 0,
-                location: "Sacramento, CA",
-                requirements: "Selling luxury residential property",
-                status: "negotiating",
-                assignedAgent: "Sarah Johnson",
-                lastContact: "2024-01-19",
-                priority: "high",
-                propertiesViewed: 0,
-                source: "Referral",
-              },
-              {
-                id: 3,
-                name: "David Thompson",
-                email: "david.t@email.com",
-                phone: "(555) 765-4321",
-                avatar: "/placeholder.svg?height=40&width=40",
-                type: "Investor",
-                budget: 5000000,
-                location: "Bay Area, CA",
-                requirements: "Multi-family investment properties",
-                status: "active",
-                assignedAgent: "Michael Chen",
-                lastContact: "2024-01-18",
-                priority: "medium",
-                propertiesViewed: 12,
-                source: "Cold Call",
-              },
-              {
-                id: 4,
-                name: "Lisa Anderson",
-                email: "lisa.a@email.com",
-                phone: "(555) 654-3210",
-                avatar: "/placeholder.svg?height=40&width=40",
-                type: "Buyer",
-                budget: 1200000,
-                location: "Oakland, CA",
-                requirements: "Industrial warehouse space",
-                status: "viewing",
-                assignedAgent: "Abdul Shah",
-                lastContact: "2024-01-17",
-                priority: "medium",
-                propertiesViewed: 5,
-                source: "Social Media",
-              },
-              {
-                id: 5,
-                name: "James Rodriguez",
-                email: "james.r@email.com",
-                phone: "(555) 543-2109",
-                avatar: "/placeholder.svg?height=40&width=40",
-                type: "Seller",
-                budget: 0,
-                location: "San Jose, CA",
-                requirements: "Selling tech startup office",
-                status: "lead",
-                assignedAgent: "Sarah Johnson",
-                lastContact: "2024-01-16",
-                priority: "low",
-                propertiesViewed: 0,
-                source: "Website",
-              },
-              {
-                id: 6,
-                name: "Maria Garcia",
-                email: "maria.g@email.com",
-                phone: "(555) 432-1098",
-                avatar: "/placeholder.svg?height=40&width=40",
-                type: "Investor",
-                budget: 8000000,
-                location: "Los Angeles, CA",
-                requirements: "Large commercial developments",
-                status: "active",
-                assignedAgent: "AJ Rana",
-                lastContact: "2024-01-15",
-                priority: "high",
-                propertiesViewed: 15,
-                source: "Referral",
-              },
-            ],
-            recentActivity: [
-              {
-                id: 1,
+                id: "TXN-001",
+                property: "520 ACR Mixed Licensed Greenhouse",
+                client: "Green Valley Corp",
+                agent: "AJ Rana",
+                amount: 9990000,
+                date: "2024-12-15",
+                status: "completed",
                 type: "sale",
-                message: "New sale completed for $2.5M commercial property",
-                time: "2 hours ago",
-                user: "AJ Rana",
               },
               {
-                id: 2,
-                type: "listing",
-                message: "New property listed in downtown Sacramento",
-                time: "4 hours ago",
-                user: "Sarah Johnson",
+                id: "TXN-002",
+                property: "Luxury Downtown Condo",
+                client: "Sarah Williams",
+                agent: "Mike Johnson",
+                amount: 1250000,
+                date: "2024-12-14",
+                status: "pending",
+                type: "sale",
               },
               {
-                id: 3,
-                type: "inquiry",
-                message: "New client inquiry for industrial properties",
-                time: "6 hours ago",
-                user: "Abdul Shah",
+                id: "TXN-003",
+                property: "Commercial Office Building",
+                client: "Tech Solutions Inc",
+                agent: "Lisa Chen",
+                amount: 4500000,
+                date: "2024-12-13",
+                status: "completed",
+                type: "lease",
               },
               {
-                id: 4,
-                type: "meeting",
-                message: "Client meeting scheduled for tomorrow",
-                time: "8 hours ago",
-                user: "Michael Chen",
+                id: "TXN-004",
+                property: "Suburban Family Home",
+                client: "Johnson Family",
+                agent: "David Brown",
+                amount: 750000,
+                date: "2024-12-12",
+                status: "completed",
+                type: "sale",
+              },
+              {
+                id: "TXN-005",
+                property: "Industrial Warehouse",
+                client: "Logistics Plus",
+                agent: "Emma Davis",
+                amount: 2300000,
+                date: "2024-12-11",
+                status: "in-progress",
+                type: "sale",
               },
             ],
           })
           setIsLoading(false)
-        }, 1500)
+        }, 1000)
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
         setIsLoading(false)
@@ -457,9 +175,10 @@ export default function EnhancedRealEstateAdminDashboard() {
     fetchDashboardData()
   }, [])
 
-  const { adminStats, recentProperties, topAgents, recentClients, recentActivity } = dashboardData
-
   const formatPrice = (price: number) => {
+    if (price >= 1000000) {
+      return `$${(price / 1000000).toFixed(1)}M`
+    }
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -468,839 +187,475 @@ export default function EnhancedRealEstateAdminDashboard() {
     }).format(price)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat("en-US").format(num)
   }
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      active: "bg-emerald-100 text-emerald-800 border-emerald-200",
-      pending: "bg-amber-100 text-amber-800 border-amber-200",
-      sold: "bg-blue-100 text-blue-800 border-blue-200",
-      negotiating: "bg-purple-100 text-purple-800 border-purple-200",
-      viewing: "bg-orange-100 text-orange-800 border-orange-200",
-      lead: "bg-gray-100 text-gray-800 border-gray-200",
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200"
+      case "pending":
+        return "bg-amber-100 text-amber-800 border-amber-200"
+      case "in-progress":
+        return "bg-blue-100 text-blue-800 border-blue-200"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200"
     }
-    return styles[status as keyof typeof styles] || "bg-gray-100 text-gray-800 border-gray-200"
   }
 
-  const getPriorityBadge = (priority: string) => {
-    const styles = {
-      high: "bg-red-100 text-red-800 border-red-200",
-      medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      low: "bg-green-100 text-green-800 border-green-200",
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "sale":
+        return "bg-green-100 text-green-800 border-green-200"
+      case "lease":
+        return "bg-purple-100 text-purple-800 border-purple-200"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200"
     }
-    return styles[priority as keyof typeof styles] || "bg-gray-100 text-gray-800 border-gray-200"
   }
 
-  const getPropertyTypeIcon = (type: string) => {
-    const icons = {
-      commercial: <Briefcase className="w-4 h-4" />,
-      land: <TreePine className="w-4 h-4" />,
-      farm: <TreePine className="w-4 h-4" />,
-      "multi-family": <Building className="w-4 h-4" />,
-      industrial: <Factory className="w-4 h-4" />,
-    }
-    return icons[type.toLowerCase() as keyof typeof icons] || <Home className="w-4 h-4" />
-  }
+  const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"]
+
+  const pieData = [
+    { name: "Residential", value: 45, amount: 15200000 },
+    { name: "Commercial", value: 30, amount: 12800000 },
+    { name: "Industrial", value: 15, amount: 8400000 },
+    { name: "Land", value: 10, amount: 4600000 },
+  ]
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-          <p className="text-gray-700 font-semibold text-lg">Loading Dashboard...</p>
-          <p className="text-gray-500 text-sm mt-2">Preparing your real estate insights</p>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-semibold">Loading Dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="w-full space-y-6">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Real Estate Dashboard</h1>
-              <p className="text-gray-600 text-sm mt-1">Welcome back, Admin</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-12 pt-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600">Welcome back! Here's what's happening with your real estate business.</p>
+        </div>
+        <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+          <button className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors font-medium text-sm">
+            Export Report
+          </button>
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
+            Add Property
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Total Properties */}
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <Building className="w-6 h-6 text-white" />
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search properties, agents, clients..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent w-80"
-                />
-              </div>
-              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
+            <div className="flex items-center space-x-1">
+              <ArrowUpRight className="w-3 h-3 text-emerald-500" />
+              <span className="text-emerald-600 text-xs font-semibold">+12%</span>
             </div>
+          </div>
+          <div>
+            <p className="text-gray-600 text-xs font-medium uppercase tracking-wide mb-1">Total Properties</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">
+              {formatNumber(dashboardData.adminStats.totalProperties)}
+            </p>
+            <p className="text-gray-500 text-xs">Active listings</p>
+          </div>
+        </div>
+
+        {/* Total Clients */}
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex items-center space-x-1">
+              <ArrowUpRight className="w-3 h-3 text-emerald-500" />
+              <span className="text-emerald-600 text-xs font-semibold">+18%</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-600 text-xs font-medium uppercase tracking-wide mb-1">Total Clients</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">
+              {formatNumber(dashboardData.adminStats.totalClients)}
+            </p>
+            <p className="text-gray-500 text-xs">Registered users</p>
+          </div>
+        </div>
+
+        {/* Total Agents */}
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <UserCheck className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex items-center space-x-1">
+              <ArrowUpRight className="w-3 h-3 text-emerald-500" />
+              <span className="text-emerald-600 text-xs font-semibold">+5%</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-600 text-xs font-medium uppercase tracking-wide mb-1">Total Agents</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">
+              {formatNumber(dashboardData.adminStats.totalAgents)}
+            </p>
+            <p className="text-gray-500 text-xs">Active agents</p>
+          </div>
+        </div>
+
+        {/* Monthly Revenue */}
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <DollarSign className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex items-center space-x-1">
+              <ArrowUpRight className="w-3 h-3 text-emerald-500" />
+              <span className="text-emerald-600 text-xs font-semibold">+24%</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-600 text-xs font-medium uppercase tracking-wide mb-1">Monthly Revenue</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">
+              {formatPrice(dashboardData.adminStats.monthlyRevenue)}
+            </p>
+            <p className="text-gray-500 text-xs">This month</p>
+          </div>
+        </div>
+
+        {/* Commercial Loans */}
+        <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 group border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-rose-500 to-rose-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <CreditCard className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex items-center space-x-1">
+              <ArrowUpRight className="w-3 h-3 text-emerald-500" />
+              <span className="text-emerald-600 text-xs font-semibold">+8%</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-600 text-xs font-medium uppercase tracking-wide mb-1">Commercial Loans</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">
+              {formatNumber(dashboardData.adminStats.commercialLoans)}
+            </p>
+            <p className="text-gray-500 text-xs">Active loans</p>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
-        {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Total Properties</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{adminStats.totalProperties}</p>
-                <div className="flex items-center mt-2">
-                  <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 text-sm font-medium ml-1">+12%</span>
-                </div>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Building className="w-7 h-7 text-white" />
+      {/* Analytics Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Sales Analytics */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Sales Analytics</h3>
+              <p className="text-gray-600 text-sm">Monthly sales performance and revenue</p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-white" />
               </div>
             </div>
           </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Active Listings</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{adminStats.activeListings}</p>
-                <div className="flex items-center mt-2">
-                  <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 text-sm font-medium ml-1">+8%</span>
-                </div>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Activity className="w-7 h-7 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Monthly Revenue</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{formatPrice(adminStats.monthlyRevenue)}</p>
-                <div className="flex items-center mt-2">
-                  <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 text-sm font-medium ml-1">+15%</span>
-                </div>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <DollarSign className="w-7 h-7 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Total Sales</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{adminStats.totalSales}</p>
-                <div className="flex items-center mt-2">
-                  <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 text-sm font-medium ml-1">+22%</span>
-                </div>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-7 h-7 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Total Clients</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{adminStats.totalClients}</p>
-                <div className="flex items-center mt-2">
-                  <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 text-sm font-medium ml-1">+18%</span>
-                </div>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Users className="w-7 h-7 text-white" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Active Clients</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{adminStats.activeClients}</p>
-                <div className="flex items-center mt-2">
-                  <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 text-sm font-medium ml-1">+25%</span>
-                </div>
-              </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <UserCheck className="w-7 h-7 text-white" />
-              </div>
-            </div>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={dashboardData.salesData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" stroke="#666" fontSize={12} />
+                <YAxis yAxisId="left" stroke="#666" fontSize={12} />
+                <YAxis yAxisId="right" orientation="right" stroke="#666" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Legend />
+                <Bar yAxisId="left" dataKey="sales" fill="#6366f1" name="Sales Count" radius={[4, 4, 0, 0]} />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  name="Revenue ($)"
+                  dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-6">
-          <div className="p-6">
-            <div className="flex space-x-1 bg-gray-100 rounded-xl p-1">
-              {[
-                { id: "overview", label: "Overview", icon: BarChart3 },
-                { id: "properties", label: "Properties", icon: Building },
-                { id: "agents", label: "Agents", icon: Users },
-                { id: "clients", label: "Clients", icon: UserCheck },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all ${
-                    activeTab === tab.id ? "bg-white text-blue-600 shadow-sm" : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  <tab.icon className="w-5 h-5" />
-                  <span>{tab.label}</span>
-                </button>
-              ))}
+        {/* Revenue Breakdown */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Revenue by Type</h3>
+              <p className="text-gray-600 text-sm">Property type performance</p>
+            </div>
+            <div className="mt-4 sm:mt-0">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                <PieChart className="w-5 h-5 text-white" />
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Content based on active tab */}
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            {/* Properties Table - Full Width */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Recent Properties</h3>
-                    <p className="text-gray-600 text-sm mt-1">Latest commercial property listings</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Filter className="w-5 h-5" />
-                    </button>
-                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2 transition-all shadow-lg hover:shadow-xl">
-                      <Plus className="w-4 h-4" />
-                      <span className="font-medium">Add Property</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6">
-                <div className="space-y-4">
-                  {recentProperties.slice(0, 3).map((property) => (
-                    <div
-                      key={property.id}
-                      className="flex items-center p-6 border border-gray-200 rounded-2xl hover:shadow-lg transition-all bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 group"
-                    >
-                      {/* Property Image and Basic Info */}
-                      <div className="flex items-center space-x-6 flex-1 min-w-0">
-                        <div className="relative flex-shrink-0">
-                          <img
-                            src={property.image || "/placeholder.svg"}
-                            alt={property.title}
-                            className="w-20 h-20 rounded-xl object-cover border-2 border-gray-200 group-hover:border-blue-300 transition-colors"
-                          />
-                          {property.featured && (
-                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                              <Star className="w-3 h-3 text-white" />
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-gray-900 font-bold text-lg mb-2">{property.title}</h4>
-                          <div className="flex items-center space-x-6 text-sm text-gray-600">
-                            <div className="flex items-center space-x-2">
-                              <MapPin className="w-4 h-4 text-gray-400" />
-                              <span>{property.location}</span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              {getPropertyTypeIcon(property.type)}
-                              <span>{property.type}</span>
-                            </div>
-                            {property.area > 0 && <span>{property.area.toLocaleString()} sqft</span>}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Price and Commission */}
-                      <div className="text-right px-6">
-                        <p className="text-2xl font-bold text-gray-900">{formatPrice(property.price)}</p>
-                        <p className="text-sm text-emerald-600 font-medium">
-                          Commission: {formatPrice(property.commission)}
-                        </p>
-                      </div>
-
-                      {/* Status */}
-                      <div className="px-6">
-                        <span
-                          className={`inline-flex px-4 py-2 rounded-full text-sm font-medium border ${getStatusBadge(property.status)}`}
-                        >
-                          {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-                        </span>
-                      </div>
-
-                      {/* Agent and Date */}
-                      <div className="px-6 text-center">
-                        <p className="text-gray-900 font-semibold">{property.agent}</p>
-                        <p className="text-sm text-gray-500">{formatDate(property.created)}</p>
-                      </div>
-
-                      {/* Views */}
-                      <div className="px-6 text-center">
-                        <div className="flex items-center justify-center space-x-2">
-                          <Eye className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-900 font-semibold">{property.views}</span>
-                        </div>
-                        <p className="text-xs text-gray-500">views</p>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center space-x-2 pl-6">
-                        <button className="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
-                          <Eye className="w-5 h-5" />
-                        </button>
-                        <button className="p-3 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors">
-                          <Edit className="w-5 h-5" />
-                        </button>
-                        <button className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
-                          <MoreHorizontal className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsPieChart>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+                <Legend />
+                <RechartsPieChart data={pieData}>
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
-                </div>
+                </RechartsPieChart>
+              </RechartsPieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
 
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <p className="text-gray-600 text-sm">Showing 3 of {adminStats.totalProperties} properties</p>
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1">
-                      <span>View All Properties</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+      {/* Location Map Section */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Sales by Location</h3>
+            <p className="text-gray-600 text-sm">Geographic distribution of sales performance</p>
+          </div>
+          <div className="mt-4 sm:mt-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Globe className="w-5 h-5 text-white" />
             </div>
-
-            {/* Bottom Section - Agents and Clients */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Top Agents */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-                <div className="p-6 border-b border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900">Top Performing Agents</h3>
-                  <p className="text-gray-600 text-sm mt-1">This month's leaders</p>
-                </div>
-
-                <div className="p-6">
-                  <div className="space-y-4">
-                    {topAgents.slice(0, 3).map((agent, index) => (
-                      <div
-                        key={agent.id}
-                        className="flex items-center p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50"
-                      >
-                        <div className="flex items-center space-x-4 flex-1">
-                          <div className="relative">
-                            <img
-                              src={agent.avatar || "/placeholder.svg"}
-                              alt={agent.name}
-                              className="w-14 h-14 rounded-full object-cover border-2 border-gray-200"
-                            />
-                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                              {index + 1}
-                            </div>
-                          </div>
-
-                          <div className="flex-1">
-                            <h4 className="text-gray-900 font-semibold text-lg">{agent.name}</h4>
-                            <p className="text-sm text-gray-600">{agent.specialization}</p>
-                            <div className="flex items-center space-x-4 mt-2">
-                              <span className="text-sm font-medium text-gray-900">{agent.sales} sales</span>
-                              <div className="flex items-center space-x-1">
-                                <Star className="w-3 h-3 text-amber-400 fill-current" />
-                                <span className="text-sm text-gray-600">{agent.rating}</span>
-                              </div>
-                              <span className="text-sm text-emerald-600">{agent.closingRate}% close rate</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-gray-900">{formatPrice(agent.revenue)}</p>
-                          <p className="text-sm text-emerald-600">+{formatPrice(agent.commission)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Clients */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-                <div className="p-6 border-b border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900">Recent Clients</h3>
-                  <p className="text-gray-600 text-sm mt-1">Latest client interactions</p>
-                </div>
-
-                <div className="p-6">
-                  <div className="space-y-4">
-                    {recentClients.slice(0, 3).map((client) => (
-                      <div
-                        key={client.id}
-                        className="flex items-center p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50"
-                      >
-                        <div className="flex items-center space-x-4 flex-1">
-                          <img
-                            src={client.avatar || "/placeholder.svg"}
-                            alt={client.name}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-                          />
-
-                          <div className="flex-1">
-                            <h4 className="text-gray-900 font-semibold">{client.name}</h4>
-                            <p className="text-sm text-gray-600">
-                              {client.type} • {client.location}
-                            </p>
-                            <div className="flex items-center space-x-3 mt-1">
-                              <span
-                                className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadge(client.status)}`}
-                              >
-                                {client.status}
-                              </span>
-                              <span
-                                className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${getPriorityBadge(client.priority)}`}
-                              >
-                                {client.priority}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          {client.budget > 0 && (
-                            <p className="text-lg font-bold text-gray-900">{formatPrice(client.budget)}</p>
-                          )}
-                          <p className="text-sm text-gray-500">{client.assignedAgent}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 h-64 flex items-center justify-center">
+              <div className="text-center">
+                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg font-semibold">Interactive Map</p>
+                <p className="text-gray-500">Sales locations visualization</p>
               </div>
             </div>
           </div>
-        )}
-
-        {activeTab === "properties" && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">All Properties</h3>
-                  <p className="text-gray-600 text-sm mt-1">Manage your property listings</p>
-                </div>
+          <div className="space-y-3">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Cities</h4>
+            {dashboardData.locationData.map((location, index) => (
+              <div
+                key={location.city}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
                 <div className="flex items-center space-x-3">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Filter className="w-5 h-5" />
-                  </button>
-                  <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2 transition-all shadow-lg hover:shadow-xl">
-                    <Plus className="w-4 h-4" />
-                    <span className="font-medium">Add Property</span>
-                  </button>
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${index === 0 ? "bg-yellow-500" : index === 1 ? "bg-gray-400" : index === 2 ? "bg-orange-500" : "bg-blue-500"}`}
+                  >
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900 text-sm">{location.city}</p>
+                    <p className="text-xs text-gray-600">{location.sales} sales</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-gray-900 text-sm">{formatPrice(location.value)}</p>
+                  <p className="text-xs text-gray-600">Total value</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Recent Transactions</h3>
+              <p className="text-gray-600 text-sm">Latest property transactions and deals</p>
             </div>
+            <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm">
+                View All
+              </button>
+              <button className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                <Download className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+          </div>
+        </div>
 
-            <div className="p-6">
-              <div className="space-y-4">
-                {recentProperties.map((property) => (
-                  <div
-                    key={property.id}
-                    className="flex items-center p-6 border border-gray-200 rounded-2xl hover:shadow-lg transition-all bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 group"
+        {/* Mobile Card Layout */}
+        <div className="block lg:hidden">
+          <div className="divide-y divide-gray-100">
+            {dashboardData.recentTransactions.map((transaction) => (
+              <div key={transaction.id} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-mono text-blue-600 font-semibold mb-1">{transaction.id}</p>
+                    <p className="text-sm font-semibold text-gray-900 truncate">{transaction.property}</p>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-4">
+                    <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button className="p-1.5 text-gray-400 hover:text-green-600 transition-colors">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Client</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{transaction.client}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Agent</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{transaction.agent}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Amount</p>
+                    <p className="text-sm font-bold text-gray-900">{formatPrice(transaction.amount)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Date</p>
+                    <p className="text-sm text-gray-600">{new Date(transaction.date).toLocaleDateString()}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(transaction.status)}`}
                   >
-                    {/* Property Image and Basic Info */}
-                    <div className="flex items-center space-x-6 flex-1 min-w-0">
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={property.image || "/placeholder.svg"}
-                          alt={property.title}
-                          className="w-20 h-20 rounded-xl object-cover border-2 border-gray-200 group-hover:border-blue-300 transition-colors"
-                        />
-                        {property.featured && (
-                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                            <Star className="w-3 h-3 text-white" />
-                          </div>
-                        )}
+                    {transaction.status}
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border capitalize ${getTypeColor(transaction.type)}`}
+                  >
+                    {transaction.type}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden lg:block">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Property
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Client
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Agent
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wide">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {dashboardData.recentTransactions.map((transaction) => (
+                  <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm font-mono text-blue-600 font-semibold">{transaction.id}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-xs">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{transaction.property}</p>
                       </div>
-
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-gray-900 font-bold text-lg mb-2">{property.title}</h4>
-                        <div className="flex items-center space-x-6 text-sm text-gray-600">
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="w-4 h-4 text-gray-400" />
-                            <span>{property.location}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {getPropertyTypeIcon(property.type)}
-                            <span>{property.type}</span>
-                          </div>
-                          {property.area > 0 && <span>{property.area.toLocaleString()} sqft</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Price and Commission */}
-                    <div className="text-right px-6">
-                      <p className="text-2xl font-bold text-gray-900">{formatPrice(property.price)}</p>
-                      <p className="text-sm text-emerald-600 font-medium">
-                        Commission: {formatPrice(property.commission)}
-                      </p>
-                    </div>
-
-                    {/* Status */}
-                    <div className="px-6">
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm font-medium text-gray-900">{transaction.client}</p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm font-medium text-gray-900">{transaction.agent}</p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm font-bold text-gray-900">{formatPrice(transaction.amount)}</p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-600">{new Date(transaction.date).toLocaleDateString()}</p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex px-4 py-2 rounded-full text-sm font-medium border ${getStatusBadge(property.status)}`}
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusColor(transaction.status)}`}
                       >
-                        {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+                        {transaction.status}
                       </span>
-                    </div>
-
-                    {/* Agent and Date */}
-                    <div className="px-6 text-center">
-                      <p className="text-gray-900 font-semibold">{property.agent}</p>
-                      <p className="text-sm text-gray-500">{formatDate(property.created)}</p>
-                    </div>
-
-                    {/* Views */}
-                    <div className="px-6 text-center">
-                      <div className="flex items-center justify-center space-x-2">
-                        <Eye className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-900 font-semibold">{property.views}</span>
-                      </div>
-                      <p className="text-xs text-gray-500">views</p>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center space-x-2 pl-6">
-                      <button className="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
-                        <Eye className="w-5 h-5" />
-                      </button>
-                      <button className="p-3 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors">
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
-                        <MoreHorizontal className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "agents" && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">All Agents</h3>
-                  <p className="text-gray-600 text-sm mt-1">Manage your real estate agents</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Filter className="w-5 h-5" />
-                  </button>
-                  <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2 transition-all shadow-lg hover:shadow-xl">
-                    <Plus className="w-4 h-4" />
-                    <span className="font-medium">Add Agent</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {topAgents.map((agent, index) => (
-                  <div
-                    key={agent.id}
-                    className="p-6 border border-gray-200 rounded-2xl hover:shadow-lg transition-all bg-gradient-to-br from-white to-gray-50 hover:from-gray-50 hover:to-white"
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className="relative">
-                        <img
-                          src={agent.avatar || "/placeholder.svg"}
-                          alt={agent.name}
-                          className="w-16 h-16 rounded-full object-cover border-3 border-gray-200"
-                        />
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                          {index + 1}
-                        </div>
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-gray-900 font-bold text-lg">{agent.name}</h4>
-                          <div className="flex items-center space-x-1">
-                            <Star className="w-4 h-4 text-amber-400 fill-current" />
-                            <span className="text-sm font-medium text-gray-700">{agent.rating}</span>
-                          </div>
-                        </div>
-
-                        <p className="text-gray-600 text-sm mb-3">{agent.specialization}</p>
-
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <p className="text-gray-500 text-xs">Properties</p>
-                            <p className="text-gray-900 font-semibold">{agent.properties}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Sales</p>
-                            <p className="text-gray-900 font-semibold">{agent.sales}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Experience</p>
-                            <p className="text-gray-900 font-semibold">{agent.experience} years</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Close Rate</p>
-                            <p className="text-emerald-600 font-semibold">{agent.closingRate}%</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-gray-500 text-xs">Revenue</p>
-                            <p className="text-gray-900 font-bold">{formatPrice(agent.revenue)}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                              <Mail className="w-4 h-4" />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
-                              <Phone className="w-4 h-4" />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
-                              <MessageSquare className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "clients" && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">All Clients</h3>
-                  <p className="text-gray-600 text-sm mt-1">Manage your client relationships</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Filter className="w-5 h-5" />
-                  </button>
-                  <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 flex items-center space-x-2 transition-all shadow-lg hover:shadow-xl">
-                    <Plus className="w-4 h-4" />
-                    <span className="font-medium">Add Client</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {recentClients.map((client) => (
-                  <div
-                    key={client.id}
-                    className="p-6 border border-gray-200 rounded-2xl hover:shadow-lg transition-all bg-gradient-to-br from-white to-gray-50 hover:from-gray-50 hover:to-white"
-                  >
-                    <div className="flex items-start space-x-4 mb-4">
-                      <img
-                        src={client.avatar || "/placeholder.svg"}
-                        alt={client.name}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-gray-200"
-                      />
-
-                      <div className="flex-1">
-                        <h4 className="text-gray-900 font-bold text-lg mb-1">{client.name}</h4>
-                        <p className="text-gray-600 text-sm">{client.type}</p>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <span
-                            className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadge(client.status)}`}
-                          >
-                            {client.status}
-                          </span>
-                          <span
-                            className={`inline-flex px-2 py-1 rounded-full text-xs font-medium border ${getPriorityBadge(client.priority)}`}
-                          >
-                            {client.priority}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        <span>{client.location}</span>
-                      </div>
-                      {client.budget > 0 && (
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <span>Budget: {formatPrice(client.budget)}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span>Last contact: {formatDate(client.lastContact)}</span>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-gray-100 pt-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-gray-500 text-sm">Assigned Agent</span>
-                        <span className="text-gray-900 font-medium text-sm">{client.assignedAgent}</span>
-                      </div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-gray-500 text-sm">Properties Viewed</span>
-                        <span className="text-gray-900 font-medium text-sm">{client.propertiesViewed}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-500 text-sm">Source</span>
-                        <span className="text-gray-900 font-medium text-sm">{client.source}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border capitalize ${getTypeColor(transaction.type)}`}
+                      >
+                        {transaction.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
-                        <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                          <Mail className="w-4 h-4" />
+                        <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors">
+                          <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors">
-                          <Phone className="w-4 h-4" />
+                        <button className="p-1.5 text-gray-400 hover:text-green-600 transition-colors">
+                          <Edit className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
-                          <MessageSquare className="w-4 h-4" />
+                        <button className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors">
+                          <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">View Details</button>
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
                 ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Right Sidebar - Always visible */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
-          <div className="lg:col-span-3"></div>
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">Pending Deals</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{adminStats.pendingDeals}</p>
-                  </div>
-                  <Clock className="w-8 h-8 text-amber-500" />
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">Avg. Price</p>
-                    <p className="text-xl font-bold text-gray-900 mt-1">{formatPrice(adminStats.avgPrice)}</p>
-                  </div>
-                  <Target className="w-8 h-8 text-purple-500" />
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
-              </div>
-
-              <div className="p-6">
-                <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        {activity.type === "sale" && <CheckCircle className="w-4 h-4 text-emerald-600" />}
-                        {activity.type === "listing" && <Plus className="w-4 h-4 text-blue-600" />}
-                        {activity.type === "inquiry" && <Mail className="w-4 h-4 text-purple-600" />}
-                        {activity.type === "meeting" && <Calendar className="w-4 h-4 text-orange-600" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-gray-900 text-sm font-medium">{activity.message}</p>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <span className="text-gray-600 text-xs">{activity.user}</span>
-                          <span className="text-gray-400 text-xs">•</span>
-                          <span className="text-gray-600 text-xs">{activity.time}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900">Quick Actions</h3>
-              </div>
-
-              <div className="p-6">
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border border-blue-200 rounded-xl transition-all group">
-                    <Plus className="w-5 h-5 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-blue-900 text-sm font-medium">Add Property</p>
-                  </button>
-
-                  <button className="p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 hover:from-emerald-100 hover:to-emerald-200 border border-emerald-200 rounded-xl transition-all group">
-                    <Users className="w-5 h-5 text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-emerald-900 text-sm font-medium">Add Agent</p>
-                  </button>
-
-                  <button className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border border-purple-200 rounded-xl transition-all group">
-                    <FileText className="w-5 h-5 text-purple-600 mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-purple-900 text-sm font-medium">Reports</p>
-                  </button>
-
-                  <button className="p-3 bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 border border-orange-200 rounded-xl transition-all group">
-                    <Download className="w-5 h-5 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-orange-900 text-sm font-medium">Export</p>
-                  </button>
-                </div>
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

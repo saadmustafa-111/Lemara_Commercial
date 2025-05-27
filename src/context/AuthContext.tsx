@@ -36,8 +36,8 @@ const PREDEFINED_USERS = [
     id: 1,
     email: "admin@zaraschool.com",
     password: "admin123",
-    firstName: "Admin",
-    lastName: "User",
+    firstName: "AJ",
+    lastName: "Rana",
     role: "admin"
   },
   {
