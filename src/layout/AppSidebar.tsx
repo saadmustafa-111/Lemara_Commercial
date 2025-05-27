@@ -58,6 +58,7 @@ const adminNavItems: NavItem[] = [
   {
     name: "MLS Listings",
     icon: <Users size={20} />,
+
     subItems: [
       { name: "All Agents", path: "/dashboard/admin/agents", pro: false },
       { name: "Add Agent", path: "/dashboard/admin/agents/add", pro: false },
@@ -66,12 +67,12 @@ const adminNavItems: NavItem[] = [
   {
     name: "Agents",
     icon: <Users size={20} />,
-    path: "/dashboard/admin/reports",
+path: "/dashboard/admin/agents"
   },
   {
     name: "Clients",
     icon: <User size={20} />,
-    path: "/dashboard/email-lists",
+    path: "/dashboard/admin/clients",
   },
   {
     name: "Contacts",
