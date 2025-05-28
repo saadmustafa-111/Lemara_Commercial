@@ -87,12 +87,12 @@ path: "/dashboard/admin/agents"
   {
     name: "Commercial Loans-Offline",
     icon: <Wallet size={20} />,
-    path: "/dashboard/admin/settings",
+    path: "/dashboard/admin/commOffline",
   },
   {
     name: "Documents Library",
     icon: <FileText size={20} />,
-    path: "/dashboard/admin/settings",
+    path: "/dashboard/admin/document",
   },
   {
     name: "Team Members",
