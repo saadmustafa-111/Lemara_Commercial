@@ -72,7 +72,7 @@ path: "/dashboard/admin/agents"
   {
     name: "Contacts",
     icon: <Mail size={20} />,
-    path: "/dashboard/email-campaigns",
+    path: "/dashboard/admin/contacts",
   },
   {
     name: "OverView",

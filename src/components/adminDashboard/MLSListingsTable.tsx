@@ -420,32 +420,33 @@ export default function MLSListingsTable() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
-        <table className="min-w-full">
-          <thead>
-            <tr className="text-left border-b border-gray-200">
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                ID#
-              </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Source
-              </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-200">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gradient-to-r from-gray-50 via-blue-500/10 to-blue-500/20">
+              <tr className="text-left">
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  ID#
+                </th>
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Source
+                </th>
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  Name
+                </th>
+              <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                 City
               </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                 List Price($)
               </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                 Last Modified Date
               </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-4 py-3 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">
+              <th className="px-6 py-5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center">
                 Actions
               </th>
             </tr>
@@ -456,30 +457,30 @@ export default function MLSListingsTable() {
               Array(5)
                 .fill(0)
                 .map((_, index) => (
-                  <tr key={index} className="bg-gray-100">
-                    <td className="px-2 py-2 border border-gray-300">
+                  <tr key={index} className="animate-pulse">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-5"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-16"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-32"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-20"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-16"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-24"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="h-4 bg-gray-200 rounded w-14"></div>
                     </td>
-                    <td className="px-2 py-2 border border-gray-300 text-center">
-                      <div className="h-4 bg-gray-200 rounded w-6 mx-auto"></div>
+                    <td className="px-6 py-5 whitespace-nowrap text-center">
+                      <div className="h-4 bg-gray-200 rounded w-16 mx-auto"></div>
                     </td>
                   </tr>
                 ))
@@ -487,37 +488,37 @@ export default function MLSListingsTable() {
               currentListings.map((listing, index) => {
                 return (
                   <tr key={listing.id} className="hover:bg-gray-50 border-b border-gray-200">
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-medium">
                       {listing.id}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center mr-3 overflow-hidden">
                           <img src={`/images/user/user-${parseInt(listing.id) % 5 + 1}.jpg`} alt={listing.source} className="h-full w-full object-cover" />
                         </div>
-                        <span>{listing.source}</span>
+                        <span className="text-sm">{listing.source}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
                       {listing.name}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
                       {listing.city}
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium text-green-600">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm font-medium text-green-600">
                       {formatCurrency(listing.listPrice)}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-6 py-5 whitespace-nowrap text-sm">
                       <div className="flex flex-col">
                         <span>{listing.createDate.split(" ")[0]}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${listing.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {listing.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-center">
+                    <td className="px-6 py-5 whitespace-nowrap text-center">
                       <div className="flex justify-center space-x-1">
                         <button className="p-1 hover:bg-blue-50 rounded-full" title="View">
                           <Eye className="w-4 h-4 text-blue-600" />
@@ -536,6 +537,85 @@ export default function MLSListingsTable() {
             )}
           </tbody>
         </table>
+        </div>
+        
+        {/* Pagination */}
+        {!isLoading && filteredListings.length > 0 && (
+          <div className="bg-gradient-to-r from-gray-50 to-blue-500/10 px-6 py-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-gray-700 font-medium">
+                  Showing <span className="font-bold text-blue-500">{startIndex + 1}</span> to{" "}
+                  <span className="font-bold text-blue-500">{Math.min(endIndex, filteredListings.length)}</span> of{" "}
+                  <span className="font-bold text-blue-500">{filteredListings.length}</span> results
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl bg-white border-2 border-gray-300 text-gray-500 hover:text-blue-500 hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 shadow-sm"
+                >
+                  <ChevronsLeft className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={() => setCurrentPage(currentPage > 1 ? currentPage - 1 : 1)}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl bg-white border-2 border-gray-300 text-gray-500 hover:text-blue-500 hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 shadow-sm"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNumber;
+                    if (totalPages <= 5) {
+                      pageNumber = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNumber = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNumber = totalPages - 4 + i;
+                    } else {
+                      pageNumber = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => setCurrentPage(pageNumber)}
+                        className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-sm ${
+                          currentPage === pageNumber
+                            ? "bg-blue-500 text-white shadow-lg"
+                            : "bg-white border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-500"
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(currentPage < totalPages ? currentPage + 1 : totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl bg-white border-2 border-gray-300 text-gray-500 hover:text-blue-500 hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 shadow-sm"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl bg-white border-2 border-gray-300 text-gray-500 hover:text-blue-500 hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 shadow-sm"
+                >
+                  <ChevronsRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
