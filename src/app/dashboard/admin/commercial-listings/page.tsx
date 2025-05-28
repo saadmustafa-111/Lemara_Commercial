@@ -252,13 +252,13 @@ export default function CommercialListingsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Link 
+          {/* <Link 
             href="/dashboard/admin/commercial-listings/add"
             className="inline-flex items-center px-6 py-3 bg-[#00a0d1] text-white font-medium rounded-xl hover:bg-[#008bb8] focus:outline-none focus:ring-4 focus:ring-[#00a0d1]/30 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl"
           >
             <Plus className="w-5 h-5 mr-2" />
             Add Listing
-          </Link>
+          </Link> */}
 
           <button
             disabled={isLoading}
