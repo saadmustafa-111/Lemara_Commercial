@@ -82,7 +82,7 @@ path: "/dashboard/admin/agents"
   {
     name: "Commercial Loans",
     icon: <Banknote size={20} />,
-    path: "/dashboard/admin/settings",
+    path: "/dashboard/admin/commercial",
   },
   {
     name: "Commercial Loans-Offline",
