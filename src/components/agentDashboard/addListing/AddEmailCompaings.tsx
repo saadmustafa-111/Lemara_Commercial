@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
+import axiosInstance from "@/lib/axios"
 
 // Self-contained UI components
 const Button = ({
@@ -143,6 +144,24 @@ type CampaignData = {
   }
 }
 
+// API Types
+type Property = {
+  id: number
+  description: string
+  address: string
+  city: string
+  state: string
+  selected?: boolean
+}
+
+type Broker = {
+  id: string
+  name: string
+  email: string
+  company?: string
+  avatar?: string
+}
+
 // Main Component
 export default function AddEmailCompaings() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -177,10 +196,15 @@ export default function AddEmailCompaings() {
     setCampaignData((prev) => ({ ...prev, ...data }))
   }
 
-  const handleSubmit = () => {
-    console.log("Campaign data submitted:", campaignData)
-    // Here you would typically send the data to your API
-    alert("Campaign created successfully!")
+  const handleSubmit = async () => {
+    try {
+      const response = await axiosInstance.post("/campaigns", campaignData)
+      console.log("Campaign created successfully:", response.data)
+      alert("Campaign created successfully!")
+    } catch (error) {
+      console.error("Error creating campaign:", error)
+      alert("Error creating campaign. Please try again.")
+    }
   }
 
   return (
@@ -356,12 +380,6 @@ function CampaignTitle({ title, onUpdate, onNext }: CampaignTitleProps) {
 }
 
 // Step 2: Properties Selection Component
-interface Property {
-  id: string
-  name: string
-  selected: boolean
-}
-
 interface PropertiesSelectionProps {
   selectedProperties: string[]
   onUpdate: (properties: string[]) => void
@@ -370,21 +388,41 @@ interface PropertiesSelectionProps {
 
 function PropertiesSelection({ selectedProperties, onUpdate, onNext }: PropertiesSelectionProps) {
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [properties, setProperties] = useState<Property[]>([])
 
-  // Mock properties data
-  const [properties, setProperties] = useState<Property[]>([
-    { id: "prop1", name: "Luxury Villa", selected: selectedProperties.includes("prop1") },
-    { id: "prop2", name: "Downtown Apartment", selected: selectedProperties.includes("prop2") },
-    { id: "prop3", name: "Beachfront Condo", selected: selectedProperties.includes("prop3") },
-    { id: "prop4", name: "Mountain Retreat", selected: selectedProperties.includes("prop4") },
-    { id: "prop5", name: "Suburban Home", selected: selectedProperties.includes("prop5") },
-  ])
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setLoading(true)
+        const response = await axiosInstance.get("/listings")
+        const fetchedProperties = response.data.map((property: any) => ({
+          id: property.id,
+          description: property.description,
+          address: property.address,
+          city: property.city,
+          state: property.state,
+          selected: selectedProperties.includes(property.id.toString()),
+        }))
+        setProperties(fetchedProperties)
+      } catch (error) {
+        console.error("Error fetching properties:", error)
+        setError("Failed to load properties. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProperties()
+  }, [selectedProperties])
 
   const toggleProperty = (id: string) => {
-    const updatedProperties = properties.map((prop) => (prop.id === id ? { ...prop, selected: !prop.selected } : prop))
+    const updatedProperties = properties.map((prop) =>
+      prop.id.toString() === id ? { ...prop, selected: !prop.selected } : prop,
+    )
     setProperties(updatedProperties)
 
-    const selectedIds = updatedProperties.filter((prop) => prop.selected).map((prop) => prop.id)
+    const selectedIds = updatedProperties.filter((prop) => prop.selected).map((prop) => prop.id.toString())
     onUpdate(selectedIds)
 
     if (selectedIds.length > 0) {
@@ -401,6 +439,22 @@ function PropertiesSelection({ selectedProperties, onUpdate, onNext }: Propertie
     onNext()
   }
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Properties</h2>
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading properties...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -412,22 +466,34 @@ function PropertiesSelection({ selectedProperties, onUpdate, onNext }: Propertie
             {properties.map((property) => (
               <div
                 key={property.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-150"
+                className="flex items-start justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-150"
               >
-                <span className="font-medium">{property.name}</span>
+                <div className="flex-1 mr-4">
+                  <div className="font-medium mb-1">
+                    {property.address}, {property.city}, {property.state}
+                  </div>
+                  <p className="text-sm text-gray-600 line-clamp-2">{property.description}</p>
+                </div>
                 <div className="flex items-center space-x-2">
                   <Label htmlFor={`property-${property.id}`} className="sr-only">
-                    Toggle {property.name}
+                    Toggle {property.address}
                   </Label>
                   <Switch
                     id={`property-${property.id}`}
-                    checked={property.selected}
-                    onCheckedChange={() => toggleProperty(property.id)}
+                    checked={property.selected || false}
+                    onCheckedChange={() => toggleProperty(property.id.toString())}
                   />
                 </div>
               </div>
             ))}
           </div>
+
+          {properties.length === 0 && !loading && (
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-500 text-lg">No properties found</p>
+              <p className="text-gray-400 text-sm mt-1">Please add some properties first</p>
+            </div>
+          )}
 
           {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
         </div>
@@ -643,13 +709,6 @@ function DesignSelection({ design, onUpdate, onNext }: DesignSelectionProps) {
 }
 
 // Step 4: Broker Selection Component
-interface Broker {
-  id: string
-  name: string
-  company: string
-  avatar: string
-}
-
 interface BrokerSelectionProps {
   selectedBroker: string
   onUpdate: (brokerId: string) => void
@@ -659,51 +718,50 @@ interface BrokerSelectionProps {
 function BrokerSelection({ selectedBroker, onUpdate, onNext }: BrokerSelectionProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [brokers, setBrokers] = useState<Broker[]>([])
+  const [filteredBrokers, setFilteredBrokers] = useState<Broker[]>([])
 
-  // Mock brokers data
-  const brokers: Broker[] = [
-    {
-      id: "broker1",
-      name: "John Smith",
-      company: "Luxury Realty",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: "broker2",
-      name: "Sarah Johnson",
-      company: "Premier Properties",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: "broker3",
-      name: "Michael Brown",
-      company: "Elite Estates",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: "broker4",
-      name: "Emily Davis",
-      company: "Golden Gate Realty",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: "broker5",
-      name: "Robert Wilson",
-      company: "Coastal Homes",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-  ]
+  useEffect(() => {
+    const fetchBrokers = async () => {
+      try {
+        setLoading(true)
+        const response = await axiosInstance.get("/user")
+        // Assuming the response is an array of users, or adjust based on your API structure
+        const fetchedBrokers = Array.isArray(response.data) ? response.data : [response.data]
+        const formattedBrokers = fetchedBrokers.map((user: any) => ({
+          id: user.id || user._id,
+          name: user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+          email: user.email,
+          company: user.company || user.organization || "Independent",
+          avatar: user.avatar || user.profilePicture,
+        }))
+        setBrokers(formattedBrokers)
+        setFilteredBrokers(formattedBrokers)
+      } catch (error) {
+        console.error("Error fetching brokers:", error)
+        setError("Failed to load brokers. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const [filteredBrokers, setFilteredBrokers] = useState<Broker[]>(brokers)
+    fetchBrokers()
+  }, [])
 
   useEffect(() => {
     if (searchTerm) {
-      const filtered = brokers.filter((broker) => broker.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      const filtered = brokers.filter(
+        (broker) =>
+          broker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          broker.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (broker.company && broker.company.toLowerCase().includes(searchTerm.toLowerCase())),
+      )
       setFilteredBrokers(filtered)
     } else {
       setFilteredBrokers(brokers)
     }
-  }, [searchTerm])
+  }, [searchTerm, brokers])
 
   const handleBrokerSelect = (brokerId: string) => {
     onUpdate(brokerId)
@@ -716,6 +774,22 @@ function BrokerSelection({ selectedBroker, onUpdate, onNext }: BrokerSelectionPr
       return
     }
     onNext()
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Select Broker/Agent</h2>
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading brokers...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -745,7 +819,7 @@ function BrokerSelection({ selectedBroker, onUpdate, onNext }: BrokerSelectionPr
                 id="broker-search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search brokers by name..."
+                placeholder="Search brokers by name, email, or company..."
                 className="pl-10 py-3"
               />
             </div>
@@ -754,7 +828,7 @@ function BrokerSelection({ selectedBroker, onUpdate, onNext }: BrokerSelectionPr
               {filteredBrokers.map((broker) => (
                 <div
                   key={broker.id}
-                  className={`flex items-center space-x-4 p-4 border rounded-lg transition-colors duration-150 ${
+                  className={`flex items-center space-x-4 p-4 border rounded-lg transition-colors duration-150 cursor-pointer ${
                     selectedBroker === broker.id ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"
                   }`}
                   onClick={() => handleBrokerSelect(broker.id)}
@@ -770,20 +844,29 @@ function BrokerSelection({ selectedBroker, onUpdate, onNext }: BrokerSelectionPr
                   />
                   <div className="flex items-center space-x-4 flex-1">
                     <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
-                      {broker.name.charAt(0)}
+                      {broker.avatar ? (
+                        <img
+                          src={broker.avatar || "/placeholder.svg"}
+                          alt={broker.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        broker.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div>
-                      <Label htmlFor={broker.id} className="font-medium text-base">
+                      <Label htmlFor={broker.id} className="font-medium text-base cursor-pointer">
                         {broker.name}
                       </Label>
-                      <p className="text-sm text-gray-500">{broker.company}</p>
+                      <p className="text-sm text-gray-500">{broker.email}</p>
+                      {broker.company && <p className="text-sm text-gray-400">{broker.company}</p>}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {filteredBrokers.length === 0 && (
+            {filteredBrokers.length === 0 && !loading && (
               <div className="text-center py-8 bg-gray-50 rounded-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
