@@ -21,10 +21,16 @@ const AppHeader: React.FC = () => {
   // Determine if sidebar is in expanded mode (more space available when collapsed)
   const hasMoreSpace = !isExpanded && !isMobileOpen
 
+  // Normalize the user role for logic
+  const userRole = user?.role?.toLowerCase() || "guest"
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollPos = window.pageYOffset
-      setVisible((prevScrollPos > currentScrollPos && prevScrollPos - currentScrollPos > 70) || currentScrollPos < 10)
+      setVisible(
+        (prevScrollPos > currentScrollPos && prevScrollPos - currentScrollPos > 70) ||
+        currentScrollPos < 10
+      )
       setPrevScrollPos(currentScrollPos)
     }
 
@@ -40,7 +46,8 @@ const AppHeader: React.FC = () => {
       style={{
         left: `${sidebarWidth}px`,
         width: `calc(100% - ${sidebarWidth}px)`,
-        fontFamily: "'Inter', 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily:
+          "'Inter', 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
       }}
     >
       <div
@@ -50,7 +57,6 @@ const AppHeader: React.FC = () => {
       >
         {/* Left - Brand Name and Welcome */}
         <div className="flex items-center gap-8 md:gap-12">
-          {/* Show "Welcome Name" on medium+ screens with better spacing */}
           <div className="hidden md:block">
             <div
               className={`font-semibold text-gray-800 dark:text-white tracking-wide transition-all duration-500 ease-in-out ${
@@ -74,7 +80,6 @@ const AppHeader: React.FC = () => {
             </div>
           </div>
         </div>
-
         {/* Right - Actions */}
         <div
           className={`flex items-center transition-all duration-500 ease-in-out ${
@@ -82,22 +87,25 @@ const AppHeader: React.FC = () => {
           }`}
         >
           {/* Theme Toggle - Always visible */}
-          <div className={`transition-all duration-500 ease-in-out ${hasMoreSpace ? "scale-110" : "scale-100"}`}>
+          <div
+            className={`transition-all duration-500 ease-in-out ${
+              hasMoreSpace ? "scale-110" : "scale-100"
+            }`}
+          >
             <ThemeToggleButton />
           </div>
 
-          {/* Notification Icon - Responsive visibility */}
+          {/* Notification Icon */}
           <Link
             href="#"
             className={`flex items-center justify-center rounded-full bg-[#00a0d1] text-white hover:bg-[#0088b3] transition-all duration-500 ease-in-out shadow-sm hover:shadow-md transform hover:scale-110 ${
               hasMoreSpace ? "w-12 h-12" : "w-10 h-10"
-            } ${
-              // Show more readily when there's more space
-              hasMoreSpace ? "flex" : "hidden sm:flex"
-            }`}
+            } ${hasMoreSpace ? "flex" : "hidden sm:flex"}`}
           >
             <svg
-              className={`transition-all duration-500 ease-in-out ${hasMoreSpace ? "w-6 h-6" : "w-5 h-5"}`}
+              className={`transition-all duration-500 ease-in-out ${
+                hasMoreSpace ? "w-6 h-6" : "w-5 h-5"
+              }`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -109,18 +117,17 @@ const AppHeader: React.FC = () => {
             </svg>
           </Link>
 
-          {/* Email Icon - Responsive visibility */}
+          {/* Email Icon */}
           <Link
             href="#"
             className={`flex items-center justify-center rounded-full bg-[#00a0d1] text-white hover:bg-[#0088b3] transition-all duration-500 ease-in-out shadow-sm hover:shadow-md transform hover:scale-110 ${
               hasMoreSpace ? "w-12 h-12" : "w-10 h-10"
-            } ${
-              // Show more readily when there's more space
-              hasMoreSpace ? "flex" : "hidden sm:flex"
-            }`}
+            } ${hasMoreSpace ? "flex" : "hidden sm:flex"}`}
           >
             <svg
-              className={`transition-all duration-500 ease-in-out ${hasMoreSpace ? "w-6 h-6" : "w-5 h-5"}`}
+              className={`transition-all duration-500 ease-in-out ${
+                hasMoreSpace ? "w-6 h-6" : "w-5 h-5"
+              }`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -132,28 +139,35 @@ const AppHeader: React.FC = () => {
             </svg>
           </Link>
 
-          {/* Add Listing Button - Responsive visibility and sizing */}
-          <Link
-            href="/dashboard/agent/add"
-            className={`font-semibold text-white bg-[#9A2236] rounded-full hover:bg-[#851c2e] transition-all duration-500 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9A2236] tracking-wide ${
-              hasMoreSpace ? "px-6 py-3 text-base" : "px-3 md:px-4 py-2 text-sm"
-            } ${
-              // Show more readily when there's more space
-              hasMoreSpace ? "inline-block" : "hidden sm:inline-block"
-            }`}
-          >
-            Add Listing
-          </Link>
+          {/* -------- "Add Listing" - Only for NON-admin roles -------- */}
+          {userRole !== "admin" && (
+            <Link
+              href="/dashboard/agent/add"
+              className={`font-semibold text-white bg-[#9A2236] rounded-full hover:bg-[#851c2e] transition-all duration-500 ease-in-out shadow-md hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9A2236] tracking-wide ${
+                hasMoreSpace ? "px-6 py-3 text-base" : "px-3 md:px-4 py-2 text-sm"
+              } ${hasMoreSpace ? "inline-block" : "hidden sm:inline-block"}`}
+            >
+              Add Listing
+            </Link>
+          )}
+          {/* -------------------------------------------------------- */}
 
           {/* User Dropdown - Always visible */}
-          <div className={`transition-all duration-500 ease-in-out ${hasMoreSpace ? "scale-110" : "scale-100"}`}>
+          <div
+            className={`transition-all duration-500 ease-in-out ${
+              hasMoreSpace ? "scale-110" : "scale-100"
+            }`}
+          >
             <UserDropdown />
           </div>
         </div>
       </div>
-
       {/* Mobile Welcome Message */}
-      <div className={`md:hidden px-4 transition-all duration-500 ease-in-out ${hasMoreSpace ? "pb-3" : "pb-2"}`}>
+      <div
+        className={`md:hidden px-4 transition-all duration-500 ease-in-out ${
+          hasMoreSpace ? "pb-3" : "pb-2"
+        }`}
+      >
         <div className="text-center">
           <span
             className={`font-light text-gray-600 dark:text-gray-300 transition-all duration-500 ease-in-out ${
