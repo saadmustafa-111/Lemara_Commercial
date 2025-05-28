@@ -2,28 +2,17 @@
 import { Save, X } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useAuth } from "../../context/AuthContext" // Make sure to adjust this path
-<<<<<<< Updated upstream
-import axiosInstance from "@/lib/axios"
-const AddContactForm = () => {
-
-  const { user, isAuthenticated } = useAuth()
-
-=======
 
 const AddContactForm = () => {
   // Get authentication context
   const { user, isAuthenticated } = useAuth()
 
   // State for contact groups
->>>>>>> Stashed changes
   const [contactGroups, setContactGroups] = useState([])
   const [isLoadingGroups, setIsLoadingGroups] = useState(true)
   const [groupsError, setGroupsError] = useState("")
 
-<<<<<<< Updated upstream
-=======
   // Form state
->>>>>>> Stashed changes
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -37,11 +26,7 @@ const AddContactForm = () => {
     zipcode: "",
     companyTitle: "",
     website: "",
-<<<<<<< Updated upstream
-    group: "",
-=======
     group: "", // This will be converted to a number when sending to API
->>>>>>> Stashed changes
   })
 
   // Error state
@@ -70,12 +55,7 @@ const AddContactForm = () => {
 
       try {
         const authToken = localStorage.getItem("authToken")
-<<<<<<< Updated upstream
-        const response = await fetch("http://192.168.1.22:3000/contacts/group", {
-        // const response = await fetch("/api/groups", {
-=======
         const response = await fetch("http://192.168.1.24:3000/contacts/group", {
->>>>>>> Stashed changes
           headers: {
             ...(authToken && { Authorization: `Bearer ${authToken}` }),
           },
@@ -137,15 +117,12 @@ const AddContactForm = () => {
       isValid = false
     }
 
-<<<<<<< Updated upstream
-=======
     // Phone number validation (basic)
     if (formData.mobileNumber && !/^[0-9\-+$$$$\s]{10,15}$/.test(formData.mobileNumber)) {
       newErrors.mobileNumber = "Please enter a valid phone number"
       isValid = false
     }
 
->>>>>>> Stashed changes
     // Zip code validation (US format)
     if (formData.zipcode && !/^\d{5}(-\d{4})?$/.test(formData.zipcode)) {
       newErrors.zipcode = "Please enter a valid US zip code"
@@ -164,54 +141,21 @@ const AddContactForm = () => {
 
   // Handle form submission with authentication
   const handleSubmit = async (e) => {
-<<<<<<< Updated upstream
-    e.preventDefault();
-  
-=======
     e.preventDefault()
 
->>>>>>> Stashed changes
     // Check if user is authenticated
     if (!isAuthenticated) {
       setSubmitStatus({
         success: false,
         message: "You must be logged in to add contacts",
-<<<<<<< Updated upstream
-      });
-      return;
-    }
-  
-=======
       })
       return
     }
 
->>>>>>> Stashed changes
     // Validate form before submission
     if (!validateForm()) {
       return;
     }
-<<<<<<< Updated upstream
-  
-    setIsSubmitting(true);
-    setSubmitStatus({ success: false, message: "" });
-  
-    try {
-      const apiData = {
-        ...formData,
-        group: formData.group ? Number.parseInt(formData.group, 10) : 0,
-        userId: user?.id,
-      };
-  
-      const response = await axiosInstance.post("/contacts", apiData);
-  
-      // Success
-      setSubmitStatus({
-        success: true,
-        message: "Contact added successfully!",
-      });
-  
-=======
 
     setIsSubmitting(true)
     setSubmitStatus({ success: false, message: "" })
@@ -245,7 +189,6 @@ const AddContactForm = () => {
         message: "Contact added successfully!",
       })
 
->>>>>>> Stashed changes
       // Reset form after successful submission
       setFormData({
         firstName: "",
@@ -261,15 +204,6 @@ const AddContactForm = () => {
         companyTitle: "",
         website: "",
         group: "",
-<<<<<<< Updated upstream
-      });
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmitStatus({
-        success: false,
-        message: error.message || "Failed to add contact. Please try again.",
-      });
-=======
       })
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -277,7 +211,6 @@ const AddContactForm = () => {
         success: false,
         message: error.message || "Failed to add contact. Please try again.",
       })
->>>>>>> Stashed changes
     } finally {
       setIsSubmitting(false)
     }
@@ -336,11 +269,6 @@ const AddContactForm = () => {
     "Wyoming",
     "District of Columbia",
   ]
-<<<<<<< Updated upstream
- 
-=======
-
->>>>>>> Stashed changes
   // If not authenticated, show login message (optional)
   if (!isAuthenticated) {
     return (
