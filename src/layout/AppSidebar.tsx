@@ -77,7 +77,7 @@ path: "/dashboard/admin/agents"
   {
     name: "OverView",
     icon: <Settings size={20} />,
-    path: "/dashboard/admin/settings",
+    path: "/dashboard/admin/overview",
   },
   {
     name: "Commercial Loans",

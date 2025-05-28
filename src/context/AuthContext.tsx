@@ -34,7 +34,7 @@ interface SignupData {
 const PREDEFINED_USERS = [
   {
     id: 1,
-    email: "admin@zaraschool.com",
+    email: "admin@Lemara.com",
     password: "admin123",
     firstName: "AJ",
     lastName: "Rana",
