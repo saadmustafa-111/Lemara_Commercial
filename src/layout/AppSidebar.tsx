@@ -97,7 +97,7 @@ path: "/dashboard/admin/agents"
   {
     name: "Team Members",
     icon: <UserPlus size={20} />,
-    path: "/dashboard/admin/settings",
+    path: "/dashboard/admin/team",
   },
 ]
 
