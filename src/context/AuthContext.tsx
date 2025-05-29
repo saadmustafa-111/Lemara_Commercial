@@ -43,10 +43,10 @@ const PREDEFINED_USERS = [
   },
   {
     id: 2,
-    email: "teacher@zaraschool.com",
-    password: "teacher123",
-    firstName: "Teacher",
-    lastName: "Smith",
+    email: "user@Lemara.com",
+    password: "user123",
+    firstName: "User",
+    lastName: "",
     role: "teacher"
   },
   {

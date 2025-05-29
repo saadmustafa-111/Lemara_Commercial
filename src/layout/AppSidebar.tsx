@@ -20,6 +20,7 @@ import {
   Contact,
   ChevronLeft,
   ChevronRight,
+  
 } from "lucide-react"
 import {
   ChevronDownIcon,
@@ -147,6 +148,11 @@ const studentNavItems: NavItem[] = [
     name: "Email Campaigns",
     icon: <PaperPlaneIcon />,
     path: "/dashboard/email-campaigns",
+  },
+  {
+    name: "PipeLines Management",
+    icon: <FileText />,
+    path: "/dashboard/agent/pipeline",
   },
 ]
 
