@@ -107,8 +107,13 @@ const teacherNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Teacher Overview", path: "/dashboard/teacher", pro: false }],
+     path: "/dashboard/teacher"
   },
+  {
+    icon: <GridIcon />,
+    name: "Commercial Loans",
+   path: "/dashboard/teacher"
+  }
 ]
 
 // Student-specific navigation items

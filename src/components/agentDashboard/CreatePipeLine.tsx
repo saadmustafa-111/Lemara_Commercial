@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Plus, Target, Users, DollarSign, TrendingUp, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Plus, Target, CheckCircle } from 'lucide-react';
 
 const CreatePipeline = () => {
   const [form, setForm] = useState({
@@ -78,75 +78,9 @@ const CreatePipeline = () => {
               </div>
 
               {/* Participants */}
-              <div className="group">
-                <label className="flex items-center text-lg font-bold text-slate-700 mb-3">
-                  <Users className="w-5 h-5 mr-2 text-emerald-600" />
-                  Participants
-                </label>
-                <input
-                  type="number"
-                  name="participants"
-                  value={form.participants}
-                  onChange={handleChange}
-                  min="0"
-                  required
-                  className="w-full px-6 py-4 border-2 border-slate-200 rounded-2xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300 text-lg font-medium placeholder-slate-400 group-hover:border-slate-300"
-                  placeholder="e.g. 1,000"
-                />
-                <p className="text-sm text-slate-500 mt-2 ml-2">Number of people in this pipeline</p>
-              </div>
-
+          
               {/* Financial Fields Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Prospects */}
-                <div className="group">
-                  <label className="flex items-center text-lg font-bold text-slate-700 mb-3">
-                    <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
-                    Prospects
-                  </label>
-                  <input
-                    type="text"
-                    name="prospects"
-                    value={form.prospects}
-                    onChange={handleChange}
-                    placeholder="$0"
-                    className="w-full px-4 py-4 border-2 border-slate-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-lg font-medium placeholder-slate-400 group-hover:border-slate-300"
-                  />
-                </div>
-
-                {/* Value */}
-                <div className="group">
-                  <label className="flex items-center text-lg font-bold text-slate-700 mb-3">
-                    <TrendingUp className="w-5 h-5 mr-2 text-amber-600" />
-                    Value
-                  </label>
-                  <input
-                    type="text"
-                    name="value"
-                    value={form.value}
-                    onChange={handleChange}
-                    placeholder="$0"
-                    className="w-full px-4 py-4 border-2 border-slate-200 rounded-2xl focus:border-amber-500 focus:ring-4 focus:ring-amber-100 transition-all duration-300 text-lg font-medium placeholder-slate-400 group-hover:border-slate-300"
-                  />
-                </div>
-
-                {/* Commission */}
-                <div className="group">
-                  <label className="flex items-center text-lg font-bold text-slate-700 mb-3">
-                    <DollarSign className="w-5 h-5 mr-2 text-purple-600" />
-                    Commission
-                  </label>
-                  <input
-                    type="text"
-                    name="commission"
-                    value={form.commission}
-                    onChange={handleChange}
-                    placeholder="$0"
-                    className="w-full px-4 py-4 border-2 border-slate-200 rounded-2xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-lg font-medium placeholder-slate-400 group-hover:border-slate-300"
-                  />
-                </div>
-              </div>
-
+          
               {/* Submit Button */}
               <div className="pt-6">
                 <button

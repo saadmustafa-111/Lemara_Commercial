@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Target, Edit3, X, Users, DollarSign, TrendingUp, Calendar, User, Mail, Phone } from 'lucide-react';
+import { Plus, Target, Edit3, X, Users, DollarSign, TrendingUp, Calendar, User, Mail, Phone, Upload, Building, MapPin, Contact } from 'lucide-react';
 
 const PipeLine = () => {
   const router = useRouter();
@@ -36,6 +36,50 @@ const PipeLine = () => {
     }
   ]);
 
+  // For pursuit form state
+  const initialPursuitForm = {
+    propertyName: '',
+    propertyType: '',
+    squareFootage: '',
+    tenancy: '',
+    yearBuilt: '',
+    entity: '',
+    trueOwner: '',
+    price: '',
+    fee: '',
+    probability: '',
+    marketingCost: '',
+    lastContact: '',
+    nextStep: '',
+    city: '',
+    state: '',
+    zip: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    image: null
+  };
+  const [pursuitForm, setPursuitForm] = useState(initialPursuitForm);
+
+  const usStates = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+    'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+    'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+    'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+    'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+    'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+    'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+  ];
+
+  const nextStepOptions = [
+    'Send Proposal',
+    'Send Email',
+    'Schedule Meeting',
+    'Follow Up Call',
+    'Site Visit'
+  ];
+
   const handleRowClick = (pipeline) => {
     setSelectedPipeline(pipeline);
     setShowEditModal(true);
@@ -43,10 +87,54 @@ const PipeLine = () => {
 
   const handleAddPursuit = () => {
     setShowPursuitModal(true);
+    setPursuitForm(initialPursuitForm);
   };
 
   const handleCreatePipeline = () => {
     router.push('/dashboard/agent/createpipeline');
+  };
+
+  const handlePursuitFormChange = (e) => {
+    const { name, value, files, type } = e.target;
+    setPursuitForm((prev) => ({
+      ...prev,
+      [name]: type === 'file' ? files[0] : value
+    }));
+  };
+
+  const handlePursuitSubmit = (e) => {
+    e.preventDefault();
+
+    // Compose new pursuit object
+    const newPursuit = {
+      id: Date.now(), // Simple unique id for demo
+      name: pursuitForm.propertyName || 'New Pursuit',
+      contact: `${pursuitForm.firstName} ${pursuitForm.lastName}`.trim(),
+      email: pursuitForm.email,
+      phone: pursuitForm.phone,
+      value: pursuitForm.price,
+      stage: pursuitForm.nextStep.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+      probability: pursuitForm.probability ? pursuitForm.probability.charAt(0).toUpperCase() + pursuitForm.probability.slice(1) : '',
+      // ...add more fields as needed
+    };
+
+    // Update pipelines state
+    setPipelines(prev =>
+      prev.map(pipe =>
+        pipe.id === selectedPipeline.id
+          ? { ...pipe, pursuits: [...(pipe.pursuits || []), newPursuit] }
+          : pipe
+      )
+    );
+
+    setShowPursuitModal(false);
+    setShowEditModal(true); // Remain in pipeline edit modal
+    setPursuitForm(initialPursuitForm);
+    // Optionally, update selectedPipeline too for instant UI update
+    setSelectedPipeline(prev => ({
+      ...prev,
+      pursuits: [...(prev.pursuits || []), newPursuit]
+    }));
   };
 
   return (
@@ -60,7 +148,6 @@ const PipeLine = () => {
             </h1>
             <p className="text-slate-600 text-lg">Manage and track your sales pipelines with precision</p>
           </div>
-          
           <button
             onClick={handleCreatePipeline}
             className="group relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 ease-out"
@@ -80,14 +167,13 @@ const PipeLine = () => {
               <Target className="w-6 h-6 mr-3 text-indigo-600" />
               Active Pipelines
             </h2>
-            
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-slate-200">
                     <th className="text-left py-4 px-6 font-bold text-slate-700 text-lg">Pipeline Name</th>
-                    <th className="text-right py-4 px-6 font-bold text-slate-700 text-lg">Participants</th>
-                    <th className="text-right py-4 px-6 font-bold text-slate-700 text-lg">Prospects</th>
+      
+          
                     <th className="text-right py-4 px-6 font-bold text-slate-700 text-lg">Value</th>
                     <th className="text-right py-4 px-6 font-bold text-slate-700 text-lg">Commission</th>
                   </tr>
@@ -134,7 +220,6 @@ const PipeLine = () => {
               </table>
             </div>
           </div>
-          
           {/* Empty State Enhancement */}
           {pipelines.length === 0 && (
             <div className="text-center py-16">
@@ -230,7 +315,6 @@ const PipeLine = () => {
                     </tbody>
                   </table>
                 </div>
-                
                 {selectedPipeline.pursuits?.length === 0 && (
                   <div className="text-center py-12">
                     <Target className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -246,7 +330,7 @@ const PipeLine = () => {
         {/* Add Pursuit Modal */}
         {showPursuitModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-60 p-4">
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-2xl">
+            <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between p-6 border-b border-slate-200">
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center">
                   <Plus className="w-6 h-6 mr-3 text-emerald-600" />
@@ -261,76 +345,297 @@ const PipeLine = () => {
               </div>
               
               <div className="p-6">
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Pursuit Name</label>
-                      <input 
-                        type="text" 
-                        placeholder="Enter pursuit name"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                      />
+                <form className="space-y-8" onSubmit={handlePursuitSubmit}>
+                  {/* Property Information Section */}
+                  <div className="bg-slate-50 rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                      <Building className="w-5 h-5 mr-2 text-indigo-600" />
+                      Property Information
+                    </h3>
+                    {/* Upload Image */}
+                    <div className="mb-6">
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Upload Image</label>
+                      <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-emerald-400 transition-colors duration-200">
+                        <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                        <p className="text-slate-600">Click to upload or drag and drop</p>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*" 
+                          name="image"
+                          onChange={handlePursuitFormChange}
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Contact Person</label>
-                      <input 
-                        type="text" 
-                        placeholder="Enter contact name"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Property Name</label>
+                        <input 
+                          type="text"
+                          name="propertyName"
+                          value={pursuitForm.propertyName}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter property name"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Property Type</label>
+                        <input 
+                          type="text"
+                          name="propertyType"
+                          value={pursuitForm.propertyType}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter property type"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Square Footage</label>
+                        <input 
+                          type="text"
+                          name="squareFootage"
+                          value={pursuitForm.squareFootage}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter sq ft"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Tenancy</label>
+                        <select 
+                          name="tenancy"
+                          value={pursuitForm.tenancy}
+                          onChange={handlePursuitFormChange}
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        >
+                          <option value="">Select tenancy</option>
+                          <option value="vacant">Vacant</option>
+                          <option value="single">Single</option>
+                          <option value="multi">Multi</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Year Built</label>
+                        <input 
+                          type="text"
+                          name="yearBuilt"
+                          value={pursuitForm.yearBuilt}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter year"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Entity</label>
+                        <input 
+                          type="text"
+                          name="entity"
+                          value={pursuitForm.entity}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter entity"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">True Owner</label>
+                        <input 
+                          type="text"
+                          name="trueOwner"
+                          value={pursuitForm.trueOwner}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter true owner"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                      <input 
-                        type="email" 
-                        placeholder="Enter email address"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                      />
+                  {/* Tracking Section */}
+                  <div className="bg-emerald-50 rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                      <TrendingUp className="w-5 h-5 mr-2 text-emerald-600" />
+                      Tracking
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Price</label>
+                        <input 
+                          type="text"
+                          name="price"
+                          value={pursuitForm.price}
+                          onChange={handlePursuitFormChange}
+                          placeholder="$0"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Fee</label>
+                        <input 
+                          type="text"
+                          name="fee"
+                          value={pursuitForm.fee}
+                          onChange={handlePursuitFormChange}
+                          placeholder="$0"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
-                      <input 
-                        type="tel" 
-                        placeholder="Enter phone number"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Probability</label>
+                        <select 
+                          name="probability"
+                          value={pursuitForm.probability}
+                          onChange={handlePursuitFormChange}
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        >
+                          <option value="">Select probability</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Est. Marketing Cost</label>
+                        <input 
+                          type="text"
+                          name="marketingCost"
+                          value={pursuitForm.marketingCost}
+                          onChange={handlePursuitFormChange}
+                          placeholder="$0"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Last Contact</label>
+                        <input 
+                          type="date"
+                          name="lastContact"
+                          value={pursuitForm.lastContact}
+                          onChange={handlePursuitFormChange}
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Value</label>
-                      <input 
-                        type="text" 
-                        placeholder="$0"
+                    <div className="mt-6">
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Next Step</label>
+                      <select 
+                        name="nextStep"
+                        value={pursuitForm.nextStep}
+                        onChange={handlePursuitFormChange}
                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Stage</label>
-                      <select className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200">
-                        <option value="">Select stage</option>
-                        <option value="Initial Contact">Initial Contact</option>
-                        <option value="Qualification">Qualification</option>
-                        <option value="Proposal">Proposal</option>
-                        <option value="Negotiation">Negotiation</option>
-                        <option value="Closed Won">Closed Won</option>
-                        <option value="Closed Lost">Closed Lost</option>
+                      >
+                        <option value="">Select next step</option>
+                        {nextStepOptions.map((option, idx) => (
+                          <option key={idx} value={option.toLowerCase().replace(' ', '_')}>{option}</option>
+                        ))}
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Probability</label>
-                      <input 
-                        type="text" 
-                        placeholder="0%"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                      />
+                  </div>
+                  {/* Address Section */}
+                  <div className="bg-blue-50 rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                      <MapPin className="w-5 h-5 mr-2 text-blue-600" />
+                      Address
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">City</label>
+                        <input 
+                          type="text"
+                          name="city"
+                          value={pursuitForm.city}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter city"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">State</label>
+                        <select 
+                          name="state"
+                          value={pursuitForm.state}
+                          onChange={handlePursuitFormChange}
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                        >
+                          <option value="">Select state</option>
+                          {usStates.map((state, idx) => (
+                            <option key={idx} value={state}>{state}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Zip Code</label>
+                        <input 
+                          type="text"
+                          name="zip"
+                          value={pursuitForm.zip}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter zip code"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                        />
+                      </div>
                     </div>
                   </div>
-                  
+                  {/* Contact Info Section */}
+                  <div className="bg-purple-50 rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                      <Contact className="w-5 h-5 mr-2 text-purple-600" />
+                      Contact Info
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">First Name</label>
+                        <input 
+                          type="text"
+                          name="firstName"
+                          value={pursuitForm.firstName}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter first name"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Last Name</label>
+                        <input 
+                          type="text"
+                          name="lastName"
+                          value={pursuitForm.lastName}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter last name"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
+                        <input 
+                          type="tel"
+                          name="phone"
+                          value={pursuitForm.phone}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter phone number"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                        <input 
+                          type="email"
+                          name="email"
+                          value={pursuitForm.email}
+                          onChange={handlePursuitFormChange}
+                          placeholder="Enter email address"
+                          className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="flex justify-end space-x-4 pt-6">
                     <button 
                       type="button"
@@ -341,7 +646,7 @@ const PipeLine = () => {
                     </button>
                     <button 
                       type="submit"
-                      className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                      className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200"
                     >
                       Add Pursuit
                     </button>
@@ -354,6 +659,6 @@ const PipeLine = () => {
       </div>
     </div>
   );
-}
+};
 
 export default PipeLine;
