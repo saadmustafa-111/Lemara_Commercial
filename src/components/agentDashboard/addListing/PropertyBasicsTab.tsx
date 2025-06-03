@@ -664,9 +664,8 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
       setIsSubmitting(false)
     }
   }
-
   return (
-    <div className="space-y-8 pt-14">
+    <div className="space-y-10 pt-14 max-w-6xl mx-auto">
       {/* Add the sub tab navigation at the top */}
       <SubTabNavigation
         activeSection={activeSection}
@@ -677,29 +676,40 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
 
       {/* Display submission error if any */}
       {submissionError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-full mb-4">
-          <p className="font-medium">Error:</p>
-          <p>{submissionError}</p>
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg shadow-md mb-6 animate-fadeIn transition-all duration-300">
+          <div className="flex items-center">
+            <svg className="h-6 w-6 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="font-medium text-lg">Error</p>
+          </div>
+          <p className="ml-9">{submissionError}</p>
         </div>
       )}
 
       {/* Display success message if any */}
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-full mb-4">
-          <p className="font-medium">Success:</p>
-          <p>{successMessage}</p>
+        <div className="bg-green-50 border-l-4 border-green-500 text-green-700 px-6 py-4 rounded-lg shadow-md mb-6 animate-fadeIn transition-all duration-300">
+          <div className="flex items-center">
+            <svg className="h-6 w-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="font-medium text-lg">Success</p>
+          </div>
+          <p className="ml-9">{successMessage}</p>
         </div>
-      )}
-
-      {/* Basic Information Section */}
-      <div id="basic-information" ref={sectionRefs["basic-information"]} className="space-y-6 pt-8">
-        <h2 className="text-xl font-semibold text-gray-800">Basic Information</h2>
+      )}      {/* Basic Information Section */}
+      <div id="basic-information" ref={sectionRefs["basic-information"]} className="space-y-8 pt-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center border-b border-gray-200 pb-4">
+          <span className="text-[#06AED7] text-2xl mr-3">📋</span>
+          <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Basic Information</h2>
+        </div>
 
         {/* Market Selection */}
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Market</label>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label className="block mb-4 text-base font-medium text-gray-800">Market Type</label>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 hover:border-[#06AED7] transition-all duration-200">
               <input
                 type="radio"
                 id="onMarket"
@@ -707,13 +717,13 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 value="onMarket"
                 checked={formData.marketType === "onMarket"}
                 onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="w-5 h-5 text-[#06AED7] border-gray-300 focus:ring-[#06AED7]"
               />
-              <label htmlFor="onMarket" className="text-sm text-gray-700">
+              <label htmlFor="onMarket" className="text-base text-gray-700 font-medium cursor-pointer flex-1">
                 On Market
               </label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 bg-white p-3 rounded-lg border border-gray-200 hover:border-[#06AED7] transition-all duration-200">
               <input
                 type="radio"
                 id="privateMarket"
@@ -721,89 +731,104 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 value="private"
                 checked={formData.marketType === "private"}
                 onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                className="w-5 h-5 text-[#06AED7] border-gray-300 focus:ring-[#06AED7]"
               />
-              <label htmlFor="privateMarket" className="text-sm text-gray-700">
+              <label htmlFor="privateMarket" className="text-base text-gray-700 font-medium cursor-pointer flex-1">
                 Private
               </label>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-sm text-gray-600 mt-3 bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400">
+              <span className="font-medium block mb-1">Note:</span>
               On Market listings will appear on our marketplace. Private listings will only be visible to your team.
             </p>
           </div>
-        </div>
-
-        {/* Title Field */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label htmlFor="title" className="text-sm font-medium text-gray-700">
-              Title
+        </div>        {/* Title Field */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <div className="flex justify-between items-center mb-3">
+            <label htmlFor="title" className="text-base font-medium text-gray-800 flex items-center">
+              <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Listing Title
             </label>
-            <span className="text-xs text-gray-500">{titleLength}/100</span>
-          </div>{" "}
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title ?? ""}
-            onChange={handleTitleChange}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            placeholder="Enter listing title"
-            maxLength={100}
-          />
-          <p className="text-xs text-gray-500 mt-1">
+            <span className="text-sm bg-gray-200 text-gray-700 px-2 py-1 rounded-full font-medium">{titleLength}/100</span>
+          </div>
+          <div className="relative group">
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title ?? ""}
+              onChange={handleTitleChange}
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-lg"
+              placeholder="Enter listing title"
+              maxLength={100}
+            />
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-3 pl-2 border-l-2 border-[#06AED7]">
             Example: "Modern Office Space in Downtown" or "Retail Property on Main Street"
           </p>
-        </div>
-
-        {/* Price Field */}
-        <div>
-          <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-700">
-            Price
+        </div>        {/* Price Field */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="price" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Listing Price
           </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-              <span className="text-gray-500">$</span>
-            </div>{" "}
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+              <span className="text-gray-500 text-xl font-semibold">$</span>
+            </div>
             <input
               type="number"
               id="price"
               name="price"
               value={formData.price ?? ""}
               onChange={handleChange}
-              className="w-full pl-8 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+              className="w-full pl-10 pr-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-lg font-medium"
               placeholder="0"
               min="0"
             />
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
           </div>
-          <div className="flex items-center mt-2">
+          <div className="flex items-center mt-4 bg-white p-3 rounded-lg border border-gray-200 hover:border-[#06AED7] transition-all duration-200">
             <input
               type="checkbox"
               id="hidePrice"
               name="hidePrice"
               checked={isChecked(formData.hidePrice)}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-5 h-5 text-[#06AED7] border-gray-300 rounded focus:ring-[#06AED7]"
             />
-            <label htmlFor="hidePrice" className="ml-2 text-sm text-gray-700">
+            <label htmlFor="hidePrice" className="ml-3 text-base text-gray-700 font-medium cursor-pointer flex-1">
               Hide price on listing
             </label>
           </div>
-        </div>
-
-        {/* Listing Sub Type */}
-        <div>
-          <label htmlFor="listingSubType" className="block mb-2 text-sm font-medium text-gray-700">
+        </div>        {/* Listing Sub Type */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="listingSubType" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
             Listing Sub Type
           </label>
-          <div className="relative">
-            {" "}
+          <div className="relative group">
             <select
               id="listingSubType"
               name="listingSubType"
               value={formData.listingSubType ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-lg appearance-none"
             >
               <option value="">Select a sub type</option>
               <option value="For Sale">For Sale</option>
@@ -813,101 +838,130 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               <option value="For Investment">For Investment</option>
               <option value="Joint Venture">Joint Venture</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-0 text-gray-700">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#06AED7]">
+              <svg className="w-6 h-6 transition-transform duration-200 transform group-hover:translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-3 pl-2 border-l-2 border-[#06AED7]">
+            Choose the appropriate sub type that best describes your property listing
+          </p>
+        </div>
+      </div>      {/* Address Section */}
+      <div id="address" ref={sectionRefs["address"]} className="space-y-8 pt-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center border-b border-gray-200 pb-4">
+          <span className="text-[#06AED7] text-2xl mr-3">📍</span>
+          <h2 className="text-2xl font-bold text-gray-800 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Address</h2>
+        </div>        {/* Street Address */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="streetAddress" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Street Address
+          </label>
+          <div className="relative group">
+            <input
+              type="text"
+              id="streetAddress"
+              name="streetAddress"
+              value={formData.streetAddress ?? ""}
+              onChange={handleChange}
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-lg"
+              placeholder="Enter street address"
+            />
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               </svg>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Address Section */}
-      <div id="address" ref={sectionRefs["address"]} className="space-y-6 pt-8">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-          <span className="mr-2">📍</span> Address
-        </h2>
-
-        {/* Street Address */}
-        <div>
-          {" "}
-          <input
-            type="text"
-            id="streetAddress"
-            name="streetAddress"
-            value={formData.streetAddress ?? ""}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            placeholder="Street Address"
-          />
-        </div>
 
         {/* Address 2 */}
-        <div>
-          {" "}
-          <input
-            type="text"
-            id="address2"
-            name="address2"
-            value={formData.address2 ?? ""}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            placeholder="Address 2"
-          />
-        </div>
-
-        {/* City, State/Province, Postal Code in one row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            {" "}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="address2" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Address Line 2 (Optional)
+          </label>
+          <div className="relative group">
             <input
               type="text"
-              id="city"
-              name="city"
-              value={formData.city ?? ""}
+              id="address2"
+              name="address2"
+              value={formData.address2 ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-              placeholder="City"
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-lg"
+              placeholder="Apartment, suite, unit, building, floor, etc."
             />
           </div>
+        </div>        {/* City, State/Province, Postal Code in one row */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Location Details
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="relative group">
+              <label htmlFor="city" className="block mb-2 text-sm font-medium text-gray-700 ml-1">City</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                value={formData.city ?? ""}
+                onChange={handleChange}
+                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md"
+                placeholder="Enter city"
+              />
+            </div>
 
-          <div>
-            {" "}
-            <input
-              type="text"
-              id="stateProvince"
-              name="stateProvince"
-              value={formData.stateProvince ?? ""}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-              placeholder="State/Province"
-            />
+            <div className="relative group">
+              <label htmlFor="stateProvince" className="block mb-2 text-sm font-medium text-gray-700 ml-1">State/Province</label>
+              <input
+                type="text"
+                id="stateProvince"
+                name="stateProvince"
+                value={formData.stateProvince ?? ""}
+                onChange={handleChange}
+                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md"
+                placeholder="Enter state/province"
+              />
+            </div>
+
+            <div className="relative group">
+              <label htmlFor="postalCode" className="block mb-2 text-sm font-medium text-gray-700 ml-1">Postal/Zip Code</label>
+              <input
+                type="text"
+                id="postalCode"
+                name="postalCode"
+                value={formData.postalCode ?? ""}
+                onChange={handleChange}
+                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md"
+                placeholder="Enter postal code"
+              />
+            </div>
           </div>
-
-          <div>
-            {" "}
-            <input
-              type="text"
-              id="postalCode"
-              name="postalCode"
-              value={formData.postalCode ?? ""}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-              placeholder="Postal Code"
-            />
-          </div>
-        </div>
-
-        {/* Country Dropdown */}
-        <div>
-          <div className="relative">
-            {" "}
+        </div>        {/* Country Dropdown */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="country" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Country
+          </label>
+          <div className="relative group">
             <select
               id="country"
               name="country"
               value={formData.country ?? ""}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-lg appearance-none"
             >
               <option value="">Select Country</option>
               <option value="Pakistan">Pakistan</option>
@@ -921,41 +975,69 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               <option value="China">China</option>
               <option value="Japan">Japan</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-0 text-gray-700">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#06AED7]">
+              <svg className="w-6 h-6 transition-transform duration-200 transform group-hover:translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </div>
-        </div>
-
-        {/* Neighborhood */}
-        <div>
-          {" "}
-          <input
-            type="text"
-            id="neighborhood"
-            name="neighborhood"
-            value={formData.neighborhood ?? ""}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            placeholder="Neighborhood"
-          />
+        </div>        {/* Neighborhood */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="neighborhood" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Neighborhood
+          </label>
+          <div className="relative group">
+            <input
+              type="text"
+              id="neighborhood"
+              name="neighborhood"
+              value={formData.neighborhood ?? ""}
+              onChange={handleChange}
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md"
+              placeholder="Enter neighborhood name"
+            />
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-3 pl-2 border-l-2 border-[#06AED7]">
+            Specifying the neighborhood helps potential buyers/renters understand the location better
+          </p>
         </div>
 
         {/* Assessor's Parcel Number */}
-        <div>
-          {" "}
-          <input
-            type="text"
-            id="parcelNumber"
-            name="parcelNumber"
-            value={formData.parcelNumber ?? ""}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-            placeholder="Assessor's Parcel Number"
-          />
-        </div>        {/* Map and Street View */}
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <label htmlFor="parcelNumber" className="flex items-center mb-3 text-base font-medium text-gray-800">
+            <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Assessor's Parcel Number
+          </label>
+          <div className="relative group">
+            <input
+              type="text"
+              id="parcelNumber"
+              name="parcelNumber"
+              value={formData.parcelNumber ?? ""}
+              onChange={handleChange}
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md"
+              placeholder="Enter parcel/lot number"
+            />
+            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-3 pl-2 border-l-2 border-[#06AED7]">
+            The parcel number helps identify the property in county/municipal records
+          </p>
+        </div>{/* Map and Street View */}
         <div className="space-y-2">
           {isLoadingMap && (
             <div className="text-center text-sm text-blue-600 py-2">Loading map coordinates based on address...</div>
@@ -1024,87 +1106,107 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             }}
           />
         </div> 
-      </div>
+      </div>      {/* Details Section */}
+      <div id="details" ref={sectionRefs["details"]} className="space-y-8 pt-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center border-b border-gray-200 pb-4">
+          <span className="text-[#06AED7] text-2xl mr-3">📋</span>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Property Details</h2>
+        </div>
 
-      {/* Details Section */}
-      <div id="details" ref={sectionRefs["details"]} className="space-y-6 pt-8">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-          <span className="mr-2">📋</span> Details
-        </h2>
-
-        <div className="border-b border-gray-200 pb-6">
-          <div className="flex flex-col md:flex-row md:items-center mb-4">
-            <label htmlFor="sellerFinancing" className="block text-sm font-medium text-gray-700 md:w-1/4 mb-2 md:mb-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Seller Financing */}
+          <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+            <label htmlFor="sellerFinancing" className="flex items-center mb-3 text-base font-medium text-gray-800">
+              <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               Seller Financing
             </label>
-            <div className="md:w-3/4">
-              <div className="relative">
-                {" "}
-                <select
-                  id="sellerFinancing"
-                  name="sellerFinancing"
-                  value={formData.sellerFinancing ?? ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
-                >
-                  <option value="">- Select Seller Financing -</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-0 text-gray-700">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                  </svg>
-                </div>
+            <div className="relative group">
+              <select
+                id="sellerFinancing"
+                name="sellerFinancing"
+                value={formData.sellerFinancing ?? ""}
+                onChange={handleChange}
+                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-base appearance-none"
+              >
+                <option value="">Select Seller Financing Option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#06AED7]">
+                <svg className="w-6 h-6 transition-transform duration-200 transform group-hover:translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
+            <p className="text-sm text-gray-600 mt-3 pl-2 border-l-2 border-[#06AED7]">
+              Indicates if the seller is willing to provide financing options for the buyer
+            </p>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-center">
-            <label htmlFor="opportunityZone" className="block text-sm font-medium text-gray-700 md:w-1/4 mb-2 md:mb-0">
+          {/* Opportunity Zone */}
+          <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+            <label htmlFor="opportunityZone" className="flex items-center mb-3 text-base font-medium text-gray-800">
+              <svg className="w-5 h-5 text-[#06AED7] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
               Opportunity Zone
             </label>
-            <div className="md:w-3/4">
-              <div className="relative">
-                {" "}
-                <select
-                  id="opportunityZone"
-                  name="opportunityZone"
-                  value={formData.opportunityZone ?? ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 appearance-none"
-                >
-                  <option value="">- Select Opportunity Zone -</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 pt-0 text-gray-700">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                  </svg>
-                </div>
+            <div className="relative group">
+              <select
+                id="opportunityZone"
+                name="opportunityZone"
+                value={formData.opportunityZone ?? ""}
+                onChange={handleChange}
+                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-white text-gray-800 shadow-sm group-hover:shadow-md text-base appearance-none"
+              >
+                <option value="">Select Opportunity Zone Status</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#06AED7]">
+                <svg className="w-6 h-6 transition-transform duration-200 transform group-hover:translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
+            <p className="text-sm text-gray-600 mt-3 pl-2 border-l-2 border-[#06AED7]">
+              Opportunity Zones offer tax benefits to investors and can increase property appeal
+            </p>
           </div>
         </div>
 
-        <div className="text-sm text-gray-600 flex items-center">
-          <p>
-            Any fields left <span className="font-semibold">blank</span> or <span className="font-semibold">zero</span>{" "}
-            will be hidden.
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+          <div className="flex items-center">
+            <svg className="h-6 w-6 text-blue-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="font-medium text-blue-800">Note:</p>
+          </div>
+          <p className="ml-9 text-blue-700">
+            Any fields left <span className="font-semibold">blank</span> or <span className="font-semibold">zero</span> will be hidden from the listing view.
           </p>
         </div>
-      </div>
-
-      {/* Descriptions Section */}
+      </div>      {/* Descriptions Section */}
       <div id="descriptions" ref={sectionRefs["descriptions"]} className="space-y-6 pt-8">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-          <span className="mr-2">📝</span> Descriptions
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center mb-6 pb-3 border-b border-gray-200">
+          <span className="mr-3 bg-indigo-100 p-2 rounded-full text-indigo-600 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </span>
+          <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Descriptions</span>
         </h2>
 
         {/* Complete Description */}
-        <div className="space-y-2">
-          <label htmlFor="completeDescription" className="block text-sm font-medium text-gray-700">
+        <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-3 border border-gray-100">
+          <label htmlFor="completeDescription" className="block text-base font-medium text-gray-800 flex items-center">
+            <span className="mr-2 text-indigo-500">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </span>
             Complete Description
           </label>
           <div className="relative">
@@ -1118,50 +1220,68 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               }}
               rows={8}
               maxLength={5000}
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-3xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:border-transparent transition-all duration-300 hover:border-[#06AED7] bg-gray-50 text-gray-800 placeholder-gray-400 shadow-sm"
               placeholder="Enter a comprehensive description of the property..."
             ></textarea>
-            <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-              {descriptionLength || 0}/5000 characters left
+            <div className="absolute bottom-4 right-4 py-1 px-3 bg-white bg-opacity-80 backdrop-blur-sm rounded-full text-xs font-medium text-gray-600 border border-gray-200">
+              {descriptionLength || 0}/5000 characters
             </div>
           </div>
+          <p className="text-sm text-gray-600 pl-4 border-l-2 border-indigo-200 italic ml-2">
+            A detailed description helps potential clients understand the unique value and features of your property.
+          </p>
         </div>
 
         {/* Investment Highlights */}
-        <div className="space-y-3">
-          <label htmlFor="investmentHighlights" className="block text-sm font-medium text-gray-700">
+        <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-4 border border-gray-100">
+          <label htmlFor="investmentHighlights" className="block text-base font-medium text-gray-800 flex items-center">
+            <span className="mr-2 text-indigo-500">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </span>
             Investment Highlights
           </label>
+          <p className="text-sm text-gray-600 pl-4 border-l-2 border-indigo-200 italic ml-2 mb-3">
+            Add key selling points that make this property stand out from competitors.
+          </p>
 
-          {highlights.map((highlight, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={highlight}
-                onChange={(e) => handleHighlightChange(index, e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-[#06AED7] dark:focus:ring-[#00c1f5] transition-all duration-300 hover:border-[#06AED7] dark:hover:border-[#00c1f5] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                placeholder={`Highlight #${index + 1}`}
-              />
-              <button
-                type="button"
-                onClick={() => removeHighlight(index)}
-                className="flex-shrink-0 p-2 text-red-500 hover:text-red-700 focus:outline-none"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-          ))}
+          <div className="space-y-3">
+            {highlights.map((highlight, index) => (
+              <div key={index} className="flex items-center space-x-2 group">
+                <div className="flex items-center bg-gray-50 border-2 border-gray-200 rounded-xl w-full group-hover:border-[#06AED7] transition-all duration-300">
+                  <span className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-l-xl">
+                    {index + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={highlight}
+                    onChange={(e) => handleHighlightChange(index, e.target.value)}
+                    className="w-full px-4 py-3 bg-transparent focus:outline-none text-gray-800 placeholder-gray-400"
+                    placeholder={`Highlight #${index + 1}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeHighlight(index)}
+                    className="flex-shrink-0 p-2 mr-1 text-gray-400 hover:text-red-500 focus:outline-none transition-colors duration-200"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
 
           <button
             type="button"
             onClick={addHighlight}
-            className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-full text-[#06AED7] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#06AED7] focus:ring-offset-2 w-full transition-all duration-300"
+            className="flex items-center justify-center px-5 py-3 mt-2 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl text-indigo-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 w-full transition-all duration-300"
           >
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -1435,28 +1555,37 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Submit Section */}
-      <div id="submit" ref={sectionRefs["submit"]} className="border-t border-gray-200 pt-6 mt-8">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center mb-6">
-          <span className="mr-2">✓</span> Submit
+      </div>      {/* Submit Section */}
+      <div id="submit" ref={sectionRefs["submit"]} className="border-t border-gray-200 pt-8 mt-10">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center mb-6 bg-gradient-to-r from-[#06AED7] to-[#00c1f5] bg-clip-text text-transparent">
+          <span className="mr-3 bg-green-100 p-2 rounded-full text-green-600 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </span> 
+          Final Submission
         </h2>
 
-        <div className="space-y-6">
-          <div className="flex items-start">
+        <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-6 border border-gray-100">
+          <div className="bg-blue-50 p-4 rounded-xl border-l-4 border-blue-500">
+            <p className="text-blue-800 font-medium">
+              You're almost there! Please review all details carefully before submitting.
+            </p>
+          </div>
+          
+          <div className="flex items-start p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-[#06AED7] transition-all duration-300">
             <div className="flex items-center h-5">
               <input
                 id="termsAgreement"
                 name="termsAgreement"
                 type="checkbox"
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-5 h-5 text-[#06AED7] border-gray-300 rounded focus:ring-[#06AED7] cursor-pointer transition-all duration-200"
               />
             </div>
-            <div className="ml-3 text-sm">
-              <label htmlFor="termsAgreement" className="font-medium text-gray-700">
+            <div className="ml-3">
+              <label htmlFor="termsAgreement" className="font-medium text-gray-800 cursor-pointer select-none text-sm">
                 I Have The Right To Publish This Listings Information, Photos And Documents, And Accept The{" "}
-                <a href="#" className="text-blue-600 hover:underline">
+                <a href="#" className="text-[#06AED7] hover:underline font-semibold">
                   Terms Of Use
                 </a>
                 .
@@ -1476,16 +1605,16 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
               }
             }}
             disabled={isSubmitting}
-            className={`px-6 py-3 ${
+            className={`px-8 py-4 w-full md:w-auto ${
               isSubmitting
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-green-100 text-green-800 hover:bg-green-200"
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06AED7] transition-colors duration-300 rounded-full text-sm font-medium flex items-center justify-center`}
+                : "bg-gradient-to-r from-[#06AED7] to-[#00c1f5] text-white hover:shadow-lg hover:from-[#05a0c7] hover:to-[#00b0e0]"
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#06AED7] transition-all duration-300 rounded-xl text-base font-medium flex items-center justify-center shadow-md`}
           >
             {isSubmitting ? (
               <>
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-green-800"
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -1500,7 +1629,12 @@ const PropertyBasicsTab: React.FC<PropertyBasicsTabProps> = ({
                 Submitting...
               </>
             ) : (
-              "Submit My Listing"
+              <>
+                <span>Submit My Listing</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </>
             )}
           </button>
 

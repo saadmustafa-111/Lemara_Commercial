@@ -19,7 +19,7 @@ const SubTabNavigation: React.FC<SubTabNavigationProps> = ({
   scrollToSection,
   sections
 }) => {  return (
-    <nav className="fixed top-18 left-75 right-0 z-50 bg-white dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 shadow-md">
+    <nav className="fixed top-1 left-75 right-0 z-50 bg-white dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700 shadow-md">
       <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
         {sections.map((section) => (
           <button

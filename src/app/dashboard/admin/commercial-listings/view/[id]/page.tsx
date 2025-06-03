@@ -136,10 +136,9 @@ export default function ViewListingPage({ params }: ViewListingPageProps) {
               ))}
             </div>
           </div>
-          
-          {/* Description */}
+            {/* Description */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-bold mb-4 text-gray-800">Description</h2>
+            <h2 className="text-lg font-bold mb-4 text-[#00a0d1]">Description</h2>
             <p className="text-gray-600">
               {listing.name}. This is a detailed description of the property. Additional information about the commercial property would appear here, including key selling points, history, and other relevant details.
             </p>
