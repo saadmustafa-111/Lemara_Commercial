@@ -71,8 +71,9 @@ const PREDEFINED_USERS = [
 const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   admin: "/dashboard/admin",
   teacher: "/dashboard/teacher",
-  broker: "/dashboard/agent",
-  agent: "/dashboard/agent",
+  broker: "/dashboard/user", // Updated to user dashboard
+  agent: "/dashboard/user", // Updated to user dashboard
+  user: "/dashboard/user", // Added user role
   default: "/dashboard" 
 };
 

@@ -20,6 +20,7 @@ import {
   Contact,
   ChevronLeft,
   ChevronRight,
+  Heart,
   
 } from "lucide-react"
 import {
@@ -108,12 +109,16 @@ const teacherNavItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
      path: "/dashboard/teacher"
-  },
-  {
-    icon: <GridIcon />,
+  },  {
+    icon: <Banknote size={20} />,
     name: "Commercial Loans",
-   path: "/dashboard/teacher"
+    path: "/dashboard/user/commercial-loan"
+  },  {
+    icon: <Heart size={20} />,
+    name: "Favourite Listings",
+    path: "/dashboard/favourite-listings"
   }
+
 ]
 
 // Student-specific navigation items
@@ -128,7 +133,7 @@ const studentNavItems: NavItem[] = [
     icon: <ListIcon />,
     path: "/dashboard/listings",
   },
-  ...commonNavItems,
+  
   {
     name: "My Contacts",
     icon: <Contact />,
@@ -153,12 +158,11 @@ const studentNavItems: NavItem[] = [
     name: "Email Campaigns",
     icon: <PaperPlaneIcon />,
     path: "/dashboard/email-campaigns",
-  },
-  {
+  },  {
     name: "PipeLines Management",
     icon: <FileText />,
     path: "/dashboard/agent/pipeline",
-  },
+  },  
 ]
 
 const AppSidebar: React.FC = () => {
@@ -166,7 +170,6 @@ const AppSidebar: React.FC = () => {
   const { user } = useAuth()
   const pathname = usePathname()
   const [navItems, setNavItems] = useState<NavItem[]>([])
-
   // Determine which navigation items to show based on user role
   useEffect(() => {
     if (user) {
@@ -175,7 +178,7 @@ const AppSidebar: React.FC = () => {
         setNavItems(adminNavItems)
       } else if (role === "teacher") {
         setNavItems(teacherNavItems)
-      } else if (role === "broker" || role === "agent") {
+      } else if (role === "broker" || role === "agent" || role === "user") {
         setNavItems(studentNavItems)
       } else {
         // Default to common items if role is not recognized

@@ -1,0 +1,258 @@
+/* Commercial Loan Form Styles */
+
+.loan-form-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.loan-form-header {
+  margin-bottom: 1.5rem;
+}
+
+.loan-form-title {
+  color: #00315e;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.loan-form-subtitle {
+  color: #4b5563;
+  font-size: 1.25rem;
+}
+
+.loan-form-notice {
+  font-style: italic;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.required-fields-text {
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.loan-form {
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.required-mark {
+  color: #ef4444;
+}
+
+/* Enhanced Input Styling */
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 9999px; /* Fully rounded */
+  background-color: #fff;
+  color: #111827;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+}
+
+.form-input:hover,
+.form-textarea:hover {
+  border-color: #00a0d1;
+  box-shadow: 0 4px 6px rgba(0, 160, 209, 0.1);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #00a0d1;
+  box-shadow: 0 0 0 3px rgba(0, 160, 209, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Textarea - special case for non-fully-rounded */
+.form-textarea {
+  border-radius: 1rem; /* Less rounded for multiline text */
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Select Input Styling */
+select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1.25rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 3rem;
+}
+
+/* Improved Submit Button */
+.form-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #00a0d1;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.form-submit-btn:hover {
+  background-color: #0088b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  animation: pulse 2s infinite;
+}
+
+.form-submit-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 160, 209, 0.4);
+}
+
+/* Enhanced Form Fields */
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #9ca3af;
+  opacity: 0.8;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.form-input:focus::placeholder,
+.form-textarea:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Better Focus Styles for Accessibility */
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+select.form-input:focus-visible {
+  outline: 2px solid rgba(0, 160, 209, 0.5);
+  outline-offset: 1px;
+}
+
+/* Improved Form Layout */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+.form-col {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-col-third {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .form-col-third {
+    width: 33.333333%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .form-input,
+  .form-textarea {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+  
+  .form-input:hover,
+  .form-textarea:hover {
+    border-color: #00c1f5;
+  }
+  
+  .form-input:focus,
+  .form-textarea:focus {
+    border-color: #00c1f5;
+    box-shadow: 0 0 0 3px rgba(0, 193, 245, 0.2);
+  }
+}
+
+/* Enhance Form Aesthetic */
+.bg-white.shadow-md.rounded-lg {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out;
+  background-image: linear-gradient(to bottom, #ffffff, #fcfcfc);
+}
+
+.bg-white.shadow-md.rounded-lg:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08), 0 12px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 160, 209, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 160, 209, 0);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .form-input,
+  .form-textarea,
+  select.form-input {
+    box-shadow: none;
+    border-color: #e5e7eb;
+  }
+  
+  .form-submit-btn,
+  button[type="button"] {
+    display: none;
+  }
+}
+
+/* Review Section Styling */
+.review-section {
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
