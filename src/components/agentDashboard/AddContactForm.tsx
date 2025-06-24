@@ -55,7 +55,7 @@ const AddContactForm = () => {
 
       try {
         const authToken = localStorage.getItem("authToken")
-        const response = await fetch("http://192.168.1.24:3000/contacts/group", {
+        const response = await fetch("https://lemara-9829c937fd90.herokuapp.com/contacts/group", {
           headers: {
             ...(authToken && { Authorization: `Bearer ${authToken}` }),
           },

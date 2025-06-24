@@ -21,7 +21,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  
 } from "lucide-react"
 import {
   ChevronDownIcon,
@@ -42,21 +41,19 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[]
 }
 
-// Common navigation items for all roles
-const commonNavItems: NavItem[] = []
-
 // Admin-specific navigation items
 const adminNavItems: NavItem[] = [
   {
     icon: <LayoutGrid size={20} />,
     name: "Dashboard",
-    path:'/dashboard/admin',
-
-  },  {
+    path: "/dashboard/admin",
+  },
+  {
     name: "Commercial Listings",
     icon: <List size={20} />,
     path: "/dashboard/admin/commercial-listings",
-  },  {
+  },
+  {
     name: "MLS Listings",
     icon: <FileText size={20} />,
     path: "/dashboard/admin/mls-listings",
@@ -64,7 +61,7 @@ const adminNavItems: NavItem[] = [
   {
     name: "Agents",
     icon: <Users size={20} />,
-path: "/dashboard/admin/agents"
+    path: "/dashboard/admin/agents",
   },
   {
     name: "Clients",
@@ -103,26 +100,32 @@ path: "/dashboard/admin/agents"
   },
 ]
 
-// Teacher-specific navigation items
-const teacherNavItems: NavItem[] = [
+// User-specific navigation items (regular users)
+const userNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-     path: "/dashboard/teacher"
-  },  {
+    path: "/dashboard/teacher",
+  },
+  {
     icon: <Banknote size={20} />,
     name: "Commercial Loans",
-    path: "/dashboard/user/commercial-loan"
-  },  {
+    path: "/dashboard/user/commercial-loan",
+  },
+  {
     icon: <Heart size={20} />,
     name: "Favourite Listings",
-    path: "/dashboard/favourite-listings"
-  }
-
+    path: "/dashboard/favourite-listings",
+  },
+  {
+    name: "Profile",
+    icon: <UserCircleIcon />,
+    path: "/dashboard/account/profile",
+  },
 ]
 
-// Student-specific navigation items
-const studentNavItems: NavItem[] = [
+// Agent/Broker-specific navigation items
+const agentNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
@@ -133,7 +136,6 @@ const studentNavItems: NavItem[] = [
     icon: <ListIcon />,
     path: "/dashboard/listings",
   },
-  
   {
     name: "My Contacts",
     icon: <Contact />,
@@ -158,11 +160,12 @@ const studentNavItems: NavItem[] = [
     name: "Email Campaigns",
     icon: <PaperPlaneIcon />,
     path: "/dashboard/email-campaigns",
-  },  {
+  },
+  {
     name: "PipeLines Management",
     icon: <FileText />,
     path: "/dashboard/agent/pipeline",
-  },  
+  },
 ]
 
 const AppSidebar: React.FC = () => {
@@ -170,22 +173,31 @@ const AppSidebar: React.FC = () => {
   const { user } = useAuth()
   const pathname = usePathname()
   const [navItems, setNavItems] = useState<NavItem[]>([])
+
   // Determine which navigation items to show based on user role
   useEffect(() => {
     if (user) {
       const role = user.role.toLowerCase()
-      if (role === "admin") {
-        setNavItems(adminNavItems)
-      } else if (role === "teacher") {
-        setNavItems(teacherNavItems)
-      } else if (role === "broker" || role === "agent" || role === "user") {
-        setNavItems(studentNavItems)
-      } else {
-        // Default to common items if role is not recognized
-        setNavItems(commonNavItems)
+      console.log("User role:", role) // Debug log
+
+      switch (role) {
+        case "admin":
+          setNavItems(adminNavItems)
+          break
+        case "user":
+          setNavItems(userNavItems)
+          break
+        case "agent":
+        case "broker":
+          setNavItems(agentNavItems)
+          break
+        default:
+          // Default to user items if role is not recognized
+          setNavItems(userNavItems)
+          console.warn(`Unknown role: ${role}, defaulting to user navigation`)
       }
     } else {
-      // No user logged in, show minimal items
+      // No user logged in, show empty items
       setNavItems([])
     }
   }, [user])
