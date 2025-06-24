@@ -6,11 +6,17 @@ import BasicInfoStep from "./BasicInfoStep"
 import ApplicantInformationStep from "./ApplicantInformationStep"
 import ReviewStep from "./ReviewStep"
 import "./styles.css"
+import { useLoading } from "@/hooks/useLoading"
+import { useToast } from "@/hooks/useToast"
+import axiosInstance from "@/lib/axios"
 
 const CommercialLoanPage = () => {  
   const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 3
+  const { isLoading, withLoading } = useLoading()
+  const { toast } = useToast()
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     // Basic info
     firstName: "",
@@ -40,6 +46,7 @@ const CommercialLoanPage = () => {
     totalLiabilities: "",
     financialComments: "",
   })
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData({
@@ -47,21 +54,90 @@ const CommercialLoanPage = () => {
       [name]: value,
     })
   }
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would handle the form submission, e.g. sending data to an API
-    console.log("Form submitted with data:", formData)
     
     // Move to the next step if not on the last step
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
-    } else {
-      // Final submission logic
-      console.log("Final submission:", formData)
-      // You could add API calls here
+      return
+    }
+    
+    // On the last step, submit the form data to the API
+    await withLoading(submitLoanApplication())
+  }
+  
+  // Function to submit loan application to the API
+  const submitLoanApplication = async () => {
+    try {
+      if (!user) {
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to submit a loan application",
+          variant: "destructive",
+        })
+        return
+      }
+      
+      setSubmitting(true)
+      
+      // Format the data according to the API structure
+      const loanData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        ssn: parseInt(formData.ssn || "0", 10), 
+        coFirstName: formData.coApplicantFirstName,
+        coLastName: formData.coApplicantLastName,
+        description: formData.purposeOfLoan,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zip,
+        houseNumber: formData.homePhone,
+        businessNumber: formData.businessPhone,
+        email: formData.emailAddress,
+        licenseNumber: formData.driversLicense,
+        licenseState: formData.licenseState,
+        dependantsNumber: parseInt(formData.dependents || "0", 10)
+      }
+      
+      const authToken = localStorage.getItem("authToken")
+      
+      // Make API call
+      const response = await axiosInstance.post("/loan", loanData, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(authToken && { Authorization: `Bearer ${authToken}` }),
+        }
+      })
+      
+      // Handle successful response
+      toast({
+        title: "Success",
+        description: "Your loan application has been submitted successfully!",
+        variant: "success",
+      })
+      
+      console.log("Loan application submitted successfully:", response.data)
+      
+      // Could redirect here or show a success page
+      
+    } catch (error: any) {
+      console.error("Error submitting loan application:", error)
+      
+      // Display error message to the user
+      toast({
+        title: "Submission Error",
+        description: error.response?.data?.message || "There was an error submitting your loan application. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setSubmitting(false)
     }
   }
-    const goToNextStep = () => {
+    
+  const goToNextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
     }
@@ -115,9 +191,10 @@ const CommercialLoanPage = () => {
                 <div className={currentStep === 1 ? "ml-auto" : ""}>
                   <button
                     type="submit"
-                    className="form-submit-btn"
+                    disabled={submitting || isLoading}
+                    className={`form-submit-btn ${(submitting || isLoading) ? "opacity-70 cursor-not-allowed" : ""}`}
                   >
-                    {currentStep === totalSteps ? 'Submit Application' : 'Save & Continue'}
+                    {submitting || isLoading ? 'Processing...' : (currentStep === totalSteps ? 'Submit Application' : 'Save & Continue')}
                   </button>
                 </div>
               </div>

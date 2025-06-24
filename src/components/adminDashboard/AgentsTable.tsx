@@ -1,138 +1,123 @@
 "use client"
 import { useState, useEffect, useMemo } from "react"
 import { Search, Filter, Edit, Trash2, Eye, MoreHorizontal, UserPlus, TrendingUp, Building, Calendar, Mail, Phone, MapPin, Star, Award, Users, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw } from 'lucide-react'
+import Image from "next/image"
+
+// Define Role enum to match with SignUpForm
+enum Role {
+  ADMIN = "admin",
+  USER = "user",
+  BROKER = "broker",
+}
 
 interface Agent {
   id: number
-  name: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
   role: string
-  properties: number
-  sales: number
-  revenue: number
-  joinDate: string
-  status: string
-  avatar: string
-  location: string
-  rating: number
-  specialization: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  whatsapp: string
+  twitter: string
+  facebook: string
+  linkedIn: string
+  instagram: string
+  nmls: string
+  dre: string
+  // UI display fields
+  properties?: number
+  sales?: number
+  revenue?: number
+  status?: string
+  avatar?: string
+  location?: string
+  rating?: number
+  specialization?: string
+  joinDate?: string
+  name?: string
 }
 
-export default function EnhancedAgentsTable() {
-  const [isLoading, setIsLoading] = useState(true)
+export default function EnhancedAgentsTable() {  const [isLoading, setIsLoading] = useState(true)
   const [agents, setAgents] = useState<Agent[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const [filterRole, setFilterRole] = useState("all")
-
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-
   const rowsPerPageOptions = [5, 10, 15, 20, 25]
-
-  useEffect(() => {
+  // Add refresh trigger state
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+    useEffect(() => {
     const fetchAgents = async () => {
-      setTimeout(() => {
-        const mockAgents: Agent[] = [
-          {
-            id: 1,
-            name: "AJ Rana",
-            email: "agent@lemaraconstruction.com",
-            phone: "+1 (555) 123-4567",
-            role: "Senior Agent",
-            properties: 42,
-            sales: 18,
-            revenue: 2450000,
-            joinDate: "Jul 15, 2019",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=60&h=60&fit=crop&crop=face",
-            location: "Los Angeles, CA",
-            rating: 4.9,
-            specialization: "Luxury Homes",
-          },
-          {
-            id: 2,
-            name: "Abdul Shah",
-            email: "ashah@lemaraconstruction.com",
-            phone: "+1 (555) 234-5678",
-            role: "Agent",
-            properties: 12,
-            sales: 8,
-            revenue: 890000,
-            joinDate: "May 3, 2022",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=60&h=60&fit=crop&crop=face",
-            location: "San Francisco, CA",
-            rating: 4.7,
-            specialization: "Commercial",
-          },
-          {
-            id: 3,
-            name: "Sarah Johnson",
-            email: "sjohnson@lemaraconstruction.com",
-            phone: "+1 (555) 345-6789",
-            role: "Broker",
-            properties: 28,
-            sales: 15,
-            revenue: 1850000,
-            joinDate: "Mar 21, 2021",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face",
-            location: "San Diego, CA",
-            rating: 4.8,
-            specialization: "Residential",
-          },
-          {
-            id: 4,
-            name: "Michael Rodriguez",
-            email: "mrodriguez@lemaraconstruction.com",
-            phone: "+1 (555) 456-7890",
-            role: "Agent",
-            properties: 7,
-            sales: 3,
-            revenue: 420000,
-            joinDate: "Jan 5, 2023",
-            status: "inactive",
-            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&h=60&fit=crop&crop=face",
-            location: "Sacramento, CA",
-            rating: 4.2,
-            specialization: "First-time Buyers",
-          },
-          {
-            id: 5,
-            name: "Emily Chen",
-            email: "echen@lemaraconstruction.com",
-            phone: "+1 (555) 567-8901",
-            role: "Senior Agent",
-            properties: 19,
-            sales: 11,
-            revenue: 1320000,
-            joinDate: "Apr 18, 2022",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face",
-            location: "Oakland, CA",
-            rating: 4.6,
-            specialization: "Investment Properties",
-          },
-        ]
-
-        setAgents(mockAgents)
+      setIsLoading(true)
+      try {
+        // First try direct connection to backend, if CORS issues use proxy
+        let response;        try {
+          // Try direct connection to the Heroku backend using the correct /user endpoint
+          response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/user?role=broker`);
+        } catch (corsError) {
+          console.log("Falling back to proxy due to potential CORS issues:", corsError);
+          // Fall back to our proxy API route
+          response = await fetch(`/api/proxy/users?role=broker`);        }
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching agents: ${response.status}`)
+        }
+        const data = await response.json()
+          // Log the data received from the API for debugging
+        console.log("Data received from API:", data);
+        
+        // Transform the API response to match our display needs
+        const agentsList = Array.isArray(data) ? data : (data.users || data.brokers || []);
+        const agentsData: Agent[] = agentsList.map((agent: any) => {
+          // Convert createdAt to readable date format (handle potential date format inconsistencies)
+          const createdDate = agent.createdAt ? new Date(agent.createdAt) : new Date();
+          const joinDate = createdDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })
+          
+          return {
+            ...agent,
+            // Default values for UI elements not provided by API
+            status: agent.isActive ? 'active' : 'inactive',
+            properties: Math.floor(Math.random() * 30) + 5, // Placeholder
+            sales: Math.floor(Math.random() * 20) + 2, // Placeholder
+            revenue: Math.floor(Math.random() * 1000000) + 500000, // Placeholder
+            joinDate,
+            name: `${agent.firstName} ${agent.lastName}`, // Add name field for display
+            avatar: `https://ui-avatars.com/api/?name=${agent.firstName}+${agent.lastName}&background=random`,
+            location: "California, USA", // Default location
+            rating: parseFloat((Math.random() * 2 + 3).toFixed(1)), // Random rating between 3.0 and 5.0
+            specialization: "Commercial Real Estate" // Default specialization
+          };
+        });
+        
+        setAgents(agentsData);
+      } catch (error) {
+        console.error("Failed to fetch agents:", error)
+        // Set empty array on error
+        setAgents([])
+      } finally {
         setIsLoading(false)
-      }, 1000)
+      }
     }
 
     fetchAgents()
-  }, [])
-
+  }, [refreshTrigger])
   // Filter and paginate data
   const filteredAgents = useMemo(() => {
     return agents.filter((agent) => {
+      const fullName = `${agent.firstName} ${agent.lastName}`.toLowerCase()
       const matchesSearch =
-        agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        fullName.includes(searchTerm.toLowerCase()) ||
         agent.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        agent.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+        agent.specialization?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === "all" || agent.status === filterStatus
       const matchesRole = filterRole === "all" || agent.role === filterRole
       return matchesSearch && matchesStatus && matchesRole
@@ -200,10 +185,9 @@ export default function EnhancedAgentsTable() {
           <button className="inline-flex items-center px-6 py-3 bg-[#00a0d1] text-white font-medium rounded-xl hover:bg-[#008bb8] focus:outline-none focus:ring-4 focus:ring-[#00a0d1]/30 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
             <UserPlus className="w-5 h-5 mr-2" />
             Add Agent
-          </button>
-
-          <button
+          </button>          <button
             disabled={isLoading}
+            onClick={() => setRefreshTrigger(prev => prev + 1)}
             className="inline-flex items-center px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none transition-all duration-200 hover:scale-105 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-5 h-5 mr-2 ${isLoading ? "animate-spin" : ""}`} />
@@ -337,16 +321,16 @@ export default function EnhancedAgentsTable() {
                         <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1] via-[#0090c0] to-[#0080b0] rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300 relative">
                           <img
                             src={agent.avatar || "/placeholder.svg"}
-                            alt={agent.name}
+                            alt={agent.firstName}
                             className="w-full h-full rounded-2xl object-cover"
                           />
                           <div
-                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${agent.status === "active" ? "bg-green-500" : "bg-gray-400"}`}
+                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${agent.isActive ? "bg-green-500" : "bg-gray-400"}`}
                           ></div>
                         </div>
                         <div className="ml-4">
                           <div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">
-                            {agent.name}
+                            {agent.firstName} {agent.lastName}
                           </div>
                           <div className="flex items-center text-sm text-gray-500 mt-1">
                             <Mail className="w-4 h-4 mr-1" />
@@ -364,7 +348,7 @@ export default function EnhancedAgentsTable() {
                         <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-sm font-medium bg-[#00a0d1]/10 text-[#00a0d1] border border-[#00a0d1]/20">
                           {agent.role}
                         </span>
-                        {renderStars(agent.rating)}
+                        {renderStars(agent.rating || 0)}
                         <div className="text-xs text-gray-600">{agent.specialization}</div>
                       </div>
                     </td>
@@ -378,7 +362,7 @@ export default function EnhancedAgentsTable() {
                           <TrendingUp className="w-4 h-4 text-gray-400" />
                           <span className="text-sm text-gray-600">{agent.sales} Sales</span>
                         </div>
-                        <div className="text-sm font-bold text-green-600">{formatCurrency(agent.revenue)}</div>
+                        <div className="text-sm font-bold text-green-600">{formatCurrency(agent.revenue || 0)}</div>
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
@@ -389,15 +373,15 @@ export default function EnhancedAgentsTable() {
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
                           <Calendar className="w-4 h-4 mr-1" />
-                          Joined {agent.joinDate}
+                          Joined {new Date(agent.createdAt).toLocaleDateString()}
                         </div>
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${agent.status === "active" ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : "bg-gray-100 text-gray-800 border border-gray-200"}`}
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${agent.isActive ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : "bg-gray-100 text-gray-800 border border-gray-200"}`}
                         >
                           <div
-                            className={`w-1.5 h-1.5 rounded-full mr-2 ${agent.status === "active" ? "bg-emerald-500" : "bg-gray-500"}`}
+                            className={`w-1.5 h-1.5 rounded-full mr-2 ${agent.isActive ? "bg-emerald-500" : "bg-gray-500"}`}
                           ></div>
-                          {agent.status === "active" ? "Active" : "Inactive"}
+                          {agent.isActive ? "Active" : "Inactive"}
                         </span>
                       </div>
                     </td>
