@@ -1,6 +1,8 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
 import { Plus, Target, CheckCircle } from 'lucide-react';
+import axiosInstance from '../../lib/axios'; // Adjust path as needed
+import { useAuth } from '../../context/AuthContext';
 
 const CreatePipeline = () => {
   const [form, setForm] = useState({
@@ -13,29 +15,38 @@ const CreatePipeline = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { user } = useAuth(); // Assumes user object has an 'id' field
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    console.log('Pipeline Created:', form);
-    
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    
-    // Reset form after showing success
-    setTimeout(() => {
-      setForm({ name: '', participants: '', prospects: '', value: '', commission: '' });
-      setShowSuccess(false);
-    }, 2000);
+
+    try {
+      // Send only the required fields, including the current logged in user id
+      await axiosInstance.post('/pipelines/name', {
+        name: form.name,
+        userId: user?.id, // Send user id from auth context
+      });
+
+      setShowSuccess(true);
+      // Optionally, you can log or handle the result
+    } catch (error) {
+      // Handle error (show a toast, alert, etc.)
+      console.error('Failed to create pipeline:', error);
+    } finally {
+      setIsSubmitting(false);
+
+      // Reset form after showing success
+      setTimeout(() => {
+        setForm({ name: '', participants: '', prospects: '', value: '', commission: '' });
+        setShowSuccess(false);
+      }, 2000);
+    }
   };
 
   return (
@@ -57,8 +68,8 @@ const CreatePipeline = () => {
         </div>
 
         {/* Form Container */}
-        <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-          <div className="p-8">
+        <div className="bg-white/80 backdrop-blur-sm border border-white/20 rounded-3xl shadow-2xl overflow-hidden relative">
+          <form className="p-8" onSubmit={handleSubmit}>
             <div className="space-y-8">
               {/* Pipeline Name */}
               <div className="group">
@@ -76,15 +87,11 @@ const CreatePipeline = () => {
                   placeholder="e.g. Technology Sector, Food & Beverage"
                 />
               </div>
-
-              {/* Participants */}
-          
-              {/* Financial Fields Grid */}
-          
+              {/* Add other fields here if you want to save them as well */}
               {/* Submit Button */}
               <div className="pt-6">
                 <button
-                  onClick={handleSubmit}
+                  type="submit"
                   disabled={isSubmitting || showSuccess}
                   className="w-full group relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white py-5 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 ease-out disabled:opacity-70 disabled:cursor-not-allowed"
                 >
@@ -110,7 +117,7 @@ const CreatePipeline = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </form>
 
           {/* Success Animation Overlay */}
           {showSuccess && (

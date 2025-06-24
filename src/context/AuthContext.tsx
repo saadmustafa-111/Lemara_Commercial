@@ -47,7 +47,7 @@ const PREDEFINED_USERS = [
     password: "user123",
     firstName: "User",
     lastName: "",
-    role: "teacher"
+    role: "user"
   },
   {
     id: 3,
@@ -70,10 +70,8 @@ const PREDEFINED_USERS = [
 // Define dashboard paths for each role
 const ROLE_DASHBOARD_PATHS: Record<string, string> = {
   admin: "/dashboard/admin",
-  teacher: "/dashboard/teacher",
-  broker: "/dashboard/user", // Updated to user dashboard
-  agent: "/dashboard/user", // Updated to user dashboard
-  user: "/dashboard/user", // Added user role
+  user: "/dashboard/teacher",
+  broker: "/dashboard/agent", 
   default: "/dashboard" 
 };
 

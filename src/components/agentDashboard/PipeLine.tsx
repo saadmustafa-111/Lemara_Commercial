@@ -1,42 +1,87 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Target, Edit3, X, Users, DollarSign, TrendingUp, Calendar, User, Mail, Phone, Upload, Building, MapPin, Contact } from 'lucide-react';
+import {
+  Plus,
+  Target,
+  Edit3,
+  X,
+  User,
+  Mail,
+  Phone,
+  Upload,
+  Building,
+  TrendingUp,
+  MapPin,
+  Contact,
+  Pencil
+} from 'lucide-react';
+import axiosInstance from '../../lib/axios';
+import { useAuth } from '../../context/AuthContext';
 
 const PipeLine = () => {
   const router = useRouter();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPursuitModal, setShowPursuitModal] = useState(false);
-  const [selectedPipeline, setSelectedPipeline] = useState(null);
+  const [selectedPipeline, setSelectedPipeline] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pipelinePursuits, setPipelinePursuits] = useState<any[]>([]);
+  const [showPipelineNameEdit, setShowPipelineNameEdit] = useState(false);
+  const [pipelineNameEditValue, setPipelineNameEditValue] = useState('');
+  const [pipelineNameEditId, setPipelineNameEditId] = useState<string | null>(null);
+  const [isEditingPipelineName, setIsEditingPipelineName] = useState(false);
 
-  // Sample data for visual idea with pursuits
-  const [pipelines, setPipelines] = useState([
-    { 
-      id: 1,
-      name: 'IT Sector', 
-      participants: 122222, 
-      prospects: '$450,000', 
-      value: '$2,340,000', 
-      commission: '$234,000',
-      pursuits: [
-        { id: 1, name: 'TechCorp Deal', contact: 'John Smith', email: 'john@techcorp.com', phone: '+1-555-0123', value: '$50,000', stage: 'Negotiation', probability: '75%' },
-        { id: 2, name: 'StartupXYZ Project', contact: 'Sarah Johnson', email: 'sarah@startupxyz.com', phone: '+1-555-0124', value: '$25,000', stage: 'Proposal', probability: '45%' }
-      ]
-    },
-    { 
-      id: 2,
-      name: 'Food Stall', 
-      participants: 12222, 
-      prospects: '$125,000', 
-      value: '$890,000', 
-      commission: '$89,000',
-      pursuits: [
-        { id: 3, name: 'Downtown Location', contact: 'Mike Chen', email: 'mike@foodgroup.com', phone: '+1-555-0125', value: '$15,000', stage: 'Initial Contact', probability: '30%' }
-      ]
-    }
-  ]);
+  const { user } = useAuth();
+  const [pipelines, setPipelines] = useState<any[]>([]);
 
-  // For pursuit form state
+  // Fetch pipelines for the current user
+  useEffect(() => {
+    const fetchPipelines = async () => {
+      try {
+        if (user?.id) {
+          const response = await axiosInstance.get('/pipelines/name/user', {
+            params: { userId: user.id }
+          });
+          setPipelines(
+            Array.isArray(response.data)
+              ? response.data.map((p: any) => ({
+                  ...p,
+                  value: '',
+                  commission: '',
+                }))
+              : []
+          );
+        }
+      } catch (error) {
+        console.error('Failed to fetch pipelines:', error);
+      }
+    };
+    fetchPipelines();
+  }, [user?.id]);
+
+  // Fetch pipeline pursuits from API when edit modal opens or pipeline changes
+  useEffect(() => {
+    const fetchPursuits = async () => {
+      if (showEditModal && selectedPipeline?.id) {
+        try {
+          const response = await axiosInstance.get('/pipelines');
+          // Filter pursuits by selected pipeline id
+          const allPursuits = Array.isArray(response.data) ? response.data : [];
+          const currentPursuits = allPursuits.filter(
+            (item) => item?.name?.id === selectedPipeline.id
+          );
+          setPipelinePursuits(currentPursuits);
+        } catch (error) {
+          setPipelinePursuits([]);
+        }
+      } else {
+        setPipelinePursuits([]);
+      }
+    };
+    fetchPursuits();
+  }, [showEditModal, selectedPipeline]);
+
+  // Pursuit form state
   const initialPursuitForm = {
     propertyName: '',
     propertyType: '',
@@ -80,7 +125,7 @@ const PipeLine = () => {
     'Site Visit'
   ];
 
-  const handleRowClick = (pipeline) => {
+  const handleRowClick = (pipeline: any) => {
     setSelectedPipeline(pipeline);
     setShowEditModal(true);
   };
@@ -94,47 +139,110 @@ const PipeLine = () => {
     router.push('/dashboard/agent/createpipeline');
   };
 
-  const handlePursuitFormChange = (e) => {
-    const { name, value, files, type } = e.target;
+  const handlePursuitFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, files, type } = e.target as any;
     setPursuitForm((prev) => ({
       ...prev,
       [name]: type === 'file' ? files[0] : value
     }));
   };
 
-  const handlePursuitSubmit = (e) => {
-    e.preventDefault();
+  // PATCH /pipelines/{id} to update pipeline name
+  const handleEditPipelineName = (pipeline: any) => {
+    setPipelineNameEditValue(pipeline.name);
+    setPipelineNameEditId(pipeline.id);
+    setShowPipelineNameEdit(true);
+    setIsEditingPipelineName(false);
+  };
 
-    // Compose new pursuit object
-    const newPursuit = {
-      id: Date.now(), // Simple unique id for demo
-      name: pursuitForm.propertyName || 'New Pursuit',
-      contact: `${pursuitForm.firstName} ${pursuitForm.lastName}`.trim(),
+  const handlePipelineNameEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPipelineNameEditValue(e.target.value);
+  };
+
+  const submitPipelineNameEdit = async () => {
+    if (!pipelineNameEditId || !pipelineNameEditValue.trim()) return;
+    setIsEditingPipelineName(true);
+    try {
+      await axiosInstance.patch(`/pipelines/${pipelineNameEditId}`, {
+        name: pipelineNameEditValue.trim()
+      });
+      // Update pipelines state
+      setPipelines((prev) =>
+        prev.map((p) =>
+          p.id === pipelineNameEditId
+            ? { ...p, name: pipelineNameEditValue.trim() }
+            : p
+        )
+      );
+      // If modal open and edited, update selectedPipeline too
+      if (selectedPipeline && selectedPipeline.id === pipelineNameEditId) {
+        setSelectedPipeline((prev: any) => ({
+          ...prev,
+          name: pipelineNameEditValue.trim()
+        }));
+      }
+      setShowPipelineNameEdit(false);
+      setPipelineNameEditId(null);
+    } catch (error) {
+      alert('Failed to update pipeline name.');
+    } finally {
+      setIsEditingPipelineName(false);
+    }
+  };
+
+  // POST /pipelines to add a pursuit
+  const handlePursuitSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPipeline || !selectedPipeline.id) return;
+    setIsSubmitting(true);
+
+    // Prepare the data to match backend API
+    const payload: any = {
+      image: pursuitForm.image ? pursuitForm.image.name : '',
+      propertyType: pursuitForm.propertyType,
+      propertyName: pursuitForm.propertyName,
+      squareFeet: Number(pursuitForm.squareFootage) || 0,
+      tenancy: pursuitForm.tenancy,
+      yearBuilt: Number(pursuitForm.yearBuilt) || 0,
+      entityType: pursuitForm.entity,
+      trueOwner: pursuitForm.trueOwner,
+      price: Number(pursuitForm.price) || 0,
+      fee: pursuitForm.fee,
+      probability: pursuitForm.probability,
+      estMarketingCost: Number(pursuitForm.marketingCost) || 0,
+      lastContact: pursuitForm.lastContact,
+      nextStep: pursuitForm.nextStep,
+      address: '',
+      city: pursuitForm.city,
+      state: pursuitForm.state,
+      zipCode: pursuitForm.zip,
+      name: { id: selectedPipeline.id, name: selectedPipeline.name },
+      firstName: pursuitForm.firstName,
+      lastName: pursuitForm.lastName,
       email: pursuitForm.email,
-      phone: pursuitForm.phone,
-      value: pursuitForm.price,
-      stage: pursuitForm.nextStep.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      probability: pursuitForm.probability ? pursuitForm.probability.charAt(0).toUpperCase() + pursuitForm.probability.slice(1) : '',
-      // ...add more fields as needed
+      phone: pursuitForm.phone
     };
 
-    // Update pipelines state
-    setPipelines(prev =>
-      prev.map(pipe =>
-        pipe.id === selectedPipeline.id
-          ? { ...pipe, pursuits: [...(pipe.pursuits || []), newPursuit] }
-          : pipe
-      )
-    );
+    try {
+      await axiosInstance.post('/pipelines', payload);
 
-    setShowPursuitModal(false);
-    setShowEditModal(true); // Remain in pipeline edit modal
-    setPursuitForm(initialPursuitForm);
-    // Optionally, update selectedPipeline too for instant UI update
-    setSelectedPipeline(prev => ({
-      ...prev,
-      pursuits: [...(prev.pursuits || []), newPursuit]
-    }));
+      // After success, refetch pursuits for this pipeline
+      const response = await axiosInstance.get('/pipelines');
+      const allPursuits = Array.isArray(response.data) ? response.data : [];
+      const currentPursuits = allPursuits.filter(
+        (item) => item?.name?.id === selectedPipeline.id
+      );
+      setPipelinePursuits(currentPursuits);
+
+      setShowPursuitModal(false);
+      setShowEditModal(true);
+      setPursuitForm(initialPursuitForm);
+    } catch (error) {
+      alert('Failed to add pursuit. Please try again.');
+      console.error('Failed to add pursuit:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -172,37 +280,27 @@ const PipeLine = () => {
                 <thead>
                   <tr className="border-b-2 border-slate-200">
                     <th className="text-left py-4 px-6 font-bold text-slate-700 text-lg">Pipeline Name</th>
-      
-          
                     <th className="text-right py-4 px-6 font-bold text-slate-700 text-lg">Value</th>
                     <th className="text-right py-4 px-6 font-bold text-slate-700 text-lg">Commission</th>
+                    <th className="text-center py-4 px-6 font-bold text-slate-700 text-lg">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pipelines.map((pipe, idx) => (
                     <tr 
-                      key={idx} 
-                      onClick={() => handleRowClick(pipe)}
-                      className="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border-b border-slate-100 cursor-pointer"
+                      key={pipe.id || idx} 
+                      className="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 border-b border-slate-100"
                     >
-                      <td className="py-6 px-6">
+                      <td 
+                        className="py-6 px-6 cursor-pointer"
+                        onClick={() => handleRowClick(pipe)}
+                      >
                         <div className="flex items-center">
                           <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mr-4 group-hover:scale-110 transition-transform duration-300"></div>
                           <span className="font-semibold text-slate-800 text-lg group-hover:text-indigo-600 transition-colors duration-300">
                             {pipe.name}
                           </span>
                         </div>
-                      </td>
-                      <td className="py-6 px-6 text-right">
-                        <span className="inline-flex items-center bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 px-4 py-2 rounded-xl font-bold text-lg group-hover:scale-105 transition-transform duration-300">
-                          <Users className="w-4 h-4 mr-2" />
-                          {pipe.participants.toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="py-6 px-6 text-right">
-                        <span className="text-slate-600 font-semibold text-lg group-hover:text-slate-800 transition-colors duration-300">
-                          {pipe.prospects}
-                        </span>
                       </td>
                       <td className="py-6 px-6 text-right">
                         <span className="text-slate-600 font-semibold text-lg group-hover:text-slate-800 transition-colors duration-300">
@@ -214,13 +312,21 @@ const PipeLine = () => {
                           {pipe.commission}
                         </span>
                       </td>
+                      <td className="py-6 px-6 text-center">
+                        <button
+                          onClick={() => handleEditPipelineName(pipe)}
+                          className="p-2 rounded-lg hover:bg-slate-100 transition-colors duration-200 flex items-center"
+                          title="Edit Pipeline Name"
+                        >
+                          <Pencil className="w-5 h-5 text-slate-600" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-          {/* Empty State Enhancement */}
           {pipelines.length === 0 && (
             <div className="text-center py-16">
               <Target className="w-16 h-16 text-slate-300 mx-auto mb-4" />
@@ -229,14 +335,61 @@ const PipeLine = () => {
             </div>
           )}
         </div>
-        
-        {/* Footer Note */}
+
         <div className="mt-8 text-center">
           <p className="text-slate-600 text-sm">
             Manage your sales pipeline efficiently with real-time insights and analytics
           </p>
         </div>
-        
+
+        {/* Edit Pipeline Name Modal */}
+        {showPipelineNameEdit && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-60 p-4">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-6 border-b border-slate-200">
+                <h2 className="text-xl font-bold text-slate-800 flex items-center">
+                  <Edit3 className="w-6 h-6 mr-2 text-indigo-600" />
+                  Edit Pipeline Name
+                </h2>
+                <button
+                  onClick={() => setShowPipelineNameEdit(false)}
+                  className="p-2 hover:bg-slate-100 rounded-xl transition-colors duration-200"
+                >
+                  <X className="w-5 h-5 text-slate-600" />
+                </button>
+              </div>
+              <div className="p-6">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Pipeline Name</label>
+                <input
+                  type="text"
+                  value={pipelineNameEditValue}
+                  onChange={handlePipelineNameEditChange}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                  disabled={isEditingPipelineName}
+                />
+                <div className="flex justify-end mt-6 space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowPipelineNameEdit(false)}
+                    className="px-6 py-2 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 transition-colors duration-200 font-semibold"
+                    disabled={isEditingPipelineName}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={submitPipelineNameEdit}
+                    disabled={isEditingPipelineName || !pipelineNameEditValue.trim()}
+                    className={`bg-gradient-to-r from-indigo-500 to-blue-600 text-white px-8 py-2 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 ${isEditingPipelineName ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  >
+                    {isEditingPipelineName ? 'Updating...' : 'Update'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Edit Pipeline Modal */}
         {showEditModal && selectedPipeline && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -253,7 +406,6 @@ const PipeLine = () => {
                   <X className="w-6 h-6 text-slate-600" />
                 </button>
               </div>
-              
               <div className="p-8">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-2xl font-bold text-slate-800">Pursuits Management</h3>
@@ -265,7 +417,6 @@ const PipeLine = () => {
                     Add Pursuit
                   </button>
                 </div>
-                
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -280,53 +431,58 @@ const PipeLine = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedPipeline.pursuits?.map((pursuit) => (
-                        <tr key={pursuit.id} className="hover:bg-slate-50 transition-colors duration-200 border-b border-slate-100">
-                          <td className="py-4 px-4 font-semibold text-slate-800">{pursuit.name}</td>
-                          <td className="py-4 px-4 text-slate-600 flex items-center">
-                            <User className="w-4 h-4 mr-2 text-slate-400" />
-                            {pursuit.contact}
-                          </td>
-                          <td className="py-4 px-4 text-slate-600">
-                            <div className="flex items-center">
-                              <Mail className="w-4 h-4 mr-2 text-slate-400" />
-                              {pursuit.email}
+                      {pipelinePursuits.length > 0 ? (
+                        pipelinePursuits.map((pursuit: any) => (
+                          <tr key={pursuit.id || `${pursuit.propertyName}-${pursuit.email}-${pursuit.phone}`} className="hover:bg-slate-50 transition-colors duration-200 border-b border-slate-100">
+                            <td className="py-4 px-4 font-semibold text-slate-800">{pursuit.propertyName}</td>
+                            <td className="py-4 px-4 text-slate-600 flex items-center">
+                              <User className="w-4 h-4 mr-2 text-slate-400" />
+                              {`${pursuit.firstName ?? ''} ${pursuit.lastName ?? ''}`.trim()}
+                            </td>
+                            <td className="py-4 px-4 text-slate-600">
+                              <div className="flex items-center">
+                                <Mail className="w-4 h-4 mr-2 text-slate-400" />
+                                {pursuit.email}
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 text-slate-600">
+                              <div className="flex items-center">
+                                <Phone className="w-4 h-4 mr-2 text-slate-400" />
+                                {pursuit.phone}
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 text-right font-bold text-emerald-600">{pursuit.price}</td>
+                            <td className="py-4 px-4 text-center">
+                              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {pursuit.nextStep}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                              <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-bold">
+                                {pursuit.probability}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={7}>
+                            <div className="text-center py-12">
+                              <Target className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                              <h4 className="text-lg font-semibold text-slate-600 mb-2">No pursuits yet</h4>
+                              <p className="text-slate-500">Add your first pursuit to start tracking opportunities</p>
                             </div>
-                          </td>
-                          <td className="py-4 px-4 text-slate-600">
-                            <div className="flex items-center">
-                              <Phone className="w-4 h-4 mr-2 text-slate-400" />
-                              {pursuit.phone}
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 text-right font-bold text-emerald-600">{pursuit.value}</td>
-                          <td className="py-4 px-4 text-center">
-                            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                              {pursuit.stage}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-center">
-                            <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-bold">
-                              {pursuit.probability}
-                            </span>
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
-                {selectedPipeline.pursuits?.length === 0 && (
-                  <div className="text-center py-12">
-                    <Target className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-slate-600 mb-2">No pursuits yet</h4>
-                    <p className="text-slate-500">Add your first pursuit to start tracking opportunities</p>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         )}
-        
+
         {/* Add Pursuit Modal */}
         {showPursuitModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-60 p-4">
@@ -343,7 +499,6 @@ const PipeLine = () => {
                   <X className="w-5 h-5 text-slate-600" />
                 </button>
               </div>
-              
               <div className="p-6">
                 <form className="space-y-8" onSubmit={handlePursuitSubmit}>
                   {/* Property Information Section */}
@@ -646,9 +801,10 @@ const PipeLine = () => {
                     </button>
                     <button 
                       type="submit"
-                      className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200"
+                      disabled={isSubmitting}
+                      className={`bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-200 ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
-                      Add Pursuit
+                      {isSubmitting ? 'Adding...' : 'Add Pursuit'}
                     </button>
                   </div>
                 </form>
@@ -656,6 +812,7 @@ const PipeLine = () => {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
