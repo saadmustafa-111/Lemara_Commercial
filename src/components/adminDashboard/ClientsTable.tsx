@@ -2,22 +2,43 @@
 import { useState, useEffect, useMemo } from "react"
 import { Search, Filter, Edit, Trash2, Eye, MoreHorizontal, UserPlus, DollarSign, Building, Calendar, Mail, Phone, MapPin, Star, Heart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw } from 'lucide-react'
 
+// Define Role enum to match with SignUpForm
+enum Role {
+  ADMIN = "admin",
+  USER = "user",
+  BROKER = "broker",
+}
+
 interface Client {
   id: number
-  name: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
-  type: string
-  totalSpent: number
-  properties: number
-  joinDate: string
-  status: string
-  avatar: string
-  location: string
-  rating: number
-  lastActivity: string
-  preferredAgent: string
-  budget: number
+  role: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  whatsapp: string
+  twitter: string
+  facebook: string
+  linkedIn: string
+  instagram: string
+  nmls: string
+  dre: string
+  // UI display fields
+  name?: string
+  type?: string
+  totalSpent?: number
+  properties?: number
+  joinDate?: string
+  status?: string
+  avatar?: string
+  location?: string
+  rating?: number
+  lastActivity?: string
+  preferredAgent?: string
+  budget?: number
 }
 
 export default function EnhancedClientsTable() {
@@ -33,129 +54,95 @@ export default function EnhancedClientsTable() {
 
   const rowsPerPageOptions = [5, 10, 15, 20, 25]
 
+  // Add refresh trigger state
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
   useEffect(() => {
     const fetchClients = async () => {
-      setTimeout(() => {
-        const mockClients: Client[] = [
-          {
-            id: 1,
-            name: "John Smith",
-            email: "john.smith@email.com",
-            phone: "+1 (555) 123-4567",
-            type: "Buyer",
-            totalSpent: 1250000,
-            properties: 2,
-            joinDate: "Jan 15, 2023",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face",
-            location: "Los Angeles, CA",
-            rating: 4.8,
-            lastActivity: "2 days ago",
-            preferredAgent: "AJ Rana",
-            budget: 2000000,
-          },
-          {
-            id: 2,
-            name: "Sarah Williams",
-            email: "sarah.williams@email.com",
-            phone: "+1 (555) 234-5678",
-            type: "Seller",
-            totalSpent: 0,
-            properties: 1,
-            joinDate: "Mar 8, 2023",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face",
-            location: "San Francisco, CA",
-            rating: 4.9,
-            lastActivity: "1 day ago",
-            preferredAgent: "Sarah Johnson",
-            budget: 0,
-          },
-          {
-            id: 3,
-            name: "Michael Johnson",
-            email: "michael.johnson@email.com",
-            phone: "+1 (555) 345-6789",
-            type: "Investor",
-            totalSpent: 3200000,
-            properties: 5,
-            joinDate: "Nov 22, 2022",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&h=60&fit=crop&crop=face",
-            location: "San Diego, CA",
-            rating: 4.7,
-            lastActivity: "5 hours ago",
-            preferredAgent: "Emily Chen",
-            budget: 5000000,
-          },
-          {
-            id: 4,
-            name: "Emily Davis",
-            email: "emily.davis@email.com",
-            phone: "+1 (555) 456-7890",
-            type: "Buyer",
-            totalSpent: 750000,
-            properties: 1,
-            joinDate: "Jun 10, 2023",
-            status: "inactive",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face",
-            location: "Sacramento, CA",
-            rating: 4.5,
-            lastActivity: "2 weeks ago",
-            preferredAgent: "Abdul Shah",
-            budget: 900000,
-          },
-          {
-            id: 5,
-            name: "Robert Brown",
-            email: "robert.brown@email.com",
-            phone: "+1 (555) 567-8901",
-            type: "Seller",
-            totalSpent: 0,
-            properties: 2,
-            joinDate: "Feb 14, 2023",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face",
-            location: "Oakland, CA",
-            rating: 4.6,
-            lastActivity: "3 days ago",
-            preferredAgent: "AJ Rana",
-            budget: 0,
-          },
-          {
-            id: 6,
-            name: "Lisa Anderson",
-            email: "lisa.anderson@email.com",
-            phone: "+1 (555) 678-9012",
-            type: "Investor",
-            totalSpent: 4500000,
-            properties: 8,
-            joinDate: "Aug 5, 2022",
-            status: "active",
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face",
-            location: "Fresno, CA",
-            rating: 4.9,
-            lastActivity: "1 hour ago",
-            preferredAgent: "Sarah Johnson",
-            budget: 10000000,
-          },
-        ]
-
-        setClients(mockClients)
+      setIsLoading(true)
+      try {
+        // First try direct connection to backend, if CORS issues use proxy
+        let response;
+        try {
+          // Try direct connection to the Heroku backend using the correct /user endpoint with role=user
+          response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/user?role=${Role.USER}`);
+        } catch (corsError) {
+          console.log("Falling back to proxy due to potential CORS issues:", corsError);
+          // Fall back to our proxy API route
+          response = await fetch(`/api/proxy/users?role=${Role.USER}`);
+        }
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching clients: ${response.status}`)
+        }
+        const data = await response.json()
+        
+        // Log the data received from the API for debugging
+        console.log("Data received from API for clients:", data);
+        
+        // Transform the API response to match our display needs
+        const clientsList = Array.isArray(data) ? data : (data.users || []);
+        const clientsData: Client[] = clientsList.map((client: any) => {
+          // Convert createdAt to readable date format
+          const createdDate = client.createdAt ? new Date(client.createdAt) : new Date();
+          const joinDate = createdDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+          
+          // Calculate last activity (random for display purposes)
+          const activityOptions = ['1 hour ago', '3 hours ago', '1 day ago', '2 days ago', '1 week ago'];
+          const randomActivity = activityOptions[Math.floor(Math.random() * activityOptions.length)];
+          
+          // Random client types
+          const types = ['Buyer', 'Seller', 'Investor'];
+          const randomType = types[Math.floor(Math.random() * types.length)];
+          
+          // Random agent names (for preferred agent)
+          const agents = ['Emily Chen', 'Sarah Johnson', 'Abdul Shah', 'AJ Rana', 'David Miller'];
+          const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+          
+          return {
+            ...client,
+            // Default values for UI elements not provided by API
+            name: `${client.firstName} ${client.lastName}`,
+            status: client.isActive ? 'active' : 'inactive',
+            type: randomType,
+            totalSpent: randomType === 'Buyer' ? Math.floor(Math.random() * 2000000) + 500000 : 0,
+            properties: Math.floor(Math.random() * 5) + 1,
+            joinDate,
+            avatar: `https://ui-avatars.com/api/?name=${client.firstName}+${client.lastName}&background=random`,
+            location: "California, USA",
+            rating: parseFloat((Math.random() * 2 + 3).toFixed(1)), // Random rating between 3.0 and 5.0
+            lastActivity: randomActivity,
+            preferredAgent: randomAgent,
+            budget: randomType !== 'Seller' ? Math.floor(Math.random() * 3000000) + 500000 : 0
+          };
+        });
+        
+        setClients(clientsData);
+      } catch (error) {
+        console.error("Failed to fetch clients:", error)
+        // Set empty array on error
+        setClients([])
+      } finally {
         setIsLoading(false)
-      }, 1000)
+      }
     }
 
     fetchClients()
-  }, [])
+  }, [refreshTrigger])
 
   // Filter and paginate data
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
+      // Create a full name from firstName and lastName for searching
+      const fullName = `${client.firstName} ${client.lastName}`.toLowerCase()
       const matchesSearch =
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        fullName.includes(searchTerm.toLowerCase()) ||
         client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.preferredAgent.toLowerCase().includes(searchTerm.toLowerCase())
+        (client.preferredAgent?.toLowerCase() || '').includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === "all" || client.status === filterStatus
       const matchesType = filterType === "all" || client.type === filterType
       return matchesSearch && matchesStatus && matchesType
@@ -172,8 +159,8 @@ export default function EnhancedClientsTable() {
     setCurrentPage(1)
   }, [searchTerm, rowsPerPage])
 
-  const formatCurrency = (amount: number) => {
-    if (amount === 0) return "N/A"
+  const formatCurrency = (amount: number | undefined) => {
+    if (amount === 0 || amount === undefined) return "N/A"
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -182,16 +169,17 @@ export default function EnhancedClientsTable() {
     }).format(amount)
   }
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number | undefined) => {
+    const ratingValue = rating || 0;
     return (
       <div className="flex items-center space-x-1">
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-3 h-3 ${i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+            className={`w-3 h-3 ${i < Math.floor(ratingValue) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
           />
         ))}
-        <span className="text-xs text-gray-600 ml-1">{rating}</span>
+        <span className="text-xs text-gray-600 ml-1">{ratingValue}</span>
       </div>
     )
   }
@@ -228,6 +216,7 @@ export default function EnhancedClientsTable() {
 
           <button
             disabled={isLoading}
+            onClick={() => setRefreshTrigger(prev => prev + 1)}
             className="inline-flex items-center px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none transition-all duration-200 hover:scale-105 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-5 h-5 mr-2 ${isLoading ? "animate-spin" : ""}`} />
