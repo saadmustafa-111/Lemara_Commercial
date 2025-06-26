@@ -50,11 +50,50 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
   // Loan information section removed
 
   const financialInfo = {
-    'Annual Income': formData.annualIncome ? `$${formData.annualIncome}` : '',
+    'Current Annual Income': formData.currentAnnualIncome ? `$${formData.currentAnnualIncome}` : '',
+    'Monthly Expenses': formData.monthlyExpenses ? `$${formData.monthlyExpenses}` : '',
     'Credit Score': formData.creditScore,
-    'Total Assets': formData.totalAssets ? `$${formData.totalAssets}` : '',
-    'Total Liabilities': formData.totalLiabilities ? `$${formData.totalLiabilities}` : '',
+    'Existing Debt': formData.existingDebt ? `$${formData.existingDebt}` : '',
+    'Cash in Bank Accounts': formData.cashInBankAccounts ? `$${formData.cashInBankAccounts}` : '',
+    'Investment Accounts': formData.investmentAccounts ? `$${formData.investmentAccounts}` : '',
+    'Real Estate Value': formData.realEstateValue ? `$${formData.realEstateValue}` : '',
+    'Other Assets': formData.otherAssets ? `$${formData.otherAssets}` : '',
+    '2020 Income': formData.incomeYear1 ? `$${formData.incomeYear1}` : '',
+    '2021 Income': formData.incomeYear2 ? `$${formData.incomeYear2}` : '',
+    '2022 Income': formData.incomeYear3 ? `$${formData.incomeYear3}` : '',
+    '2023 Income': formData.incomeYear4 ? `$${formData.incomeYear4}` : '',
+    '2024 Income': formData.incomeYear5 ? `$${formData.incomeYear5}` : '',
+    'Primary Bank': formData.primaryBankName,
+    'Account Type': formData.accountType,
+    'Banking Relationship': formData.bankRelationshipYears,
     'Financial Comments': formData.financialComments
+  };
+
+  const businessInfo = {
+    'Business Name': formData.businessName,
+    'Business Type': formData.businessType,
+    'Federal Tax ID': formData.federalTaxId,
+    'Year Established': formData.yearEstablished,
+    'Industry': formData.industryType,
+    'Number of Employees': formData.numberOfEmployees,
+    'Business Address': formData.businessAddress,
+    'Business City': formData.businessCity,
+    'Business State': formData.businessState,
+    'Business Zip': formData.businessZip,
+    'Annual Revenue': formData.annualBusinessRevenue ? `$${formData.annualBusinessRevenue}` : '',
+    'Net Income': formData.businessNetIncome ? `$${formData.businessNetIncome}` : '',
+    'Business Debt': formData.businessDebt ? `$${formData.businessDebt}` : '',
+    'Business Assets': formData.businessAssets ? `$${formData.businessAssets}` : '',
+    '2022 Revenue': formData.businessRevenue2022 ? `$${formData.businessRevenue2022}` : '',
+    '2023 Revenue': formData.businessRevenue2023 ? `$${formData.businessRevenue2023}` : '',
+    '2024 Revenue': formData.businessRevenue2024 ? `$${formData.businessRevenue2024}` : '',
+    'Requested Loan Amount': formData.loanAmount ? `$${formData.loanAmount}` : '',
+    'Loan Purpose': formData.loanPurpose,
+    'Business Plan': formData.businessPlan,
+    'Business Bank': formData.businessBankName,
+    'Business Banking Years': formData.businessBankingYears,
+    'Average Monthly Balance': formData.averageMonthlyBalance ? `$${formData.averageMonthlyBalance}` : '',
+    'Existing Business Loans': formData.existingBusinessLoans
   };
   // Property info and documents sections removed
   return (
@@ -117,6 +156,26 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Object.entries(financialInfo).map(([key, value]) => (
               <div key={key} className={key === 'Financial Comments' ? "col-span-1 md:col-span-2 flex items-start" : "flex items-start"}>
+                <span className="font-medium min-w-[180px] text-gray-700">{key}:</span>
+                <span className="text-gray-800">{formatValue(value)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Business Information Section */}
+      {isSectionFilled(businessInfo) && (
+        <div className="bg-white bg-opacity-60 p-6 rounded-xl shadow-sm">
+          <h4 className="text-md font-medium text-[#00a0d1] mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Business Information
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Object.entries(businessInfo).map(([key, value]) => (
+              <div key={key} className={key === 'Business Plan' ? "col-span-1 md:col-span-2 flex items-start" : "flex items-start"}>
                 <span className="font-medium min-w-[180px] text-gray-700">{key}:</span>
                 <span className="text-gray-800">{formatValue(value)}</span>
               </div>

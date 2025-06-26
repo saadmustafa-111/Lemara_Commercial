@@ -4,6 +4,8 @@ import { useAuth } from "../../../../context/AuthContext"
 import FormProgressIndicator from "./FormProgressIndicator"
 import BasicInfoStep from "./BasicInfoStep"
 import ApplicantInformationStep from "./ApplicantInformationStep"
+import FinancialInformationStep from "./FinancialInformationStep"
+import BusinessInformationStep from "./BusinessInformationStep"
 import ReviewStep from "./ReviewStep"
 import "./styles.css"
 import { useLoading } from "@/hooks/useLoading"
@@ -13,7 +15,7 @@ import axiosInstance from "@/lib/axios"
 const CommercialLoanPage = () => {  
   const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
-  const totalSteps = 3
+  const totalSteps = 5
   const { isLoading, withLoading } = useLoading()
   const { toast } = useToast()
   const [submitting, setSubmitting] = useState(false)
@@ -39,12 +41,56 @@ const CommercialLoanPage = () => {
     licenseState: "",
     dateOfBirth: "",
     dependents: "0",
-      // Financial details (keeping these for now to maintain compatibility)
-    annualIncome: "",
+
+    // Financial Information
+    currentAnnualIncome: "",
+    monthlyExpenses: "",
     creditScore: "",
+    existingDebt: "",
+    cashInBankAccounts: "",
+    investmentAccounts: "",
+    realEstateValue: "",
+    otherAssets: "",
+    incomeYear1: "", // 2020
+    incomeYear2: "", // 2021
+    incomeYear3: "", // 2022
+    incomeYear4: "", // 2023
+    incomeYear5: "", // 2024
+    primaryBankName: "",
+    accountType: "",
+    bankRelationshipYears: "",
+    financialComments: "",
+
+    // Business Information
+    businessName: "",
+    businessType: "",
+    federalTaxId: "",
+    yearEstablished: "",
+    industryType: "",
+    numberOfEmployees: "",
+    businessAddress: "",
+    businessCity: "",
+    businessState: "",
+    businessZip: "",
+    annualBusinessRevenue: "",
+    businessNetIncome: "",
+    businessDebt: "",
+    businessAssets: "",
+    businessRevenue2022: "",
+    businessRevenue2023: "",
+    businessRevenue2024: "",
+    loanAmount: "",
+    loanPurpose: "",
+    businessPlan: "",
+    businessBankName: "",
+    businessBankingYears: "",
+    averageMonthlyBalance: "",
+    existingBusinessLoans: "",
+
+    // Legacy fields (keeping for compatibility)
+    annualIncome: "",
     totalAssets: "",
     totalLiabilities: "",
-    financialComments: "",
   })
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -157,7 +203,9 @@ const CommercialLoanPage = () => {
             <p className="text-gray-600 loan-form-subtitle">
               {currentStep === 1 && "Loan Needs"}
               {currentStep === 2 && "Applicant's Information"}
-              {currentStep === 3 && "Review & Submit"}
+              {currentStep === 3 && "Financial Information"}
+              {currentStep === 4 && "Business Information"}
+              {currentStep === 5 && "Review & Submit"}
             </p>
           </div>          <div className="mb-6">
             <p className="loan-form-notice bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
@@ -177,6 +225,14 @@ const CommercialLoanPage = () => {
             )}
             
             {currentStep === 3 && (
+              <FinancialInformationStep formData={formData} handleChange={handleChange} />
+            )}
+            
+            {currentStep === 4 && (
+              <BusinessInformationStep formData={formData} handleChange={handleChange} />
+            )}
+            
+            {currentStep === 5 && (
               <ReviewStep formData={formData} />
             )}              <div className="flex justify-between mt-8">
                 {currentStep > 1 && (

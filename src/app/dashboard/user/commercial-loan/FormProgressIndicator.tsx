@@ -31,8 +31,10 @@ const FormProgressIndicator: React.FC<ProgressStepProps> = ({ currentStep, total
       </div>
       <div className="flex justify-between text-xs font-medium text-gray-600 px-1">
         <span className={`${currentStep === 1 ? 'text-[#00a0d1] font-semibold' : ''}`}>Basic Info</span>
-        <span className={`${currentStep === 2 ? 'text-[#00a0d1] font-semibold' : ''}`}>Applicant's Information</span>
-        <span className={`${currentStep === 3 ? 'text-[#00a0d1] font-semibold' : ''}`}>Review</span>
+        <span className={`${currentStep === 2 ? 'text-[#00a0d1] font-semibold' : ''}`}>Applicant Info</span>
+        <span className={`${currentStep === 3 ? 'text-[#00a0d1] font-semibold' : ''}`}>Financial Info</span>
+        <span className={`${currentStep === 4 ? 'text-[#00a0d1] font-semibold' : ''}`}>Business Info</span>
+        <span className={`${currentStep === 5 ? 'text-[#00a0d1] font-semibold' : ''}`}>Review</span>
       </div>
     </div>
   )
