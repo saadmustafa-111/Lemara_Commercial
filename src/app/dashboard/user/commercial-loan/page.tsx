@@ -24,73 +24,29 @@ const CommercialLoanPage = () => {
     firstName: "",
     lastName: "",
     ssn: "",
-    coApplicantFirstName: "",
-    coApplicantLastName: "",
-    coApplicantSSN: "",
-    purposeOfLoan: "",
+    details: "", // Changed from purposeOfLoan to match API schema
     
     // Applicant Information
     address: "",
     city: "",
     state: "",
     zip: "",
-    homePhone: "",
-    businessPhone: "",
-    emailAddress: "",
-    driversLicense: "",
-    licenseState: "",
-    dateOfBirth: "",
-    dependents: "0",
-
+    houseNumber: "", // Changed from homePhone to match API schema
+    businessNumber: "", // Changed from businessPhone to match API schema
+    email: "", // Changed from emailAddress to match API schema
+ 
     // Financial Information
-    currentAnnualIncome: "",
+    annualIncome: "", // Changed from currentAnnualIncome to match API schema
     monthlyExpenses: "",
     creditScore: "",
     existingDebt: "",
-    cashInBankAccounts: "",
-    investmentAccounts: "",
-    realEstateValue: "",
-    otherAssets: "",
-    incomeYear1: "", // 2020
-    incomeYear2: "", // 2021
-    incomeYear3: "", // 2022
-    incomeYear4: "", // 2023
-    incomeYear5: "", // 2024
-    primaryBankName: "",
-    accountType: "",
-    bankRelationshipYears: "",
-    financialComments: "",
 
     // Business Information
     businessName: "",
-    businessType: "",
-    federalTaxId: "",
-    yearEstablished: "",
-    industryType: "",
-    numberOfEmployees: "",
+    businesstype: "", // Note the lowercase 't' to match API schema
     businessAddress: "",
-    businessCity: "",
-    businessState: "",
-    businessZip: "",
     annualBusinessRevenue: "",
-    businessNetIncome: "",
-    businessDebt: "",
-    businessAssets: "",
-    businessRevenue2022: "",
-    businessRevenue2023: "",
-    businessRevenue2024: "",
     loanAmount: "",
-    loanPurpose: "",
-    businessPlan: "",
-    businessBankName: "",
-    businessBankingYears: "",
-    averageMonthlyBalance: "",
-    existingBusinessLoans: "",
-
-    // Legacy fields (keeping for compatibility)
-    annualIncome: "",
-    totalAssets: "",
-    totalLiabilities: "",
   })
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -128,35 +84,49 @@ const CommercialLoanPage = () => {
       
       setSubmitting(true)
       
-      // Format the data according to the API structure
+      // Format the data according to the API schema
       const loanData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        ssn: parseInt(formData.ssn || "0", 10), 
-        coFirstName: formData.coApplicantFirstName,
-        coLastName: formData.coApplicantLastName,
-        description: formData.purposeOfLoan,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zip: formData.zip,
-        houseNumber: formData.homePhone,
-        businessNumber: formData.businessPhone,
-        email: formData.emailAddress,
-        licenseNumber: formData.driversLicense,
-        licenseState: formData.licenseState,
-        dependantsNumber: parseInt(formData.dependents || "0", 10)
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
+        ssn: formData.ssn ? parseInt(formData.ssn, 10) : 0,
+        details: formData.details || "",
+        address: formData.address || "",
+        city: formData.city || "",
+        state: formData.state || "",
+        zip: formData.zip || "",
+        houseNumber: formData.houseNumber || "",
+        businessNumber: formData.businessNumber || "",
+        email: formData.email || "",
+        annualIncome: formData.annualIncome ? parseInt(formData.annualIncome, 10) : 0,
+        monthlyExpenses: formData.monthlyExpenses ? parseInt(formData.monthlyExpenses, 10) : 0,
+        creditScore: formData.creditScore ? 
+          // Handle if creditScore is a string like "excellent" or a number
+          isNaN(parseInt(formData.creditScore, 10)) ? 0 : parseInt(formData.creditScore, 10) : 0,
+        existingDebt: formData.existingDebt ? parseInt(formData.existingDebt, 10) : 0,
+        businessName: formData.businessName || "",
+        businesstype: formData.businesstype || "",
+        businessAddress: formData.businessAddress || "",
+        annualBusinessRevenue: formData.annualBusinessRevenue ? parseInt(formData.annualBusinessRevenue, 10) : 0,
+        loanAmount: formData.loanAmount ? parseInt(formData.loanAmount, 10) : 0
       }
       
+      // Log the data being sent to the API
+      console.log("Submitting loan data:", JSON.stringify(loanData))
+      
       const authToken = localStorage.getItem("authToken")
+      
+      console.log("Using baseURL:", axiosInstance.defaults.baseURL)
       
       // Make API call
       const response = await axiosInstance.post("/loan", loanData, {
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           ...(authToken && { Authorization: `Bearer ${authToken}` }),
-        }
+        },
+        timeout: 30000 // Increase timeout to 30 seconds
       })
+      
       
       // Handle successful response
       toast({
@@ -171,6 +141,96 @@ const CommercialLoanPage = () => {
       
     } catch (error: any) {
       console.error("Error submitting loan application:", error)
+      console.log("Error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      })
+      
+      // If there was an error with axios, try using fetch as a fallback
+      try {
+        console.log("Attempting fallback with fetch API...")
+        
+        // Re-get the auth token to ensure it's in scope
+        const fallbackAuthToken = localStorage.getItem("authToken")
+        
+        const fetchResponse = await fetch("https://lemara-9829c937fd90.herokuapp.com/loan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(fallbackAuthToken && { Authorization: `Bearer ${fallbackAuthToken}` }),
+          },
+          body: JSON.stringify({
+            firstName: formData.firstName || "",
+            lastName: formData.lastName || "",
+            ssn: formData.ssn ? parseInt(formData.ssn, 10) : 0,
+            details: formData.details || "",
+            address: formData.address || "",
+            city: formData.city || "",
+            state: formData.state || "",
+            zip: formData.zip || "",
+            houseNumber: formData.houseNumber || "",
+            businessNumber: formData.businessNumber || "",
+            email: formData.email || "",
+            annualIncome: formData.annualIncome ? parseInt(formData.annualIncome, 10) : 0,
+            monthlyExpenses: formData.monthlyExpenses ? parseInt(formData.monthlyExpenses, 10) : 0,
+            creditScore: formData.creditScore ? 
+              isNaN(parseInt(formData.creditScore, 10)) ? 0 : parseInt(formData.creditScore, 10) : 0,
+            existingDebt: formData.existingDebt ? parseInt(formData.existingDebt, 10) : 0,
+            businessName: formData.businessName || "",
+            businesstype: formData.businesstype || "",
+            businessAddress: formData.businessAddress || "",
+            annualBusinessRevenue: formData.annualBusinessRevenue ? parseInt(formData.annualBusinessRevenue, 10) : 0,
+            loanAmount: formData.loanAmount ? parseInt(formData.loanAmount, 10) : 0
+          })
+        })
+        
+        if (fetchResponse.ok) {
+          const data = await fetchResponse.json()
+          console.log("Fallback successful:", data)
+          
+          toast({
+            title: "Success",
+            description: "Your loan application has been submitted successfully!",
+            variant: "success",
+          })
+          
+          return
+        } else {
+          console.log("Fallback failed with status:", fetchResponse.status)
+          const errorText = await fetchResponse.text()
+          console.log("Error response:", errorText)
+        }
+      } catch (fetchError) {
+        console.error("Fallback fetch also failed:", fetchError)
+        
+        // Try one more time with minimal data to check if it's a data format issue
+        try {
+          console.log("Attempting minimal data test...")
+          
+          const minimalResponse = await fetch("https://lemara-9829c937fd90.herokuapp.com/loan", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              firstName: "Test",
+              lastName: "User",
+              ssn: 123456789,
+              email: "test@example.com"
+            })
+          })
+          
+          console.log("Minimal test status:", minimalResponse.status)
+          if (!minimalResponse.ok) {
+            const minimalErrorText = await minimalResponse.text()
+            console.log("Minimal test error:", minimalErrorText)
+          }
+        } catch (minimalError) {
+          console.error("Even minimal test failed:", minimalError)
+        }
+      }
       
       // Display error message to the user
       toast({

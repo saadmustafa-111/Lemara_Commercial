@@ -21,17 +21,58 @@ import {
   RefreshCw,
   CreditCard,
 } from "lucide-react"
+import LoanDetailsModal from "../common/LoanDetailsModal"
 
-interface CommercialLoan {
-  id: string
-  source: string
-  applicantName: string
-  loanPurpose: string
-  createdDate: string
-  status: "in progress" | "submitted" | "approved" | "rejected"
-  submittedDate: string
+export interface User {
+  id: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  firstName: string
+  lastName: string
+  password: string
+  email: string
+  phone: string
+  whatsapp: string
+  twitter: string
+  facebook: string
+  linkedIn: string
+  instagram: string
+  nmls: string
+  dre: string
+  role: string
+}
+
+export interface CommercialLoan {
+  id: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  firstName: string
+  lastName: string
+  ssn: number
+  details: string
+  address: string
+  city: string
+  state: string
+  zip: string
+  houseNumber: string
+  businessNumber: string
+  email: string
+  annualIncome: number
+  monthlyExpenses: number
+  creditScore: number | null
+  existingDebt: number
+  businessName: string
+  businesstype: string
+  businessAddress: string
+  annualBusinessRevenue: number
   loanAmount: number
-  avatar: string
+  status: "in progress" | "submitted" | "approved" | "rejected"
+  source: string
+  submittedDate?: string
+  user: User
+  avatar?: string
 }
 
 export default function CommercialLoansTable() {
@@ -39,6 +80,9 @@ export default function CommercialLoansTable() {
   const [loans, setLoans] = useState<CommercialLoan[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
+  const [error, setError] = useState<string | null>(null)
+  const [selectedLoan, setSelectedLoan] = useState<CommercialLoan | null>(null)
+  const [userLoanCounts, setUserLoanCounts] = useState<Record<string, number>>({})
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
@@ -46,94 +90,55 @@ export default function CommercialLoansTable() {
 
   const rowsPerPageOptions = [5, 10, 15, 20, 25]
 
-  useEffect(() => {
-    const fetchLoans = async () => {
-      setTimeout(() => {
-        const mockLoans: CommercialLoan[] = [
-          {
-            id: "CL-2024-001",
-            source: "Online Application",
-            applicantName: "John Smith",
-            loanPurpose: "Equipment Purchase",
-            createdDate: "Jan 15, 2024",
-            status: "approved",
-            submittedDate: "Jan 18, 2024",
-            loanAmount: 250000,
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face",
-          },
-          {
-            id: "CL-2024-002",
-            source: "Branch Office",
-            applicantName: "Sarah Williams",
-            loanPurpose: "Real Estate Investment",
-            createdDate: "Jan 20, 2024",
-            status: "in progress",
-            submittedDate: "Jan 22, 2024",
-            loanAmount: 1500000,
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face",
-          },
-          {
-            id: "CL-2024-003",
-            source: "Referral",
-            applicantName: "Michael Johnson",
-            loanPurpose: "Business Expansion",
-            createdDate: "Jan 25, 2024",
-            status: "submitted",
-            submittedDate: "Jan 28, 2024",
-            loanAmount: 750000,
-            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&h=60&fit=crop&crop=face",
-          },
-          {
-            id: "CL-2024-004",
-            source: "Online Application",
-            applicantName: "Emily Davis",
-            loanPurpose: "Working Capital",
-            createdDate: "Feb 1, 2024",
-            status: "rejected",
-            submittedDate: "Feb 3, 2024",
-            loanAmount: 100000,
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face",
-          },
-          {
-            id: "CL-2024-005",
-            source: "Branch Office",
-            applicantName: "Robert Brown",
-            loanPurpose: "Inventory Financing",
-            createdDate: "Feb 5, 2024",
-            status: "approved",
-            submittedDate: "Feb 8, 2024",
-            loanAmount: 500000,
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face",
-          },
-          {
-            id: "CL-2024-006",
-            source: "Partner Bank",
-            applicantName: "Lisa Anderson",
-            loanPurpose: "Commercial Property",
-            createdDate: "Feb 10, 2024",
-            status: "in progress",
-            submittedDate: "Feb 12, 2024",
-            loanAmount: 2000000,
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face",
-          },
-        ]
-
-        setLoans(mockLoans)
-        setIsLoading(false)
-      }, 1000)
+  const fetchLoans = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const response = await fetch('/api/loans')
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+      const data = await response.json()
+      setLoans(data)
+      
+      // Calculate how many loans each user has
+      const userCounts: Record<string, number> = {}
+      data.forEach((loan: CommercialLoan) => {
+        // We can use the user's email as a unique identifier
+        const userEmail = loan.email
+        userCounts[userEmail] = (userCounts[userEmail] || 0) + 1
+      })
+      setUserLoanCounts(userCounts)
+    } catch (err) {
+      console.error('Failed to fetch loans:', err)
+      setError('Failed to load loans. Please try again later.')
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    fetchLoans()
+  // Fetch data initially and set up auto-refresh every 30 seconds
+  useEffect(() => {
+    fetchLoans();
+    
+    // Set up automatic refresh
+    const refreshInterval = setInterval(() => {
+      fetchLoans();
+    }, 30000); // Refresh every 30 seconds
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, [])
 
   // Filter and paginate data
   const filteredLoans = useMemo(() => {
     return loans.filter((loan) => {
       const matchesSearch =
-        loan.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        loan.applicantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        loan.loanPurpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        loan.source.toLowerCase().includes(searchTerm.toLowerCase())
+        String(loan.id).includes(searchTerm.toLowerCase()) ||
+        `${loan.firstName} ${loan.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        loan.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        loan.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        loan.businessName.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesStatus = filterStatus === "all" || loan.status === filterStatus
       return matchesSearch && matchesStatus
     })
@@ -188,6 +193,43 @@ export default function CommercialLoansTable() {
     }
   }
 
+  const handleViewLoan = async (loanId: number) => {
+    // Show a loading state in just part of the UI rather than the whole table
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+      loadingIndicator.style.display = 'flex';
+    }
+    
+    try {
+      // Always fetch fresh data from the backend
+      const response = await fetch(`/api/loans?id=${loanId}`)
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+      const loanData = await response.json()
+      setSelectedLoan(loanData)
+    } catch (err) {
+      console.error('Failed to fetch loan details:', err)
+      setError('Failed to load loan details. Please try again later.')
+    } finally {
+      if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+      }
+    }
+  }
+
+  const handleCloseLoanDetails = () => {
+    setSelectedLoan(null)
+  }
+
+  // New function to filter by user email
+  const filterByUser = (email: string) => {
+    // Clear any other filters and search terms
+    setFilterStatus("all")
+    // Set the search term to the email to filter by user
+    setSearchTerm(email)
+  }
+
   // Pagination handlers
   const goToPage = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
@@ -213,17 +255,18 @@ export default function CommercialLoansTable() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center px-6 py-3 bg-[#00a0d1] text-white font-medium rounded-xl hover:bg-[#008bb8] focus:outline-none focus:ring-4 focus:ring-[#00a0d1]/30 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
+          <a href="/admin/loans/new" className="inline-flex items-center px-6 py-3 bg-[#00a0d1] text-white font-medium rounded-xl hover:bg-[#008bb8] focus:outline-none focus:ring-4 focus:ring-[#00a0d1]/30 transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
             <Plus className="w-5 h-5 mr-2" />
             New Loan Application
-          </button>
+          </a>
 
           <button
+            onClick={fetchLoans}
             disabled={isLoading}
             className="inline-flex items-center px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none transition-all duration-200 hover:scale-105 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-5 h-5 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-            Refresh
+            Refresh Data
           </button>
         </div>
       </div>
@@ -237,8 +280,19 @@ export default function CommercialLoansTable() {
             placeholder="Search loans..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-[#00a0d1]/30 focus:border-[#00a0d1] transition-all duration-200"
+            className={`w-full pl-10 ${searchTerm && searchTerm.includes('@') ? 'pr-10' : 'pr-4'} py-3 bg-white border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-[#00a0d1]/30 focus:border-[#00a0d1] transition-all duration-200`}
           />
+          {searchTerm && searchTerm.includes('@') && (
+            <button 
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              title="Clear user filter"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
@@ -277,6 +331,64 @@ export default function CommercialLoansTable() {
           </div>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 bg-red-100 rounded-xl p-2">
+              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <div className="mt-1 text-sm text-red-700">{error}</div>
+            </div>
+            <div className="ml-auto pl-3">
+              <button 
+                type="button" 
+                className="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100"
+                onClick={() => setError(null)}
+              >
+                <span className="sr-only">Dismiss</span>
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Filter Notification */}
+      {searchTerm && searchTerm.includes('@') && (
+        <div className="mb-6 p-4 bg-[#00a0d1]/10 border border-[#00a0d1]/30 rounded-xl">
+          <div className="flex items-center">
+            <div className="flex-shrink-0 bg-[#00a0d1]/20 rounded-xl p-2">
+              <User className="w-5 h-5 text-[#00a0d1]" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-[#00a0d1]">User Filter Active</h3>
+              <div className="mt-1 text-sm text-gray-700">
+                Showing all loan applications for user with email: <span className="font-medium">{searchTerm}</span>
+              </div>
+            </div>
+            <div className="ml-auto pl-3">
+              <button 
+                type="button" 
+                className="inline-flex bg-[#00a0d1]/10 rounded-md p-1.5 text-[#00a0d1] hover:bg-[#00a0d1]/20"
+                onClick={() => setSearchTerm('')}
+              >
+                <span className="sr-only">Clear filter</span>
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Table Section */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-200">
@@ -327,7 +439,8 @@ export default function CommercialLoansTable() {
                         <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
                         <div className="w-16 h-16 border-4 border-[#00a0d1] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
                       </div>
-                      <span className="text-gray-600 font-medium text-lg">Loading loans...</span>
+                      <span className="text-gray-600 font-medium text-lg">Loading loans from API...</span>
+                      <p className="text-sm text-gray-500">Fetching the latest data from the server</p>
                     </div>
                   </td>
                 </tr>
@@ -357,27 +470,37 @@ export default function CommercialLoansTable() {
                         <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#00a0d1] via-[#0090c0] to-[#0080b0] rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                           <img
                             src={loan.avatar || "/placeholder.svg"}
-                            alt={loan.applicantName}
+                            alt={`${loan.firstName} ${loan.lastName}`}
                             className="w-full h-full rounded-2xl object-cover"
                           />
                         </div>
                         <div className="ml-3">
-                          <div className="text-sm font-bold text-gray-900">{loan.applicantName}</div>
+                          <div className="text-sm font-bold text-gray-900">{loan.firstName} {loan.lastName}</div>
+                          {userLoanCounts[loan.email] > 1 && (
+                            <div 
+                              onClick={() => filterByUser(loan.email)}
+                              className="mt-1 text-xs px-2 py-1 bg-[#00a0d1]/10 rounded-full inline-flex items-center text-[#00a0d1] font-medium cursor-pointer hover:bg-[#00a0d1]/20 group-hover:scale-105 transition-transform" 
+                              title={`Click to show all ${userLoanCounts[loan.email]} loan applications from this user`}
+                            >
+                              <span className="mr-1">👤</span>
+                              {`+${userLoanCounts[loan.email] - 1} more application${userLoanCounts[loan.email] - 1 > 1 ? 's' : ''}`}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{loan.loanPurpose}</div>
+                      <div className="text-sm font-medium text-gray-900">{loan.details}</div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <div className="space-y-2">
                         <div className="flex items-center text-sm text-gray-700">
                           <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                          <span>Created: {loan.createdDate}</span>
+                          <span>Created: {new Date(loan.createdAt).toLocaleDateString()}</span>
                         </div>
                         <div className="flex items-center text-sm text-gray-700">
                           <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                          <span>Submitted: {loan.submittedDate}</span>
+                          <span>Submitted: {loan.submittedDate || 'N/A'}</span>
                         </div>
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
@@ -391,7 +514,10 @@ export default function CommercialLoansTable() {
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center space-x-2">
-                        <button className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md">
+                        <button
+                          onClick={() => handleViewLoan(loan.id)}
+                          className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"
+                        >
                           <Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" />
                         </button>
                         <button className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md">
@@ -413,14 +539,20 @@ export default function CommercialLoansTable() {
                       </div>
                       <div>
                         <p className="text-xl font-bold text-gray-900 mb-2">
-                          {searchTerm ? "No matching loans found" : "No loans found"}
+                          {searchTerm ? "No matching loans found" : "No loans found in the database"}
                         </p>
                         <p className="text-base text-gray-600 mb-6 max-w-md">
                           {searchTerm
                             ? `No loans match "${searchTerm}". Try adjusting your search.`
-                            : "Get started by creating your first commercial loan application."}
+                            : "Use the 'New Loan Application' button to create your first commercial loan application."}
                         </p>
                       </div>
+                      {!searchTerm && (
+                        <a href="/admin/loans/new" className="px-6 py-3 bg-[#00a0d1] text-white font-medium rounded-xl hover:bg-[#008bb8] transition-all hover:scale-105">
+                          <Plus className="w-5 h-5 inline mr-2" />
+                          Create New Application
+                        </a>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -506,6 +638,29 @@ export default function CommercialLoansTable() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Loan Details Modal */}
+      {selectedLoan && (
+        <LoanDetailsModal 
+          loan={selectedLoan}
+          onClose={handleCloseLoanDetails}
+        />
+      )}
+      
+      {/* Loading indicator for modal */}
+      <div 
+        id="loading-indicator" 
+        style={{ display: 'none' }}
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+      >
+        <div className="bg-white p-8 rounded-2xl shadow-xl flex flex-col items-center">
+          <div className="relative mb-4">
+            <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-[#00a0d1] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <span className="text-gray-800 font-medium">Loading loan details...</span>
+        </div>
       </div>
     </div>
   )

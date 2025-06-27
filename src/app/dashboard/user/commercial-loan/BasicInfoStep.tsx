@@ -65,70 +65,19 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, handleChange })
           </div>
         </div>
         
-        {/* Co-Applicant Section */}
-        <div className="bg-white bg-opacity-60 p-6 rounded-xl shadow-sm">
-          <h3 className="text-lg font-medium text-gray-700 mb-4">Co-Applicant Information</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <div className="md:col-span-4">
-              <label htmlFor="coApplicantFirstName" className="input-label">
-                First Name:
-              </label>
-              <input
-                type="text"
-                id="coApplicantFirstName"
-                name="coApplicantFirstName"
-                value={formData.coApplicantFirstName || ''}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Co-applicant First Name"
-              />
-            </div>
-            
-            <div className="md:col-span-4">
-              <label htmlFor="coApplicantLastName" className="input-label">
-                Last Name:
-              </label>
-              <input
-                type="text"
-                id="coApplicantLastName"
-                name="coApplicantLastName"
-                value={formData.coApplicantLastName || ''}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Co-applicant Last Name"
-              />
-            </div>
-            
-            <div className="md:col-span-4">
-              <label htmlFor="coApplicantSSN" className="input-label">
-                SSN/TIN:
-              </label>
-              <input
-                type="text"
-                id="coApplicantSSN"
-                name="coApplicantSSN"
-                value={formData.coApplicantSSN || ''}
-                onChange={handleChange}
-                className="form-input"
-                placeholder="Co-applicant SSN/TIN"
-              />
-            </div>
-          </div>
-        </div>
-        
+      
         {/* Loan Details Section */}
         <div className="bg-white bg-opacity-60 p-6 rounded-xl shadow-sm">
           <h3 className="text-lg font-medium text-gray-700 mb-4">Loan Details</h3>
           
           <div className="grid grid-cols-1 gap-6">
-            <div>              <label htmlFor="purposeOfLoan" className="input-label">
+            <div>              <label htmlFor="details" className="input-label">
                 <span className="required-mark">*</span> Purpose of Loan:
               </label>
               <textarea
-                id="purposeOfLoan"
-                name="purposeOfLoan"
-                value={formData.purposeOfLoan || ''}
+                id="details"
+                name="details"
+                value={formData.details || ''}
                 onChange={handleChange}
                 className="form-textarea"
                 rows={3}

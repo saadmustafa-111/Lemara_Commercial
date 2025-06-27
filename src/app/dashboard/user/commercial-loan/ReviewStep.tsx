@@ -29,9 +29,7 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
     'First Name': formData.firstName,
     'Last Name': formData.lastName,
     'SSN/TIN': formData.ssn,
-    'Co-applicant Name': formData.coApplicantFirstName,
-    'Co-applicant Last Name': formData.coApplicantLastName,
-    'Co-applicant SSN/TIN': formData.coApplicantSSN
+    'Purpose of Loan': formData.details
   };
 
   const applicantInfo = {
@@ -39,61 +37,26 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
     'City': formData.city,
     'State': formData.state,
     'Zip': formData.zip,
-    'Home Phone': formData.homePhone,
-    'Business Phone': formData.businessPhone,
-    'Email Address': formData.emailAddress,
-    'Driver\'s License': formData.driversLicense,
-    'License State': formData.licenseState,
-    'Date of Birth': formData.dateOfBirth,
-    'Number of Dependents': formData.dependents
+    'Home Phone': formData.houseNumber,
+    'Business Phone': formData.businessNumber,
+    'Email Address': formData.email
   };
   // Loan information section removed
 
   const financialInfo = {
-    'Current Annual Income': formData.currentAnnualIncome ? `$${formData.currentAnnualIncome}` : '',
+    'Current Annual Income': formData.annualIncome ? `$${formData.annualIncome}` : '',
     'Monthly Expenses': formData.monthlyExpenses ? `$${formData.monthlyExpenses}` : '',
     'Credit Score': formData.creditScore,
-    'Existing Debt': formData.existingDebt ? `$${formData.existingDebt}` : '',
-    'Cash in Bank Accounts': formData.cashInBankAccounts ? `$${formData.cashInBankAccounts}` : '',
-    'Investment Accounts': formData.investmentAccounts ? `$${formData.investmentAccounts}` : '',
-    'Real Estate Value': formData.realEstateValue ? `$${formData.realEstateValue}` : '',
-    'Other Assets': formData.otherAssets ? `$${formData.otherAssets}` : '',
-    '2020 Income': formData.incomeYear1 ? `$${formData.incomeYear1}` : '',
-    '2021 Income': formData.incomeYear2 ? `$${formData.incomeYear2}` : '',
-    '2022 Income': formData.incomeYear3 ? `$${formData.incomeYear3}` : '',
-    '2023 Income': formData.incomeYear4 ? `$${formData.incomeYear4}` : '',
-    '2024 Income': formData.incomeYear5 ? `$${formData.incomeYear5}` : '',
-    'Primary Bank': formData.primaryBankName,
-    'Account Type': formData.accountType,
-    'Banking Relationship': formData.bankRelationshipYears,
-    'Financial Comments': formData.financialComments
+    'Existing Debt': formData.existingDebt ? `$${formData.existingDebt}` : ''
+    
   };
 
   const businessInfo = {
     'Business Name': formData.businessName,
-    'Business Type': formData.businessType,
-    'Federal Tax ID': formData.federalTaxId,
-    'Year Established': formData.yearEstablished,
-    'Industry': formData.industryType,
-    'Number of Employees': formData.numberOfEmployees,
+    'Business Type': formData.businesstype,
     'Business Address': formData.businessAddress,
-    'Business City': formData.businessCity,
-    'Business State': formData.businessState,
-    'Business Zip': formData.businessZip,
     'Annual Revenue': formData.annualBusinessRevenue ? `$${formData.annualBusinessRevenue}` : '',
-    'Net Income': formData.businessNetIncome ? `$${formData.businessNetIncome}` : '',
-    'Business Debt': formData.businessDebt ? `$${formData.businessDebt}` : '',
-    'Business Assets': formData.businessAssets ? `$${formData.businessAssets}` : '',
-    '2022 Revenue': formData.businessRevenue2022 ? `$${formData.businessRevenue2022}` : '',
-    '2023 Revenue': formData.businessRevenue2023 ? `$${formData.businessRevenue2023}` : '',
-    '2024 Revenue': formData.businessRevenue2024 ? `$${formData.businessRevenue2024}` : '',
-    'Requested Loan Amount': formData.loanAmount ? `$${formData.loanAmount}` : '',
-    'Loan Purpose': formData.loanPurpose,
-    'Business Plan': formData.businessPlan,
-    'Business Bank': formData.businessBankName,
-    'Business Banking Years': formData.businessBankingYears,
-    'Average Monthly Balance': formData.averageMonthlyBalance ? `$${formData.averageMonthlyBalance}` : '',
-    'Existing Business Loans': formData.existingBusinessLoans
+    'Requested Loan Amount': formData.loanAmount ? `$${formData.loanAmount}` : ''
   };
   // Property info and documents sections removed
   return (
