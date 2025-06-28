@@ -117,11 +117,6 @@ const userNavItems: NavItem[] = [
     name: "Favourite Listings",
     path: "/dashboard/favourite-listings",
   },
-  {
-    name: "Profile",
-    icon: <UserCircleIcon />,
-    path: "/dashboard/account/profile",
-  },
 ]
 
 // Agent/Broker-specific navigation items

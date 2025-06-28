@@ -1,14 +1,21 @@
 "use client"
 import { Save, X } from "lucide-react"
 import { useState, useEffect } from "react"
-import { useAuth } from "../../context/AuthContext" // Make sure to adjust this path
+import { useAuth } from "../../context/AuthContext"
+import axiosInstance from "@/lib/axios"
+
+// Define interface for contact group
+interface ContactGroup {
+  id: number;
+  name: string;
+}
 
 const AddContactForm = () => {
   // Get authentication context
   const { user, isAuthenticated } = useAuth()
 
   // State for contact groups
-  const [contactGroups, setContactGroups] = useState([])
+  const [contactGroups, setContactGroups] = useState<ContactGroup[]>([])
   const [isLoadingGroups, setIsLoadingGroups] = useState(true)
   const [groupsError, setGroupsError] = useState("")
 
@@ -66,7 +73,8 @@ const AddContactForm = () => {
         }
 
         const result = await response.json()
-        setContactGroups(Array.isArray(result) ? result : result.data || [])
+        const groups: ContactGroup[] = Array.isArray(result) ? result : result.data || []
+        setContactGroups(groups)
       } catch (error) {
         console.error("Error fetching contact groups:", error)
         setGroupsError("Failed to load contact groups. Please try again later.")
@@ -78,13 +86,13 @@ const AddContactForm = () => {
       fetchContactGroups()
     }
   }, [isAuthenticated])
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value,
     })
-    if (errors[name]) {
+    if (errors[name as keyof typeof errors]) {
       setErrors({
         ...errors,
         [name]: "",
@@ -140,7 +148,7 @@ const AddContactForm = () => {
   }
 
   // Handle form submission with authentication
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     // Check if user is authenticated
@@ -168,22 +176,14 @@ const AddContactForm = () => {
         userId: user?.id,
       }
 
-      const response = await fetch("/api/addcontacts", {
-        method: "POST",
+      const response = await axiosInstance.post("/contacts", apiData, {
         headers: {
-          "Content-Type": "application/json",
-          ...(authToken && { Authorization: `Bearer ${authToken}` }),
-        },
-        body: JSON.stringify(apiData),
+          ...(authToken && { Authorization: `Bearer ${authToken}` })
+        }
       })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `Error: ${response.status}`)
-      }
-
       // Success
-      const data = await response.json()
+      const data = response.data
       setSubmitStatus({
         success: true,
         message: "Contact added successfully!",
@@ -205,11 +205,11 @@ const AddContactForm = () => {
         website: "",
         group: "",
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error)
       setSubmitStatus({
         success: false,
-        message: error.message || "Failed to add contact. Please try again.",
+        message: error.response?.data?.message || error.message || "Failed to add contact. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
