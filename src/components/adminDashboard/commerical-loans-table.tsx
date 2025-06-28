@@ -20,6 +20,7 @@ import {
   ChevronsRight,
   RefreshCw,
   CreditCard,
+  MessageSquare
 } from "lucide-react"
 import LoanDetailsModal from "../common/LoanDetailsModal"
 
@@ -73,6 +74,7 @@ export interface CommercialLoan {
   submittedDate?: string
   user: User
   avatar?: string
+  comments?: string // Admin comments for loan applications
 }
 
 export default function CommercialLoansTable() {
@@ -83,6 +85,11 @@ export default function CommercialLoansTable() {
   const [error, setError] = useState<string | null>(null)
   const [selectedLoan, setSelectedLoan] = useState<CommercialLoan | null>(null)
   const [userLoanCounts, setUserLoanCounts] = useState<Record<string, number>>({})
+  // Comment modal states
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false)
+  const [commentLoanId, setCommentLoanId] = useState<number | null>(null)
+  const [commentText, setCommentText] = useState("")
+  const [isSavingComment, setIsSavingComment] = useState(false)
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
@@ -121,6 +128,7 @@ export default function CommercialLoansTable() {
           ...loan,
           // Ensure required fields are present with defaults if needed
           status: loan.status || 'submitted',
+          comments: loan.comments || '', // Ensure comments field is included
           submittedDate: loan.createdAt ? new Date(loan.createdAt).toLocaleDateString() : undefined,
           avatar: loan.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((loan.firstName || '') + ' ' + (loan.lastName || ''))}&background=0D8ABC&color=fff`,
           // Ensure user object is present
@@ -278,6 +286,7 @@ export default function CommercialLoansTable() {
       const processedLoan = {
         ...loanData,
         status: loanData.status || 'submitted',
+        comments: loanData.comments || '', // Ensure comments field is included
         submittedDate: loanData.createdAt ? new Date(loanData.createdAt).toLocaleDateString() : undefined,
         avatar: loanData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((loanData.firstName || '') + ' ' + (loanData.lastName || ''))}&background=0D8ABC&color=fff`,
         // Ensure user object is present
@@ -313,6 +322,68 @@ export default function CommercialLoansTable() {
     setFilterStatus("all")
     // Set the search term to the email to filter by user
     setSearchTerm(email)
+  }
+  
+  // Handle opening the comment modal
+  const handleOpenCommentModal = (loanId: number) => {
+    const loan = loans.find(loan => loan.id === loanId)
+    setCommentLoanId(loanId)
+    // Pre-populate with existing comment if it exists
+    setCommentText(loan?.comments || "")
+    setIsCommentModalOpen(true)
+  }
+  
+  // Handle saving the comment
+  const handleSaveComment = async () => {
+    if (!commentLoanId) return
+    
+    setIsSavingComment(true)
+    try {
+      // Try direct connection to the Heroku backend, if CORS issues use proxy
+      let response
+      try {
+        // Try direct connection to the Heroku backend
+        response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan/${commentLoanId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ comments: commentText })
+        })
+      } catch (corsError) {
+        console.log("Falling back to proxy due to potential CORS issues:", corsError)
+        // Fall back to our proxy API route
+        response = await fetch(`/api/proxy/loans/${commentLoanId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ comments: commentText })
+        })
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error updating loan comments: ${response.status}`)
+      }
+      
+      // Update the local state with the new comment
+      setLoans(prevLoans => prevLoans.map(loan => 
+        loan.id === commentLoanId ? { ...loan, comments: commentText } : loan
+      ))
+      
+      // Close the modal
+      setIsCommentModalOpen(false)
+      setCommentLoanId(null)
+      setCommentText("")
+      
+      // Refresh the loans data
+      fetchLoans()
+    } catch (error) {
+      console.error("Failed to update loan comments:", error)
+      setError("Failed to update comments. Please try again.")
+    } finally {
+      setIsSavingComment(false)
+    }
   }
 
   // Pagination handlers
@@ -576,6 +647,14 @@ export default function CommercialLoansTable() {
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{loan.details}</div>
+                      {loan.comments && (
+                        <div className="mt-1 flex items-start">
+                          <MessageSquare className="w-3.5 h-3.5 mr-1 text-purple-600 flex-shrink-0 mt-0.5" />
+                          <p className="text-xs text-purple-700 line-clamp-2">
+                            {loan.comments}
+                          </p>
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <div className="space-y-2">
@@ -602,13 +681,27 @@ export default function CommercialLoansTable() {
                         <button
                           onClick={() => handleViewLoan(loan.id)}
                           className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"
+                          title="View Details"
                         >
                           <Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" />
                         </button>
-                        <button className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md">
+                        <button 
+                          onClick={() => handleOpenCommentModal(loan.id)}
+                          className="inline-flex items-center p-3 rounded-xl text-purple-600 hover:bg-purple-100 transition-all duration-200 hover:scale-110 group/comment border border-purple-200 shadow-sm hover:shadow-md"
+                          title={loan.comments ? "Edit Comments" : "Add Comments"}
+                        >
+                          <MessageSquare className="w-5 h-5 group-hover/comment:scale-110 transition-transform" />
+                        </button>
+                        <button 
+                          className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"
+                          title="Edit Loan"
+                        >
                           <Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" />
                         </button>
-                        <button className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md">
+                        <button 
+                          className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"
+                          title="Delete Loan"
+                        >
                           <Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform" />
                         </button>
                       </div>
@@ -747,6 +840,72 @@ export default function CommercialLoansTable() {
           <span className="text-gray-800 font-medium">Loading loan details...</span>
         </div>
       </div>
+      
+      {/* Comments Modal */}
+      {isCommentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-900">
+                {commentLoanId ? `Edit Comments for Loan #${commentLoanId}` : 'Add Comments'}
+              </h3>
+              <button 
+                onClick={() => {
+                  setIsCommentModalOpen(false);
+                  setCommentLoanId(null);
+                  setCommentText("");
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+                Admin Comments
+              </label>
+              <textarea
+                id="comment"
+                rows={5}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Enter your comments about this loan application..."
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-[#00a0d1]/30 focus:border-[#00a0d1] transition-all duration-200"
+              />
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setIsCommentModalOpen(false);
+                  setCommentLoanId(null);
+                  setCommentText("");
+                }}
+                className="px-4 py-2 border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveComment}
+                disabled={isSavingComment}
+                className="px-6 py-2 bg-[#00a0d1] text-white font-medium rounded-xl hover:bg-[#0090c0] focus:outline-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              >
+                {isSavingComment ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Comments'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -23,11 +23,19 @@ interface Contact {
   id: number
   firstName: string
   lastName: string
-  phone: string
   email: string
-  created: string
-  avatar: string
-  status: string
+  mobileNumber: string
+  createdAt: string
+  isActive: boolean
+  title?: string
+  country?: string
+  state?: string
+  city?: string
+  address?: string
+  zipcode?: string
+  companyTitle?: string
+  website?: string
+  avatar?: string // Keeping this for UI purposes
 }
 
 export default function ContactsTable() {
@@ -44,87 +52,159 @@ export default function ContactsTable() {
 
   useEffect(() => {
     const fetchContacts = async () => {
-      setTimeout(() => {
+      try {
+        setIsLoading(true)
+        
+        try {
+          // Fetch from the actual backend API
+          const response = await fetch('https://lemara-9829c937fd90.herokuapp.com/contacts/admin/all', { 
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            
+            // Add avatar field for UI if missing and ensure all required fields have default values
+            const contactsWithAvatars = data.map((contact: any) => ({
+              id: contact.id || 0,
+              firstName: contact.firstName || "",
+              lastName: contact.lastName || "",
+              email: contact.email || "",
+              mobileNumber: contact.mobileNumber || "",
+              createdAt: contact.createdAt || new Date().toISOString(),
+              isActive: typeof contact.isActive === 'boolean' ? contact.isActive : true,
+              title: contact.title || "",
+              country: contact.country || "",
+              state: contact.state || "",
+              city: contact.city || "",
+              address: contact.address || "",
+              zipcode: contact.zipcode || "",
+              companyTitle: contact.companyTitle || "",
+              website: contact.website || "",
+              avatar: contact.avatar || `https://ui-avatars.com/api/?name=${contact.firstName || ""}+${contact.lastName || ""}&background=00a0d1&color=fff`
+            }))
+            
+            setContacts(contactsWithAvatars)
+            return
+          } else {
+            console.warn('API response not OK:', response.status, response.statusText)
+            throw new Error(`API returned ${response.status}: ${response.statusText}`)
+          }
+        } catch (apiError) {
+          console.warn('API fetch failed, falling back to mock data:', apiError)
+        }
+        
+        // If API call fails, use mock data
+        console.info('Using mock contact data')
         const mockContacts: Contact[] = [
           {
             id: 1,
-            firstName: "John",
-            lastName: "Smith",
-            email: "john.smith@email.com",
-            phone: "+1 (555) 123-4567",
-            created: "Jan 15, 2023",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face",
-            status: "active",
+            firstName: "Safa",
+            lastName: "Noor",
+            email: "safa.noor@firnas.tech",
+            mobileNumber: "04343432434",
+            createdAt: "2025-06-28T09:02:42.760Z",
+            isActive: true,
+            title: "Manager",
+            country: "USA",
+            state: "Alabama",
+            city: "Montgomery",
+            address: "123 Tech Avenue",
+            zipcode: "22010",
+            companyTitle: "Firnaas",
+            website: "https://firnas.tech/",
+            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face"
           },
           {
             id: 2,
-            firstName: "Sarah",
-            lastName: "Williams",
-            email: "sarah.williams@email.com",
-            phone: "+1 (555) 234-5678",
-            created: "Mar 8, 2023",
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face",
-            status: "active",
+            firstName: "John",
+            lastName: "Smith",
+            email: "john.smith@example.com",
+            mobileNumber: "+1 (555) 123-4567",
+            createdAt: "2025-06-20T09:00:00.000Z",
+            isActive: true,
+            title: "Sales Representative",
+            country: "USA",
+            companyTitle: "Lemara Commercial"
           },
           {
             id: 3,
-            firstName: "Michael",
+            firstName: "Emma",
             lastName: "Johnson",
-            email: "michael.johnson@email.com",
-            phone: "+1 (555) 345-6789",
-            created: "Nov 22, 2022",
-            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&h=60&fit=crop&crop=face",
-            status: "active",
+            email: "emma.johnson@example.com",
+            mobileNumber: "+1 (555) 234-5678",
+            createdAt: "2025-05-15T11:30:00.000Z",
+            isActive: false,
+            title: "Marketing Director",
+            website: "https://emmaportfolio.com",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face"
           },
           {
             id: 4,
-            firstName: "Emily",
+            firstName: "Michael",
             lastName: "Davis",
-            email: "emily.davis@email.com",
-            phone: "+1 (555) 456-7890",
-            created: "Jun 10, 2023",
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face",
-            status: "inactive",
+            email: "michael.davis@example.com",
+            mobileNumber: "+1 (555) 345-6789",
+            createdAt: "2025-04-10T14:45:00.000Z",
+            isActive: true,
+            companyTitle: "Davis Properties"
           },
           {
             id: 5,
-            firstName: "Robert",
-            lastName: "Brown",
-            email: "robert.brown@email.com",
-            phone: "+1 (555) 567-8901",
-            created: "Feb 14, 2023",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face",
-            status: "active",
-          },
-          {
-            id: 6,
-            firstName: "Lisa",
-            lastName: "Anderson",
-            email: "lisa.anderson@email.com",
-            phone: "+1 (555) 678-9012",
-            created: "Aug 5, 2022",
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face",
-            status: "active",
-          },
+            firstName: "Sarah",
+            lastName: "Williams",
+            email: "sarah.williams@example.com",
+            mobileNumber: "+1 (555) 456-7890",
+            createdAt: "2025-03-05T08:15:00.000Z",
+            isActive: true,
+            title: "Property Manager",
+            country: "Canada",
+            city: "Toronto",
+            companyTitle: "Global Realty"
+          }
         ]
-
-        setContacts(mockContacts)
+        
+        // Add avatar field for UI if missing
+        const contactsWithAvatars = mockContacts.map((contact) => ({
+          ...contact,
+          firstName: contact.firstName || "",
+          lastName: contact.lastName || "",
+          email: contact.email || "",
+          mobileNumber: contact.mobileNumber || "",
+          avatar: contact.avatar || `https://ui-avatars.com/api/?name=${contact.firstName || ""}+${contact.lastName || ""}&background=00a0d1&color=fff`
+        }))
+        
+        setContacts(contactsWithAvatars)
+      } catch (error) {
+        console.error('Error in contact loading process:', error)
+        // Set empty array on error
+        setContacts([])
+      } finally {
         setIsLoading(false)
-      }, 1000)
+      }
     }
-
+    
     fetchContacts()
   }, [])
 
   // Filter and paginate data
   const filteredContacts = useMemo(() => {
     return contacts.filter((contact) => {
+      // Safely check if fields exist and are not null before calling toLowerCase()
       const matchesSearch =
-        contact.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.phone.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = filterStatus === "all" || contact.status === filterStatus
+        (contact.firstName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.lastName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.mobileNumber?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.companyTitle?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.country?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (contact.city?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+      
+      const matchesStatus = filterStatus === "all" || (filterStatus === "active" ? contact.isActive : !contact.isActive)
       return matchesSearch && matchesStatus
     })
   }, [contacts, searchTerm, filterStatus])
@@ -149,6 +229,85 @@ export default function ContactsTable() {
   const goToPreviousPage = () => goToPage(currentPage - 1)
   const goToNextPage = () => goToPage(currentPage + 1)
 
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return new Intl.DateTimeFormat('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }).format(date)
+    } catch (error) {
+      console.error('Invalid date format:', dateString)
+      return dateString
+    }
+  }
+
+  // Function to refresh contacts data
+  const refreshContacts = () => {
+    const fetchContacts = async () => {
+      try {
+        setIsLoading(true)
+        
+        try {
+          // Fetch from the actual backend API
+          const response = await fetch('https://lemara-9829c937fd90.herokuapp.com/contacts/admin/all', { 
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            // Prevent caching
+            cache: 'no-store'
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            
+            // Add avatar field for UI if missing and ensure all required fields have default values
+            const contactsWithAvatars = data.map((contact: any) => ({
+              id: contact.id || 0,
+              firstName: contact.firstName || "",
+              lastName: contact.lastName || "",
+              email: contact.email || "",
+              mobileNumber: contact.mobileNumber || "",
+              createdAt: contact.createdAt || new Date().toISOString(),
+              isActive: typeof contact.isActive === 'boolean' ? contact.isActive : true,
+              title: contact.title || "",
+              country: contact.country || "",
+              state: contact.state || "",
+              city: contact.city || "",
+              address: contact.address || "",
+              zipcode: contact.zipcode || "",
+              companyTitle: contact.companyTitle || "",
+              website: contact.website || "",
+              avatar: contact.avatar || `https://ui-avatars.com/api/?name=${contact.firstName || ""}+${contact.lastName || ""}&background=00a0d1&color=fff`
+            }))
+            
+            setContacts(contactsWithAvatars)
+            console.info('Contacts refreshed from API successfully')
+            return
+          } else {
+            console.warn('API response not OK during refresh:', response.status, response.statusText)
+            throw new Error(`API returned ${response.status}: ${response.statusText}`)
+          }
+        } catch (apiError) {
+          console.warn('API refresh failed, showing existing data:', apiError)
+        }
+        
+        // On refresh error, we don't modify the existing contacts
+        // Just show a console message
+        console.info('Unable to refresh contacts from API')
+      } catch (error) {
+        console.error('Error in refresh process:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchContacts()
+  }
+
   return (
     <div className="p-6 sm:p-8 bg-gray-50 min-h-screen">
       {/* Header Section */}
@@ -171,6 +330,7 @@ export default function ContactsTable() {
 
           <button
             disabled={isLoading}
+            onClick={refreshContacts}
             className="inline-flex items-center px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none transition-all duration-200 hover:scale-105 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-5 h-5 mr-2 ${isLoading ? "animate-spin" : ""}`} />
@@ -295,20 +455,26 @@ export default function ContactsTable() {
                             className="w-full h-full rounded-2xl object-cover"
                           />
                           <div
-                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${contact.status === "active" ? "bg-green-500" : "bg-gray-400"}`}
+                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${contact.isActive ? "bg-green-500" : "bg-gray-400"}`}
                           ></div>
                         </div>
                         <div className="ml-4">
                           <div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">
                             {contact.firstName} {contact.lastName}
                           </div>
+                          {contact.title && (
+                            <div className="text-sm text-gray-500">{contact.title}</div>
+                          )}
+                          {contact.companyTitle && (
+                            <div className="text-xs text-gray-400">{contact.companyTitle}</div>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-700">
                         <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                        {contact.phone}
+                        {contact.mobileNumber}
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
@@ -316,11 +482,14 @@ export default function ContactsTable() {
                         <Mail className="w-4 h-4 mr-2 text-gray-400" />
                         {contact.email}
                       </div>
+                      {contact.website && (
+                        <div className="text-xs text-gray-400 mt-1 ml-6">{contact.website}</div>
+                      )}
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-700">
                         <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                        {contact.created}
+                        {formatDate(contact.createdAt)}
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap text-center">
