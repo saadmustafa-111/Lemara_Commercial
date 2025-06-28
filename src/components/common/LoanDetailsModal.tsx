@@ -298,17 +298,21 @@ export default function LoanDetailsModal({ loan, onClose }: LoanDetailsModalProp
               </div>
               
               {/* Admin Comments Section */}
-              {activeLoan.comments && (
-                <div className="bg-purple-50 rounded-xl p-6 mb-6 border border-purple-200">
-                  <h4 className="text-lg font-bold text-purple-900 mb-4 flex items-center">
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Admin Comments
-                  </h4>
+              <div className="bg-purple-50 rounded-xl p-6 mb-6 border border-purple-200">
+                <h4 className="text-lg font-bold text-purple-900 mb-4 flex items-center">
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  Remarks
+                </h4>
+                {activeLoan.comments ? (
                   <div className="whitespace-pre-wrap text-purple-800 bg-white p-4 rounded-lg border border-purple-100">
                     {activeLoan.comments}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="text-purple-700 bg-white p-4 rounded-lg border border-purple-100 italic">
+                    No admin remarks have been added for this loan application.
+                  </div>
+                )}
+              </div>
               
               {/* User/Submitter Info */}
               <div className="bg-gray-50 rounded-xl p-6">
@@ -462,6 +466,7 @@ export default function LoanDetailsModal({ loan, onClose }: LoanDetailsModalProp
                           <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase">Date</th>
                           <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase">Amount</th>
                           <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase">Business</th>
+                          <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase">Remarks</th>
                           <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase">Status</th>
                           <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase">Action</th>
                         </tr>
@@ -485,6 +490,20 @@ export default function LoanDetailsModal({ loan, onClose }: LoanDetailsModalProp
                               }).format(otherLoan.loanAmount)}
                             </td>
                             <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-600">{otherLoan.businessName}</td>
+                            <td className="px-3 py-2">
+                              {otherLoan.comments ? (
+                                <div className="max-w-[200px] overflow-hidden">
+                                  <div className="flex items-start">
+                                    <MessageSquare className="w-3.5 h-3.5 mr-1 text-purple-600 flex-shrink-0 mt-0.5" />
+                                    <p className="text-xs text-purple-700 line-clamp-2">
+                                      {otherLoan.comments}
+                                    </p>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-gray-500 italic">No comments</span>
+                              )}
+                            </td>
                             <td className="px-3 py-2 whitespace-nowrap">
                               <span className={`
                                 px-2 py-1 text-xs font-semibold rounded-full inline-flex items-center

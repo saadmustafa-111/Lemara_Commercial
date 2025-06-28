@@ -574,6 +574,12 @@ export default function CommercialLoansTable() {
                 </th>
                 <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                   <div className="flex items-center space-x-2">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Remarks</span>
+                  </div>
+                </th>
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <div className="flex items-center space-x-2">
                     <Calendar className="w-4 h-4" />
                     <span>Dates & Status</span>
                   </div>
@@ -589,7 +595,7 @@ export default function CommercialLoansTable() {
             <tbody className="bg-white divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-16 text-center">
+                  <td colSpan={6} className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center justify-center space-y-4">
                       <div className="relative">
                         <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
@@ -647,13 +653,17 @@ export default function CommercialLoansTable() {
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{loan.details}</div>
-                      {loan.comments && (
-                        <div className="mt-1 flex items-start">
+                    </td>
+                    <td className="px-6 py-5">
+                      {loan.comments ? (
+                        <div className="flex items-start">
                           <MessageSquare className="w-3.5 h-3.5 mr-1 text-purple-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-xs text-purple-700 line-clamp-2">
+                          <p className="text-sm text-purple-700 whitespace-normal pr-4 max-w-[300px]">
                             {loan.comments}
                           </p>
                         </div>
+                      ) : (
+                        <span className="text-xs text-gray-500 italic">No remarks</span>
                       )}
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
@@ -710,7 +720,7 @@ export default function CommercialLoansTable() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-20 text-center">
+                  <td colSpan={6} className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center space-y-6">
                       <div className="w-24 h-24 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-3xl flex items-center justify-center shadow-lg">
                         <CreditCard className="w-12 h-12 text-[#00a0d1]" />
