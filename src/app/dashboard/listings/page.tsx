@@ -5,79 +5,44 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-// Mock data for the listings
-const mockListings = [
-  {
-    id: 1,
-    title: "Agriculture Greenhouse With Processing Unit",
-    type: "Agriculture",
-    price: "$0",
-    location: "Property 1",
-    area: "Greenhouse With Processing Unit",
-    status: "Active",
-    lastUpdate: "07/01/2023",
-    views: 0,
-    messages: 0,
-    nda: 0,
-    image: "/images/product/product-01.jpg"
-  },
-  {
-    id: 2,
-    title: "Agriculture Greenhouse With Processing Unit",
-    type: "Agriculture",
-    price: "$0",
-    location: "Property 2",
-    area: "Greenhouse With Processing Unit",
-    status: "Active",
-    lastUpdate: "07/01/2023",
-    views: 0,
-    messages: 0,
-    nda: 0,
-    image: "/images/product/product-02.jpg"
-  },
-  {
-    id: 3,
-    title: "Agriculture Greenhouse With Processing Unit",
-    type: "Agriculture",
-    price: "$0",
-    location: "Property 3",
-    area: "Greenhouse With Processing Unit",
-    status: "Active",
-    lastUpdate: "07/01/2023",
-    views: 0,
-    messages: 0,
-    nda: 0,
-    image: "/images/product/product-03.jpg"
-  },
-  {
-    id: 4,
-    title: "Agriculture Greenhouse With Processing Unit",
-    type: "Agriculture",
-    price: "$0",
-    location: "Property 4",
-    area: "Greenhouse With Processing Unit",
-    status: "Active",
-    lastUpdate: "07/01/2023",
-    views: 0,
-    messages: 0,
-    nda: 0,
-    image: "/images/product/product-04.jpg"
-  },
-  {
-    id: 5,
-    title: "Agriculture Greenhouse With Processing Unit",
-    type: "Agriculture",
-    price: "$0",
-    location: "Property 5",
-    area: "Greenhouse With Processing Unit",
-    status: "Active",
-    lastUpdate: "07/01/2023",
-    views: 0,
-    messages: 0,
-    nda: 0,
-    image: "/images/product/product-05.jpg"
-  }
-];
+// Define the type for Listing data
+interface Listing {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  market: string;
+  listingType: string;
+  address: string;
+  address2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  neighborhood: string;
+  assessorsPArcelNumber: string;
+  latitude: number;
+  longitude: number;
+  sellerFinancing: boolean;
+  oppertunityZone: boolean;
+  description: string;
+  highlights: string[];
+  confidentiality: string;
+  availableToBroker: boolean;
+  visibility: boolean;
+  // These fields might not come from API but are needed for UI display
+  title?: string;
+  type?: string;
+  price?: string;
+  location?: string;
+  area?: string;
+  status?: string;
+  lastUpdate?: string;
+  views?: number;
+  messages?: number;
+  nda?: number;
+  image?: string;
+}
 
 const ListingsPage = () => {
   const router = useRouter();
@@ -89,6 +54,57 @@ const ListingsPage = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  // State for listings data
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch listings data
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/listings', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching listings: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Transform API data to match UI requirements
+        const transformedListings = data.map((listing: Listing) => ({
+          ...listing,
+          title: listing.description?.substring(0, 40) || "Untitled Listing",
+          type: listing.listingType || "Commercial",
+          price: "$0", // You may want to add price field to your API response
+          location: `${listing.city}, ${listing.state}`,
+          area: listing.neighborhood || "Not specified",
+          status: listing.isActive ? "Active" : "Inactive",
+          lastUpdate: new Date(listing.updatedAt).toLocaleDateString(),
+          views: 0, // These fields might need to come from the API in the future
+          messages: 0,
+          nda: 0,
+          image: "/images/product/product-01.jpg" // Placeholder image
+        }));
+        
+        setListings(transformedListings);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch listings:", err);
+        setError("Failed to load listings. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchListings();
+  }, []);
   
   // Reset pagination when filters change
   useEffect(() => {
@@ -174,9 +190,10 @@ const ListingsPage = () => {
   }, []);
   
   // Filter listings based on search term and filters
-  const filteredListings = mockListings.filter(listing => {
-    const matchesSearch = listing.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         listing.location.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredListings = listings.filter((listing: Listing) => {
+    const matchesSearch = (listing.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          listing.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          listing.description?.toLowerCase().includes(searchTerm.toLowerCase())) ?? false;
     const matchesStatus = statusFilter === "All" || listing.status === statusFilter;
     const matchesType = typeFilter === "All" || listing.type === typeFilter;
     
@@ -199,10 +216,16 @@ const ListingsPage = () => {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-[#00a0d1] dark:text-[#00c1f5]">My Listings</h1>
-          <p className="text-gray-600 dark:text-gray-400">{filteredListings.length} Properties</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {loading ? "Loading..." : `${listings.length} Properties (${filteredListings.length} filtered)`}
+          </p>
         </div>
         <div className="flex gap-4">
-          <button className="flex items-center text-[#00a0d1] dark:text-[#00c1f5]">
+          <button 
+            className="flex items-center text-[#00a0d1] dark:text-[#00c1f5]"
+            onClick={() => window.location.reload()}
+            title="Refresh listings"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M8.5 12H14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -299,21 +322,41 @@ const ListingsPage = () => {
       
       {/* Listings Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 border-collapse">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-              <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">PROPERTY</th>
-              <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">PRICE</th>
-              <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">STATUS</th>
-              <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">TYPE</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">VIEWS</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">MESSAGE</th>
-              <th className="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">NDA</th>
-              <th className="py-3 px-4 text-right font-medium text-gray-700 dark:text-gray-300">ACTION</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((listing) => (
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#00a0d1] dark:border-[#00c1f5]"></div>
+            <span className="ml-4 text-gray-600 dark:text-gray-300">Loading listings...</span>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800 text-center">
+            <p className="text-red-700 dark:text-red-300">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-2 px-4 py-2 text-sm bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200 rounded-md hover:bg-red-200 dark:hover:bg-red-700"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : filteredListings.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">No listings match your search criteria.</p>
+          </div>
+        ) : (
+          <table className="min-w-full bg-white dark:bg-gray-800 border-collapse">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">PROPERTY</th>
+                <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">PRICE</th>
+                <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">STATUS</th>
+                <th className="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">TYPE</th>
+                <th className="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">VIEWS</th>
+                <th className="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">MESSAGE</th>
+                <th className="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">NDA</th>
+                <th className="py-3 px-4 text-right font-medium text-gray-700 dark:text-gray-300">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((listing: Listing) => (
               <tr key={listing.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td className="py-4 px-4">
                   <div className="flex items-center">
@@ -355,6 +398,29 @@ const ListingsPage = () => {
                       <select
                         className="w-full px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-[#00a0d1] dark:focus:ring-[#00c1f5] appearance-none dark:bg-gray-700 dark:text-gray-100"
                         defaultValue={listing.status}
+                        onChange={async (e) => {
+                          // Update status through API
+                          try {
+                            const response = await fetch(`/api/listings/${listing.id}/status`, {
+                              method: 'PATCH',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({ status: e.target.value }),
+                            });
+                            
+                            if (!response.ok) {
+                              throw new Error(`Error updating status: ${response.status}`);
+                            }
+                            
+                            // Success message or visual feedback
+                            // In a production app, you might want to use a toast notification
+                            console.log(`Status updated successfully to ${e.target.value}`);
+                          } catch (error) {
+                            console.error('Failed to update status:', error);
+                            alert('Failed to update status. Please try again.');
+                          }
+                        }}
                       >
                         <option value="Active">Active</option>
                         <option value="Pending">Pending</option>
@@ -458,17 +524,13 @@ const ListingsPage = () => {
                 </td>
               </tr>
             ))}
-          </tbody>
-        </table>
-        {filteredListings.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No listings match your search criteria.</p>
-          </div>
+            </tbody>
+          </table>
         )}
       </div>
       
       {/* Pagination */}
-      {filteredListings.length > 0 && (
+      {!loading && !error && filteredListings.length > 0 && (
         <div className="flex justify-between items-center mt-6 mb-4">
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             <span>Show</span>
