@@ -94,16 +94,53 @@ export default function CommercialLoansTable() {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch('/api/loans')
+      let response;
+      
+      try {
+        // Try direct connection to the Heroku backend 
+        response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan`);
+      } catch (corsError) {
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        // Fall back to our proxy API route
+        response = await fetch('/api/loans');
+      }
+      
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`)
       }
+      
       const data = await response.json()
-      setLoans(data)
+      console.log("Loans data from backend:", data);
+      
+      // Transform the data to ensure it matches our CommercialLoan interface
+      const loansData = Array.isArray(data) ? data : (data.loans || []);
+      
+      // Process and standardize the loan data
+      const processedLoans = loansData.map((loan: any) => {
+        return {
+          ...loan,
+          // Ensure required fields are present with defaults if needed
+          status: loan.status || 'submitted',
+          submittedDate: loan.createdAt ? new Date(loan.createdAt).toLocaleDateString() : undefined,
+          avatar: loan.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((loan.firstName || '') + ' ' + (loan.lastName || ''))}&background=0D8ABC&color=fff`,
+          // Ensure user object is present
+          user: loan.user || {
+            id: loan.userId || 0,
+            isActive: true,
+            firstName: loan.firstName || '',
+            lastName: loan.lastName || '',
+            email: loan.email || '',
+            phone: loan.houseNumber || '',
+            role: 'user'
+          }
+        };
+      });
+      
+      setLoans(processedLoans);
       
       // Calculate how many loans each user has
       const userCounts: Record<string, number> = {}
-      data.forEach((loan: CommercialLoan) => {
+      processedLoans.forEach((loan: CommercialLoan) => {
         // We can use the user's email as a unique identifier
         const userEmail = loan.email
         userCounts[userEmail] = (userCounts[userEmail] || 0) + 1
@@ -202,12 +239,60 @@ export default function CommercialLoansTable() {
     
     try {
       // Always fetch fresh data from the backend
-      const response = await fetch(`/api/loans?id=${loanId}`)
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      let response;
+      let loanData;
+      
+      try {
+        // Try direct connection to the Heroku backend for specific loan
+        response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan/${loanId}`);
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        loanData = await response.json();
+        
+        // If the loan has a userId but no detailed user info, fetch user details
+        if (loanData && loanData.userId && (!loanData.user || Object.keys(loanData.user).length === 0)) {
+          try {
+            const userResponse = await fetch(`https://lemara-9829c937fd90.herokuapp.com/user/${loanData.userId}`);
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              loanData.user = userData;
+            }
+          } catch (userError) {
+            console.error("Failed to fetch user details:", userError);
+            // Continue without user details
+          }
+        }
+        
+      } catch (corsError) {
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        // Fall back to our proxy API route
+        response = await fetch(`/api/loans?id=${loanId}`);
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`)
+        }
+        loanData = await response.json();
       }
-      const loanData = await response.json()
-      setSelectedLoan(loanData)
+
+      // Process loan data to ensure it matches our interface
+      const processedLoan = {
+        ...loanData,
+        status: loanData.status || 'submitted',
+        submittedDate: loanData.createdAt ? new Date(loanData.createdAt).toLocaleDateString() : undefined,
+        avatar: loanData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((loanData.firstName || '') + ' ' + (loanData.lastName || ''))}&background=0D8ABC&color=fff`,
+        // Ensure user object is present
+        user: loanData.user || {
+          id: loanData.userId || 0,
+          isActive: true,
+          firstName: loanData.firstName || '',
+          lastName: loanData.lastName || '',
+          email: loanData.email || '',
+          phone: loanData.houseNumber || '',
+          role: 'user'
+        }
+      };
+      
+      setSelectedLoan(processedLoan);
     } catch (err) {
       console.error('Failed to fetch loan details:', err)
       setError('Failed to load loan details. Please try again later.')
