@@ -321,9 +321,7 @@ export default function CommercialListingsPage() {
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 via-[#00a0d1]/10 to-[#00a0d1]/20">
-              <tr>
-                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  <div className="flex items-center space-x-3">
+              <tr><th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider"><div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-[#00a0d1] rounded-lg flex items-center justify-center">
                       <Building className="w-4 h-4 text-white" />
                     </div>
@@ -355,9 +353,7 @@ export default function CommercialListingsPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-16 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-4">
+                <tr><td colSpan={7} className="px-6 py-16 text-center"><div className="flex flex-col items-center justify-center space-y-4">
                       <div className="relative">
                         <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
                         <div className="w-16 h-16 border-4 border-[#00a0d1] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
@@ -367,91 +363,21 @@ export default function CommercialListingsPage() {
                   </td>
                 </tr>
               ) : currentListings.length > 0 ? (
-                currentListings.map((listing) => (
-                  <tr
-                    key={listing.id}
-                    className="hover:bg-gradient-to-r hover:from-[#00a0d1]/5 hover:to-[#00a0d1]/10 transition-all duration-300 group"
-                  >
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-                          <Building className="w-8 h-8 text-[#00a0d1]" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">
-                            {listing.name.length > 30 ? `${listing.name.substring(0, 30)}...` : listing.name}
-                          </div>
-                          <div className="flex items-center text-sm text-gray-500 mt-1">
-                            ID: {listing.id}
-                          </div>
-                          <div className="flex items-center text-sm text-gray-500">
-                            {listing.contacts ? `${listing.contacts} contacts` : "No contacts"} | {listing.documents === 'Y' ? 'Has documents' : 'No documents'}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{listing.source}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{listing.city || 'Unknown location'}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="font-bold text-gray-900">{formatCurrency(listing.listPrice)}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{listing.createDate}</div>
-                    </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                currentListings.map((listing) => (<tr key={listing.id} className="hover:bg-gradient-to-r hover:from-[#00a0d1]/5 hover:to-[#00a0d1]/10 transition-all duration-300 group"><td className="px-6 py-5 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300"><Building className="w-8 h-8 text-[#00a0d1]" /></div><div className="ml-4"><div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">{listing.name.length > 30 ? `${listing.name.substring(0, 30)}...` : listing.name}</div><div className="flex items-center text-sm text-gray-500 mt-1">ID: {listing.id}</div><div className="flex items-center text-sm text-gray-500">{listing.contacts ? `${listing.contacts} contacts` : "No contacts"} | {listing.documents === 'Y' ? 'Has documents' : 'No documents'}</div></div></div></td><td className="px-6 py-5 whitespace-nowrap"><div className="font-medium text-gray-900">{listing.source}</div></td><td className="px-6 py-5 whitespace-nowrap"><div className="font-medium text-gray-900">{listing.city || 'Unknown location'}</div></td><td className="px-6 py-5 whitespace-nowrap"><div className="font-bold text-gray-900">{formatCurrency(listing.listPrice)}</div></td><td className="px-6 py-5 whitespace-nowrap"><div className="text-sm text-gray-900">{listing.createDate}</div></td><td className="px-6 py-5 whitespace-nowrap"><span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                           listing.status === 'Active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
                           listing.status === 'Sold' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 
                           listing.status === 'Inactive' ? 'bg-gray-100 text-gray-800 border border-gray-200' :
                           'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                        }`}
-                      >
-                        <div
-                          className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                        }`}><div className={`w-1.5 h-1.5 rounded-full mr-2 ${
                             listing.status === 'Active' ? 'bg-emerald-500' :
                             listing.status === 'Sold' ? 'bg-blue-500' :
                             listing.status === 'Inactive' ? 'bg-gray-500' :
                             'bg-yellow-500'
-                          }`}
-                        ></div>
-                        {listing.status}
-                      </span>
-                    </td>                    <td className="px-6 py-5 whitespace-nowrap text-center">
-                      <div className="flex items-center justify-center space-x-2">
-                        <Link
-                          href={`/dashboard/admin/commercial-listings/view/${listing.id}`}
-                          className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"
-                        >
-                          <Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" />
-                        </Link>
-                        <Link
-                          href={`/dashboard/admin/commercial-listings/edit/${listing.id}`}
-                          className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"
-                        >
-                          <Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" />
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setSelectedListing(listing.id);
-                            setIsModalOpen(true);
-                          }}
-                          className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"
-                        >
-                          <Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                          }`}></div>{listing.status}</span></td><td className="px-6 py-5 whitespace-nowrap text-center">
+<div className="flex items-center justify-center space-x-2"><Link href={`/dashboard/admin/commercial-listings/view/${listing.id}`} className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"><Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" /></Link><Link href={`/dashboard/admin/commercial-listings/edit/${listing.id}`} className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"><Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" /></Link><button onClick={() => {setSelectedListing(listing.id);setIsModalOpen(true);}} className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"><Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform" /></button></div></td></tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={7} className="px-6 py-20 text-center">
-                    <div className="flex flex-col items-center space-y-6">
+                <tr><td colSpan={7} className="px-6 py-20 text-center"><div className="flex flex-col items-center space-y-6">
                       <div className="w-24 h-24 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-3xl flex items-center justify-center shadow-lg">
                         <Building className="w-12 h-12 text-[#00a0d1]" />
                       </div>

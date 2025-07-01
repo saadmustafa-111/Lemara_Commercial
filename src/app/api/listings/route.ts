@@ -165,12 +165,28 @@ const sampleListings = [
 
 export async function GET(request: NextRequest) {
   try {
-    // In a real application, you would fetch data from a database
-    // For now, we'll return mock data that matches the expected structure
-    
     // Add a small delay to simulate network latency (only for development)
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    // Check if an ID parameter was provided in the URL
+    const searchParams = request.nextUrl.searchParams;
+    const id = searchParams.get('id');
+    
+    if (id) {
+      // Find the specific listing with the matching ID
+      const listing = sampleListings.find(listing => listing.id === parseInt(id, 10));
+      
+      if (!listing) {
+        return NextResponse.json(
+          { error: `Listing with ID ${id} not found` },
+          { status: 404 }
+        );
+      }
+      
+      return NextResponse.json(listing);
+    }
+    
+    // If no ID was provided, return the full list
     return NextResponse.json(sampleListings);
   } catch (error) {
     console.error('Error fetching listings:', error);

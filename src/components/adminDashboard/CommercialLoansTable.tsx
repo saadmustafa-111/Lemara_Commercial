@@ -574,12 +574,7 @@ export default function CommercialLoansTable() {
                         >
                           <MessageSquare className="w-5 h-5 group-hover/comment:scale-110 transition-transform" />
                         </button>
-                        <button 
-                          className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"
-                          title="Edit Loan"
-                        >
-                          <Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" />
-                        </button>
+                        {/* Edit button removed as requested */}
                         <button 
                           className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"
                           title="Delete Loan"

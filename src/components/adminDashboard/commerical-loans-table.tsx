@@ -583,46 +583,46 @@ export default function CommercialLoansTable() {
 
       {/* Table Section */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className="w-full">
+          <table className="w-full table-fixed divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-gray-50 via-[#00a0d1]/10 to-[#00a0d1]/20">
               <tr>
-                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-[15%]">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-[#00a0d1] rounded-lg flex items-center justify-center">
                       <Hash className="w-4 h-4 text-white" />
                     </div>
-                    <span>Loan ID & Source</span>
+                    <span className="truncate">Loan ID & Source</span>
                   </div>
                 </th>
-                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-[15%]">
                   <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4" />
-                    <span>Applicant</span>
+                    <User className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">Applicant</span>
                   </div>
                 </th>
-                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-[20%] hidden md:table-cell">
                   <div className="flex items-center space-x-2">
-                    <FileText className="w-4 h-4" />
-                    <span>Loan Purpose</span>
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">Loan Purpose</span>
                   </div>
                 </th>
-                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-[20%]">
                   <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>Dates & Status</span>
+                    <Calendar className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">Dates & Status</span>
                   </div>
                 </th>
-                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider w-[15%] hidden md:table-cell">
                   <div className="flex items-center space-x-2">
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Remarks</span>
+                    <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">Remarks</span>
                   </div>
                 </th>
-                <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider w-[15%]">
                   <div className="flex items-center justify-center space-x-2">
-                    <MoreHorizontal className="w-4 h-4" />
-                    <span>Actions</span>
+                    <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">Actions</span>
                   </div>
                 </th>
               </tr>
@@ -647,73 +647,69 @@ export default function CommercialLoansTable() {
                     key={loan.id}
                     className="hover:bg-gradient-to-r hover:from-[#00a0d1]/5 hover:to-[#00a0d1]/10 transition-all duration-300 group"
                   >
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="space-y-2">
-                        <div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">
-                          {loan.id}
+                    <td className="px-4 py-5">
+                      <div className="space-y-1">
+                        <div className="text-sm font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">
+                          #{loan.id}
                         </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Building className="w-4 h-4 mr-1" />
-                          {loan.source}
+                        <div className="flex items-center text-xs text-gray-500 truncate">
+                          <Building className="w-3 h-3 mr-1 flex-shrink-0" />
+                          <span className="truncate">{loan.source}</span>
                         </div>
-                        <div className="flex items-center text-sm text-gray-700">
-                          <DollarSign className="w-4 h-4 mr-1 text-gray-400" />
+                        <div className="flex items-center text-xs text-gray-700">
+                          <DollarSign className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" />
                           <span className="font-semibold">{formatCurrency(loan.loanAmount)}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
+                    <td className="px-6 py-5">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-[#00a0d1] via-[#0090c0] to-[#0080b0] rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-[#00a0d1] via-[#0090c0] to-[#0080b0] rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                           <img
                             src={loan.avatar || "/placeholder.svg"}
                             alt={`${loan.firstName} ${loan.lastName}`}
-                            className="w-full h-full rounded-2xl object-cover"
+                            className="w-full h-full rounded-lg object-cover"
                           />
                         </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-bold text-gray-900">{loan.firstName} {loan.lastName}</div>
+                        <div className="ml-2 overflow-hidden">
+                          <div className="text-sm font-bold text-gray-900 truncate">{loan.firstName} {loan.lastName}</div>
                           {userLoanCounts[loan.email] > 1 && (
                             <div 
                               onClick={() => filterByUser(loan.email)}
-                              className="mt-1 text-xs px-2 py-1 bg-[#00a0d1]/10 rounded-full inline-flex items-center text-[#00a0d1] font-medium cursor-pointer hover:bg-[#00a0d1]/20 group-hover:scale-105 transition-transform" 
+                              className="mt-1 text-xs px-1 py-0.5 bg-[#00a0d1]/10 rounded-full inline-flex items-center text-[#00a0d1] font-medium cursor-pointer hover:bg-[#00a0d1]/20 group-hover:scale-105 transition-transform" 
                               title={`Click to show all ${userLoanCounts[loan.email]} loan applications from this user`}
                             >
-                              <span className="mr-1">👤</span>
-                              {`+${userLoanCounts[loan.email] - 1} more application${userLoanCounts[loan.email] - 1 > 1 ? 's' : ''}`}
+                              <span className="mr-0.5">👤</span>
+                              {`+${userLoanCounts[loan.email] - 1}`}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{loan.details}</div>
+                    <td className="px-6 py-5 whitespace-nowrap hidden md:table-cell">
+                      <div className="text-sm font-medium text-gray-900 line-clamp-2" title={loan.details}>{loan.details}</div>
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap">
+                    <td className="px-6 py-5">
                       <div className="space-y-2">
                         <div className="flex items-center text-sm text-gray-700">
-                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                          <span>Created: {new Date(loan.createdAt).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-700">
-                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                          <span>Submitted: {loan.submittedDate || 'N/A'}</span>
+                          <Calendar className="w-4 h-4 mr-1 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{new Date(loan.createdAt).toLocaleDateString()}</span>
                         </div>
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                             loan.status,
                           )}`}
                         >
-                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${getStatusDot(loan.status)}`}></div>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-1 ${getStatusDot(loan.status)}`}></div>
                           {loan.status.charAt(0).toUpperCase() + loan.status.slice(1)}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-5 hidden md:table-cell">
                       {loan.comments ? (
                         <div className="flex items-start">
                           <MessageSquare className="w-3.5 h-3.5 mr-1 text-purple-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-purple-700 whitespace-normal pr-4 max-w-[300px]">
+                          <p className="text-sm text-purple-700 line-clamp-3 pr-4" title={loan.comments}>
                             {loan.comments}
                           </p>
                         </div>
@@ -721,33 +717,27 @@ export default function CommercialLoansTable() {
                         <span className="text-xs text-gray-500 italic">No remarks</span>
                       )}
                     </td>
-                    <td className="px-6 py-5 whitespace-nowrap text-center">
-                      <div className="flex items-center justify-center space-x-2">
+                    <td className="px-4 py-5 text-center">
+                      <div className="flex flex-wrap items-center justify-center gap-1">
                         <button
                           onClick={() => handleViewLoan(loan.id)}
-                          className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"
+                          className="inline-flex items-center p-2 rounded-lg text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"
                           title="View Details"
                         >
-                          <Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" />
+                          <Eye className="w-4 h-4 group-hover/view:scale-110 transition-transform" />
                         </button>
                         <button 
                           onClick={() => handleOpenStatusModal(loan)}
-                          className="inline-flex items-center p-3 rounded-xl text-purple-600 hover:bg-purple-100 transition-all duration-200 hover:scale-110 group/comment border border-purple-200 shadow-sm hover:shadow-md"
+                          className="inline-flex items-center p-2 rounded-lg text-purple-600 hover:bg-purple-100 transition-all duration-200 hover:scale-110 group/comment border border-purple-200 shadow-sm hover:shadow-md"
                           title="Update Status & Comments"
                         >
-                          <MessageSquare className="w-5 h-5 group-hover/comment:scale-110 transition-transform" />
+                          <MessageSquare className="w-4 h-4 group-hover/comment:scale-110 transition-transform" />
                         </button>
                         <button 
-                          className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"
-                          title="Edit Loan"
-                        >
-                          <Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" />
-                        </button>
-                        <button 
-                          className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"
+                          className="inline-flex items-center p-2 rounded-lg text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"
                           title="Delete Loan"
                         >
-                          <Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform" />
+                          <Trash2 className="w-4 h-4 group-hover/delete:scale-110 transition-transform" />
                         </button>
                       </div>
                     </td>
@@ -998,6 +988,7 @@ export default function CommercialLoansTable() {
           </div>
         </div>
       )}
+    
     </div>
   )
 }
