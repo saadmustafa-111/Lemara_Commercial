@@ -10,7 +10,7 @@ import ReviewStep from "./ReviewStep"
 import "./styles.css"
 import { useLoading } from "@/hooks/useLoading"
 import { useToast } from "@/hooks/useToast"
-import axiosInstance from "@/lib/axios"
+import { submitLoanApplication } from "@/lib/apis/userApis/commercialLoan"
 
 const CommercialLoanPage = () => {  
   const { user } = useAuth()
@@ -57,7 +57,7 @@ const CommercialLoanPage = () => {
     })
   }
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
     // Move to the next step if not on the last step
@@ -67,11 +67,11 @@ const CommercialLoanPage = () => {
     }
     
     // On the last step, submit the form data to the API
-    await withLoading(submitLoanApplication())
+    withLoading(handleLoanSubmission())
   }
   
   // Function to submit loan application to the API
-  const submitLoanApplication = async () => {
+  const handleLoanSubmission = async () => {
     try {
       if (!user) {
         toast({
@@ -100,7 +100,6 @@ const CommercialLoanPage = () => {
         annualIncome: formData.annualIncome ? parseInt(formData.annualIncome, 10) : 0,
         monthlyExpenses: formData.monthlyExpenses ? parseInt(formData.monthlyExpenses, 10) : 0,
         creditScore: formData.creditScore ? 
-          // Handle if creditScore is a string like "excellent" or a number
           isNaN(parseInt(formData.creditScore, 10)) ? 0 : parseInt(formData.creditScore, 10) : 0,
         existingDebt: formData.existingDebt ? parseInt(formData.existingDebt, 10) : 0,
         businessName: formData.businessName || "",
@@ -110,129 +109,22 @@ const CommercialLoanPage = () => {
         loanAmount: formData.loanAmount ? parseInt(formData.loanAmount, 10) : 0
       }
       
-      // Log the data being sent to the API
-      console.log("Submitting loan data:", JSON.stringify(loanData))
-      
       const authToken = localStorage.getItem("authToken")
       
-      console.log("Using baseURL:", axiosInstance.defaults.baseURL)
+      // Submit the loan application using the API function
+      const result = await submitLoanApplication(loanData, authToken)
       
-      // Make API call
-      const response = await axiosInstance.post("/loan", loanData, {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          ...(authToken && { Authorization: `Bearer ${authToken}` }),
-        },
-        timeout: 30000 // Increase timeout to 30 seconds
-      })
-      
-      
-      // Handle successful response
       toast({
         title: "Success",
         description: "Your loan application has been submitted successfully!",
         variant: "success",
       })
       
-      console.log("Loan application submitted successfully:", response.data)
-      
-      // Could redirect here or show a success page
+      console.log("Loan application submitted successfully:", result.data)
       
     } catch (error: any) {
       console.error("Error submitting loan application:", error)
-      console.log("Error details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
-      })
       
-      // If there was an error with axios, try using fetch as a fallback
-      try {
-        console.log("Attempting fallback with fetch API...")
-        
-        // Re-get the auth token to ensure it's in scope
-        const fallbackAuthToken = localStorage.getItem("authToken")
-        
-        const fetchResponse = await fetch("https://lemara-9829c937fd90.herokuapp.com/loan", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(fallbackAuthToken && { Authorization: `Bearer ${fallbackAuthToken}` }),
-          },
-          body: JSON.stringify({
-            firstName: formData.firstName || "",
-            lastName: formData.lastName || "",
-            ssn: formData.ssn ? parseInt(formData.ssn, 10) : 0,
-            details: formData.details || "",
-            address: formData.address || "",
-            city: formData.city || "",
-            state: formData.state || "",
-            zip: formData.zip || "",
-            houseNumber: formData.houseNumber || "",
-            businessNumber: formData.businessNumber || "",
-            email: formData.email || "",
-            annualIncome: formData.annualIncome ? parseInt(formData.annualIncome, 10) : 0,
-            monthlyExpenses: formData.monthlyExpenses ? parseInt(formData.monthlyExpenses, 10) : 0,
-            creditScore: formData.creditScore ? 
-              isNaN(parseInt(formData.creditScore, 10)) ? 0 : parseInt(formData.creditScore, 10) : 0,
-            existingDebt: formData.existingDebt ? parseInt(formData.existingDebt, 10) : 0,
-            businessName: formData.businessName || "",
-            businesstype: formData.businesstype || "",
-            businessAddress: formData.businessAddress || "",
-            annualBusinessRevenue: formData.annualBusinessRevenue ? parseInt(formData.annualBusinessRevenue, 10) : 0,
-            loanAmount: formData.loanAmount ? parseInt(formData.loanAmount, 10) : 0
-          })
-        })
-        
-        if (fetchResponse.ok) {
-          const data = await fetchResponse.json()
-          console.log("Fallback successful:", data)
-          
-          toast({
-            title: "Success",
-            description: "Your loan application has been submitted successfully!",
-            variant: "success",
-          })
-          
-          return
-        } else {
-          console.log("Fallback failed with status:", fetchResponse.status)
-          const errorText = await fetchResponse.text()
-          console.log("Error response:", errorText)
-        }
-      } catch (fetchError) {
-        console.error("Fallback fetch also failed:", fetchError)
-        
-        // Try one more time with minimal data to check if it's a data format issue
-        try {
-          console.log("Attempting minimal data test...")
-          
-          const minimalResponse = await fetch("https://lemara-9829c937fd90.herokuapp.com/loan", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              firstName: "Test",
-              lastName: "User",
-              ssn: 123456789,
-              email: "test@example.com"
-            })
-          })
-          
-          console.log("Minimal test status:", minimalResponse.status)
-          if (!minimalResponse.ok) {
-            const minimalErrorText = await minimalResponse.text()
-            console.log("Minimal test error:", minimalErrorText)
-          }
-        } catch (minimalError) {
-          console.error("Even minimal test failed:", minimalError)
-        }
-      }
-      
-      // Display error message to the user
       toast({
         title: "Submission Error",
         description: error.response?.data?.message || "There was an error submitting your loan application. Please try again.",

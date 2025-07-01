@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { Search, Filter, Edit, Trash2, Eye, MoreHorizontal, UserPlus, TrendingUp, Building, Calendar, Mail, Phone, MapPin, Star, Award, Users, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw } from 'lucide-react'
 import Image from "next/image"
+import { AgentsApi } from '@/lib/apis/adminDashboardApis/agentsApi'
 
 // Define Role enum to match with SignUpForm
 enum Role {
@@ -53,71 +54,27 @@ export default function EnhancedAgentsTable() {  const [isLoading, setIsLoading]
   const [refreshTrigger, setRefreshTrigger] = useState(0)
     useEffect(() => {
     const fetchAgents = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        // First try direct connection to backend, if CORS issues use proxy
-        let response;        try {
-          // Try direct connection to the Heroku backend using the correct /user endpoint
-          response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/user?role=broker`);
-          // If no specific role filter is needed, just use fetch(`https://lemara-9829c937fd90.herokuapp.com/user`)
-        } catch (corsError) {
-          console.log("Falling back to proxy due to potential CORS issues:", corsError);
-          // Fall back to our proxy API route
-          response = await fetch(`/api/proxy/users?role=broker`);        }
-        
-        if (!response.ok) {
-          throw new Error(`Error fetching agents: ${response.status}`)
-        }
-        const data = await response.json()
-          // Log the data received from the API for debugging
-        console.log("Data received from API:", data);
-        
-        // Transform the API response to match our display needs
-        const agentsList = Array.isArray(data) ? data : (data.users || data.brokers || []);
-        const agentsData: Agent[] = agentsList.map((agent: any) => {
-          // Convert createdAt to readable date format (handle potential date format inconsistencies)
-          const createdDate = agent.createdAt ? new Date(agent.createdAt) : new Date();
-          const joinDate = createdDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })
-          
-          // Handle potential missing data
-          const firstName = agent.firstName || agent.name?.split(' ')[0] || "Unknown";
-          const lastName = agent.lastName || (agent.name?.split(' ').slice(1).join(' ')) || "Agent";
-          const isActive = typeof agent.isActive !== 'undefined' ? agent.isActive : true;
-          
-          return {
-            ...agent,
-            firstName,
-            lastName,
-            isActive,
-            // Default values for UI elements not provided by API
-            status: isActive ? 'active' : 'inactive',
-            properties: agent.properties || Math.floor(Math.random() * 30) + 5, // Placeholder
-            sales: agent.sales || Math.floor(Math.random() * 20) + 2, // Placeholder
-            revenue: agent.revenue || Math.floor(Math.random() * 1000000) + 500000, // Placeholder
-            joinDate,
-            name: `${firstName} ${lastName}`, // Add name field for display
-            avatar: agent.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName+'+'+lastName)}&background=random`,
-            location: agent.location || "California, USA", // Default location
-            rating: agent.rating || parseFloat((Math.random() * 2 + 3).toFixed(1)), // Random rating between 3.0 and 5.0
-            specialization: agent.specialization || "Commercial Real Estate" // Default specialization
-          };
-        });
-        
-        setAgents(agentsData);
+        const agentsData = await AgentsApi.fetchAgents();
+        const enrichedAgents = agentsData.map(agent => ({
+          ...agent,
+          name: `${agent.firstName} ${agent.lastName}`,
+          avatar: agent.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(agent.firstName+'+'+agent.lastName)}&background=random`,
+          location: agent.location || "California, USA",
+          rating: agent.rating || parseFloat((Math.random() * 2 + 3).toFixed(1)),
+          specialization: agent.specialization || "Commercial Real Estate"
+        }));
+        setAgents(enrichedAgents);
       } catch (error) {
-        console.error("Failed to fetch agents:", error)
-        // Set empty array on error
-        setAgents([])
+        console.error("Failed to fetch agents:", error);
+        setAgents([]);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchAgents()
+    fetchAgents();
   }, [refreshTrigger])
   // Filter and paginate data
   const filteredAgents = useMemo(() => {
