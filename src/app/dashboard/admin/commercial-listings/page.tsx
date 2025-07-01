@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
@@ -25,6 +25,43 @@ import { CommercialListing } from '../../../../types';
 import FloatingActionButton from '../../../../components/commercial-listings/FloatingActionButton';
 import './styles.css';
 import Link from 'next/link';
+import axios from 'axios';
+
+// Define interface for the API response
+interface ApiListing {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  market: string | null;
+  listingType: string | null;
+  address: string | null;
+  address2: string | null;
+  city: string | null;
+  state: string | null;
+  postalCode: string | null;
+  country: string | null;
+  neighborhood: string | null;
+  assessorsPArcelNumber: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  sellerFinancing: boolean | null;
+  oppertunityZone: boolean | null;
+  description: string | null;
+  highlights: string | null;
+  confidentiality: string | null;
+  availableToBroker: boolean | null;
+  visibility: string | null;
+  
+  // Additional fields that might be included in the API or needed for display
+  price?: number | null;
+  source?: string | null;
+  status?: string;
+  name?: string;
+  contactsCount?: number;
+  hasDocuments?: boolean;
+  listPrice?: string | number;
+}
 
 export default function CommercialListingsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,177 +73,84 @@ export default function CommercialListingsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [listings, setListings] = useState<ApiListing[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const filters = ['All', 'Admin', 'Agent'];
   const statusFilters = ['Featured', 'Active', 'Inactive', 'Sold'];
 
-  // Sample data to match the image
-  const listings = [
-    {
-      id: '100079',
-      source: 'AJ Rana',
-      name: '520 ACR MIXED LICENSED GRN HS & OUTD...',
-      city: 'Lake Nacimiento',
-      listPrice: '9990000.00',
-      createDate: '7/23/2019',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '642',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100100',
-      source: 'AJ Rana',
-      name: 'LICENSED GREEN-HOUSE CANNABIS FARM!',
-      city: 'Salinas',
-      listPrice: '7750000.00',
-      createDate: '8/19/2019',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '868',
-      img: '1',
-      status: 'Sold'
-    },
-    {
-      id: '100104',
-      source: 'AJ Rana',
-      name: 'ESTABLISHED DELI CAFE AND GYRO!',
-      city: 'Newark',
-      listPrice: '89000.00',
-      createDate: '8/22/2019',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '866',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100135',
-      source: 'AJ Rana',
-      name: 'SUCCESSFUL ASSISTED LIVING FACILITY!',
-      city: '',
-      listPrice: '9750000.00',
-      createDate: '8/27/2019',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '9',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100238',
-      source: 'AJ Rana',
-      name: 'OPPORTUNITY TO BUY MULTI-FAMILY BUILD...',
-      city: '',
-      listPrice: '35449230.00',
-      createDate: '2/2/2020',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100239',
-      source: 'AJ Rana',
-      name: 'Opportunity To Buy Multi-Family Building!',
-      city: 'Redlands',
-      listPrice: '45390240.00',
-      createDate: '2/2/2020',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '3',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100240',
-      source: 'AJ Rana',
-      name: 'Opportunity To Buy Multi-Family Building!',
-      city: 'Hemet',
-      listPrice: '37431968.00',
-      createDate: '2/2/2020',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '3',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100241',
-      source: 'AJ Rana',
-      name: 'OPPORTUNITY TO BUY MULTI-FAMILY BUILD...',
-      city: 'Riverside',
-      listPrice: '37136220.00',
-      createDate: '2/2/2020',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '3',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100256',
-      source: 'AJ Rana',
-      name: 'Multifamily Building For Sale!',
-      city: 'Chico',
-      listPrice: '5104008.00',
-      createDate: '3/4/2020',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100371',
-      source: 'AJ Rana',
-      name: '',
-      city: 'Dublin',
-      listPrice: '1550000.00',
-      createDate: '2/5/2022',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '6',
-      img: '',
-      status: 'Active'
-    },
-    {
-      id: '100372',
-      source: 'Abdul Shah',
-      name: 'Arden Way',
-      city: 'Sacramento',
-      listPrice: '2200000.00',
-      createDate: '7/8/2023',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '2',
-      img: '1',
-      status: 'Active'
-    },
-    {
-      id: '100374',
-      source: 'Abdul Shah',
-      name: '',
-      city: '',
-      listPrice: '0.00',
-      createDate: '4/23/2024',
-      reInc: 'N',
-      documents: 'N',
-      contacts: '0',
-      img: '',
-      status: 'Active'
-    },
-  ];
+  // Fetch listings from API
+  const fetchListings = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // You may need to adjust the API endpoint and headers based on your backend configuration
+      const response = await axios.get('/api/listings', {
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any authentication headers if needed
+          // 'Authorization': `Bearer ${token}`,
+        }
+      });
+      
+      // Check if response has expected structure
+      if (Array.isArray(response.data)) {
+        setListings(response.data);
+      } else if (response.data && Array.isArray(response.data.data)) {
+        // Some APIs wrap the data in a data property
+        setListings(response.data.data);
+      } else {
+        console.error('Unexpected API response format:', response.data);
+        setError('Received invalid data format from the server.');
+        setListings([]);
+      }
+    } catch (err) {
+      console.error('Error fetching listings:', err);
+      setError('Failed to fetch listings. Please try again later.');
+      // Set empty array to prevent errors
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch listings on component mount
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
+  // Handle refresh
+  const handleRefresh = () => {
+    fetchListings();
+  };
+
+  // Map API listing to display status
+  const getListingStatus = (listing: ApiListing): string => {
+    if (!listing.isActive) return 'Inactive';
+    // Add more logic based on your requirements
+    return 'Active';
+  };
+
+  // Map API listing to display name
+  const getListingName = (listing: ApiListing): string => {
+    return listing.description || `Listing ${listing.id}`;
+  };
+  
   // Filter and paginate data
   const filteredListings = useMemo(() => {
     return listings.filter((listing) => {
+      const listingName = getListingName(listing);
+      const listingCity = listing.city || '';
+      const listingSource = listing.source || '';
+      const listingStatus = getListingStatus(listing);
+      
       const matchesSearch =
-        listing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.city.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === "All" || listing.status === statusFilter;
+        listingName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listingSource.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listingCity.toLowerCase().includes(searchTerm.toLowerCase());
+        
+      const matchesStatus = statusFilter === "All" || listingStatus === statusFilter;
+      
       return matchesSearch && matchesStatus;
     });
   }, [listings, searchTerm, statusFilter]);
@@ -228,7 +172,8 @@ export default function CommercialListingsPage() {
   const goToNextPage = () => goToPage(currentPage + 1);
   
   // Format currency
-  const formatCurrency = (amount: string) => {
+  const formatCurrency = (amount: string | number | null | undefined) => {
+    if (amount === null || amount === undefined) return '$0';
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -261,6 +206,7 @@ export default function CommercialListingsPage() {
           </Link> */}
 
           <button
+            onClick={handleRefresh}
             disabled={isLoading}
             className="inline-flex items-center px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none transition-all duration-200 hover:scale-105 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -362,20 +308,107 @@ export default function CommercialListingsPage() {
                     </div>
                   </td>
                 </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                      <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                      <span className="text-gray-700 font-medium text-lg">{error}</span>
+                      <button
+                        onClick={handleRefresh}
+                        className="px-4 py-2 bg-[#00a0d1] text-white rounded-lg hover:bg-[#008bb8] transition-colors"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ) : currentListings.length > 0 ? (
-                currentListings.map((listing) => (<tr key={listing.id} className="hover:bg-gradient-to-r hover:from-[#00a0d1]/5 hover:to-[#00a0d1]/10 transition-all duration-300 group"><td className="px-6 py-5 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300"><Building className="w-8 h-8 text-[#00a0d1]" /></div><div className="ml-4"><div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">{listing.name.length > 30 ? `${listing.name.substring(0, 30)}...` : listing.name}</div><div className="flex items-center text-sm text-gray-500 mt-1">ID: {listing.id}</div><div className="flex items-center text-sm text-gray-500">{listing.contacts ? `${listing.contacts} contacts` : "No contacts"} | {listing.documents === 'Y' ? 'Has documents' : 'No documents'}</div></div></div></td><td className="px-6 py-5 whitespace-nowrap"><div className="font-medium text-gray-900">{listing.source}</div></td><td className="px-6 py-5 whitespace-nowrap"><div className="font-medium text-gray-900">{listing.city || 'Unknown location'}</div></td><td className="px-6 py-5 whitespace-nowrap"><div className="font-bold text-gray-900">{formatCurrency(listing.listPrice)}</div></td><td className="px-6 py-5 whitespace-nowrap"><div className="text-sm text-gray-900">{listing.createDate}</div></td><td className="px-6 py-5 whitespace-nowrap"><span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                          listing.status === 'Active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
-                          listing.status === 'Sold' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 
-                          listing.status === 'Inactive' ? 'bg-gray-100 text-gray-800 border border-gray-200' :
+                currentListings.map((listing) => {
+                  const listingName = getListingName(listing);
+                  const listingStatus = getListingStatus(listing);
+                  const listingPrice = listing.price || 0;
+                  const formattedDate = new Date(listing.createdAt).toLocaleDateString();
+                  
+                  return (
+                    <tr key={listing.id} className="hover:bg-gradient-to-r hover:from-[#00a0d1]/5 hover:to-[#00a0d1]/10 transition-all duration-300 group">
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                            <Building className="w-8 h-8 text-[#00a0d1]" />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-base font-bold text-gray-900 group-hover:text-[#00a0d1] transition-colors">
+                              {listingName.length > 30 ? `${listingName.substring(0, 30)}...` : listingName || 'Untitled Listing'}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-500 mt-1">ID: {listing.id}</div>
+                            <div className="flex items-center text-sm text-gray-500">
+                              {/* API doesn't include contacts and documents yet - can be extended later */}
+                              0 contacts | No documents
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{listing.source || 'N/A'}</div>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{listing.city || 'Unknown location'}</div>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="font-bold text-gray-900">{formatCurrency(listingPrice)}</div>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{formattedDate}</div>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                          listingStatus === 'Active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                          listingStatus === 'Sold' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 
+                          listingStatus === 'Inactive' ? 'bg-gray-100 text-gray-800 border border-gray-200' :
                           'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                        }`}><div className={`w-1.5 h-1.5 rounded-full mr-2 ${
-                            listing.status === 'Active' ? 'bg-emerald-500' :
-                            listing.status === 'Sold' ? 'bg-blue-500' :
-                            listing.status === 'Inactive' ? 'bg-gray-500' :
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                            listingStatus === 'Active' ? 'bg-emerald-500' :
+                            listingStatus === 'Sold' ? 'bg-blue-500' :
+                            listingStatus === 'Inactive' ? 'bg-gray-500' :
                             'bg-yellow-500'
-                          }`}></div>{listing.status}</span></td><td className="px-6 py-5 whitespace-nowrap text-center">
-<div className="flex items-center justify-center space-x-2"><Link href={`/dashboard/admin/commercial-listings/view/${listing.id}`} className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"><Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" /></Link><Link href={`/dashboard/admin/commercial-listings/edit/${listing.id}`} className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"><Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" /></Link><button onClick={() => {setSelectedListing(listing.id);setIsModalOpen(true);}} className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"><Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform" /></button></div></td></tr>
-                ))
+                          }`}></div>
+                          {listingStatus}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center space-x-2">
+                          <Link 
+                            href={`/dashboard/admin/commercial-listings/view/${listing.id}`} 
+                            className="inline-flex items-center p-3 rounded-xl text-[#00a0d1] hover:bg-[#00a0d1]/10 transition-all duration-200 hover:scale-110 group/view border border-[#00a0d1]/20 shadow-sm hover:shadow-md"
+                          >
+                            <Eye className="w-5 h-5 group-hover/view:scale-110 transition-transform" />
+                          </Link>
+                          <Link 
+                            href={`/dashboard/admin/commercial-listings/edit/${listing.id}`} 
+                            className="inline-flex items-center p-3 rounded-xl text-emerald-600 hover:bg-emerald-100 transition-all duration-200 hover:scale-110 group/edit border border-emerald-200 shadow-sm hover:shadow-md"
+                          >
+                            <Edit className="w-5 h-5 group-hover/edit:rotate-12 transition-transform" />
+                          </Link>
+                          <button 
+                            onClick={() => {
+                              setSelectedListing(String(listing.id));
+                              setIsModalOpen(true);
+                            }} 
+                            className="inline-flex items-center p-3 rounded-xl text-red-600 hover:bg-red-100 transition-all duration-200 hover:scale-110 group/delete border border-red-200 shadow-sm hover:shadow-md"
+                          >
+                            <Trash2 className="w-5 h-5 group-hover/delete:scale-110 transition-transform" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr><td colSpan={7} className="px-6 py-20 text-center"><div className="flex flex-col items-center space-y-6">
                       <div className="w-24 h-24 bg-gradient-to-br from-[#00a0d1]/20 to-[#00a0d1]/30 rounded-3xl flex items-center justify-center shadow-lg">
@@ -388,7 +421,7 @@ export default function CommercialListingsPage() {
                         <p className="text-base text-gray-600 mb-6 max-w-md">
                           {searchTerm
                             ? `No listings match "${searchTerm}". Try adjusting your search.`
-                            : "Get started by adding your first commercial listing."}
+                            : "No listings found in the database. Get started by adding your first commercial listing."}
                         </p>
                       </div>
                       <Link
