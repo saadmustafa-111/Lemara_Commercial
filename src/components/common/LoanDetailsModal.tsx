@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, User, Briefcase, Phone, Mail, MapPin, DollarSign, CreditCard, BarChart4, AlertCircle, ChevronDown, ChevronUp, Calendar, MessageSquare } from "lucide-react";
-import { CommercialLoan as BaseCommercialLoan } from "../adminDashboard/commerical-loans-table";
-
-// Extend CommercialLoan to include comments
-interface CommercialLoan extends BaseCommercialLoan {
-  comments?: string;
-}
+import { CommercialLoan, LoansApi } from "@/lib/apis/adminDashboardApis/loansApi";
 
 interface LoanDetailsModalProps {
   loan: CommercialLoan | null;
@@ -25,52 +20,10 @@ export default function LoanDetailsModal({ loan, onClose }: LoanDetailsModalProp
       
       setIsLoadingOtherLoans(true);
       try {
-        let response;
-        let data;
-        
-        try {
-          // Try direct connection to Heroku backend
-          // Use user email to find all applications from the same user
-          response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan?email=${encodeURIComponent(loan.email)}`);
-          
-          if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-          }
-          
-          data = await response.json();
-          
-        } catch (corsError) {
-          console.log("Falling back to proxy due to potential CORS issues:", corsError);
-          // Fall back to our proxy API route
-          response = await fetch('/api/loans');
-          if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-          }
-          data = await response.json();
-        }
-        
-        // Process the data to match our interface
-        const loansData = Array.isArray(data) ? data : (data.loans || []);
-        
-        // Filter loans that belong to the same user but are not the current loan
-        // and process them to match our interface
-        const userLoans = loansData
-          .filter((l: any) => l.email === loan.email && l.id !== loan.id)
-          .map((l: any) => ({
-            ...l,
-            status: l.status || 'submitted',
-            submittedDate: l.createdAt ? new Date(l.createdAt).toLocaleDateString() : undefined,
-            avatar: l.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((l.firstName || '') + ' ' + (l.lastName || ''))}&background=0D8ABC&color=fff`,
-            user: l.user || {
-              id: l.userId || 0,
-              isActive: true,
-              firstName: l.firstName || '',
-              lastName: l.lastName || '',
-              email: l.email || '',
-              phone: l.houseNumber || '',
-              role: 'user'
-            }
-          }));
+        // Use LoansApi to fetch all loans, then filter by email
+        const allLoans = await LoansApi.fetchLoans();
+        const userLoans = allLoans
+          .filter((l) => l.email === loan.email && l.id !== loan.id);
         
         setOtherLoans(userLoans);
       } catch (error) {
@@ -144,7 +97,7 @@ export default function LoanDetailsModal({ loan, onClose }: LoanDetailsModalProp
               <div className="bg-gray-50 rounded-xl p-6 mb-6">
                 <h4 className="text-lg font-bold text-gray-900 mb-4">Applicant Information</h4>
                 <div className="flex items-center mb-4">
-                  <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1] via-[#0090c0] to-[#0080b0] rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-[#00a0d1] via-[#0090c0] to-[#0080b0] rounded-xl flex items-center justify-center mr-4">
                     <img
                       src={activeLoan.avatar || "/placeholder.svg"}
                       alt={`${activeLoan.firstName} ${activeLoan.lastName}`}
@@ -555,7 +508,6 @@ export default function LoanDetailsModal({ loan, onClose }: LoanDetailsModalProp
 
           {/* Actions */}
           <div className="mt-8 pt-6 border-t border-gray-200 flex flex-wrap justify-end gap-4">
-        
             <button onClick={onClose} className="px-6 py-3 bg-gray-100 text-gray-800 font-medium rounded-xl hover:bg-gray-200 transition-all">
               Close
             </button>

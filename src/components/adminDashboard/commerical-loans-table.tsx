@@ -23,66 +23,9 @@ import {
   MessageSquare
 } from "lucide-react"
 import LoanDetailsModal from "../common/LoanDetailsModal"
+import { LoansApi, type CommercialLoan } from '@/lib/apis/adminDashboardApis/loansApi'
 
-export interface User {
-  id: number
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-  firstName: string
-  lastName: string
-  password: string
-  email: string
-  phone: string
-  whatsapp: string
-  twitter: string
-  facebook: string
-  linkedIn: string
-  instagram: string
-  nmls: string
-  dre: string
-  role: string
-}
-
-// Define the loan status enum
-export enum LoanStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-}
-
-export interface CommercialLoan {
-  id: number
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-  firstName: string
-  lastName: string
-  ssn: number
-  details: string
-  address: string
-  city: string
-  state: string
-  zip: string
-  houseNumber: string
-  businessNumber: string
-  email: string
-  annualIncome: number
-  monthlyExpenses: number
-  creditScore: number | null
-  existingDebt: number
-  businessName: string
-  businesstype: string
-  businessAddress: string
-  annualBusinessRevenue: number
-  loanAmount: number
-  status: LoanStatus | "in progress" | "submitted" | "approved" | "rejected" // Support both enum and string for backward compatibility
-  source: string
-  submittedDate?: string
-  user: User
-  avatar?: string
-  comments: string // Admin comments for loan applications
-}
+import { LoanStatus } from '@/lib/apis/adminDashboardApis/loansApi'
 
 export default function CommercialLoansTable() {
   const [isLoading, setIsLoading] = useState(true)
@@ -109,56 +52,8 @@ export default function CommercialLoansTable() {
     setIsLoading(true)
     setError(null)
     try {
-      let response;
-      
-      try {
-        // Try direct connection to the Heroku backend 
-        response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan`);
-      } catch (corsError) {
-        console.log("Falling back to proxy due to potential CORS issues:", corsError);
-        // Fall back to our proxy API route
-        response = await fetch('/api/loans');
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`)
-      }
-      
-      const data = await response.json()
-      console.log("Loans data from backend:", data);
-      
-      // Transform the data to ensure it matches our CommercialLoan interface
-      const loansData = Array.isArray(data) ? data : (data.loans || []);
-      
-      // Process and standardize the loan data
-      const processedLoans = loansData.map((loan: any) => {
-        // Map status to enum values when possible
-        let status = loan.status || 'submitted';
-        if (status === 'pending' || status === 'approved' || status === 'rejected') {
-          status = status.toLowerCase();
-        }
-        
-        return {
-          ...loan,
-          // Ensure required fields are present with defaults if needed
-          status: status,
-          comments: loan.comments || '', // Ensure comments field is included
-          submittedDate: loan.createdAt ? new Date(loan.createdAt).toLocaleDateString() : undefined,
-          avatar: loan.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((loan.firstName || '') + ' ' + (loan.lastName || ''))}&background=0D8ABC&color=fff`,
-          // Ensure user object is present
-          user: loan.user || {
-            id: loan.userId || 0,
-            isActive: true,
-            firstName: loan.firstName || '',
-            lastName: loan.lastName || '',
-            email: loan.email || '',
-            phone: loan.houseNumber || '',
-            role: 'user'
-          }
-        };
-      });
-      
-      setLoans(processedLoans);
+      const processedLoans = await LoansApi.fetchLoans()
+      setLoans(processedLoans)
       
       // Calculate how many loans each user has
       const userCounts: Record<string, number> = {}
@@ -259,67 +154,7 @@ export default function CommercialLoansTable() {
     }
     
     try {
-      // Always fetch fresh data from the backend
-      let response;
-      let loanData;
-      
-      try {
-        // Try direct connection to the Heroku backend for specific loan
-        response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan/${loanId}`);
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-        loanData = await response.json();
-        
-        // If the loan has a userId but no detailed user info, fetch user details
-        if (loanData && loanData.userId && (!loanData.user || Object.keys(loanData.user).length === 0)) {
-          try {
-            const userResponse = await fetch(`https://lemara-9829c937fd90.herokuapp.com/user/${loanData.userId}`);
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              loanData.user = userData;
-            }
-          } catch (userError) {
-            console.error("Failed to fetch user details:", userError);
-            // Continue without user details
-          }
-        }
-        
-      } catch (corsError) {
-        console.log("Falling back to proxy due to potential CORS issues:", corsError);
-        // Fall back to our proxy API route
-        response = await fetch(`/api/loans?id=${loanId}`);
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`)
-        }
-        loanData = await response.json();
-      }
-
-      // Process loan data to ensure it matches our interface
-      // Map status to enum values when possible
-      let status = loanData.status || 'submitted';
-      if (status === 'pending' || status === 'approved' || status === 'rejected') {
-        status = status.toLowerCase();
-      }
-      
-      const processedLoan = {
-        ...loanData,
-        status: status,
-        comments: loanData.comments || '', // Ensure comments field is included
-        submittedDate: loanData.createdAt ? new Date(loanData.createdAt).toLocaleDateString() : undefined,
-        avatar: loanData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((loanData.firstName || '') + ' ' + (loanData.lastName || ''))}&background=0D8ABC&color=fff`,
-        // Ensure user object is present
-        user: loanData.user || {
-          id: loanData.userId || 0,
-          isActive: true,
-          firstName: loanData.firstName || '',
-          lastName: loanData.lastName || '',
-          email: loanData.email || '',
-          phone: loanData.houseNumber || '',
-          role: 'user'
-        }
-      };
-      
+      const processedLoan = await LoansApi.fetchLoanById(loanId);
       setSelectedLoan(processedLoan);
     } catch (err) {
       console.error('Failed to fetch loan details:', err)
@@ -358,38 +193,13 @@ export default function CommercialLoansTable() {
     
     setIsSavingComment(true)
     try {
-      // Prepare the update data
+      // Use CommercialLoansApi to update the loan
       const updateData = {
-        status: updatedStatus,
+        status: updatedStatus as LoanStatus, // Cast to LoanStatus since we know the value comes from our enum
         comments: commentText
       }
       
-      // Try direct connection to the Heroku backend, if CORS issues use proxy
-      let response
-      try {
-        // Try direct connection to the Heroku backend
-        response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan/${selectedLoanForUpdate.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updateData)
-        })
-      } catch (corsError) {
-        console.log("Falling back to proxy due to potential CORS issues:", corsError)
-        // Fall back to our proxy API route
-        response = await fetch(`/api/proxy/loans/${selectedLoanForUpdate.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updateData)
-        })
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Error updating loan: ${response.status}`)
-      }
+      await LoansApi.updateLoan(selectedLoanForUpdate.id, updateData)
       
       // Update the local state with the new values
       setLoans(prevLoans => prevLoans.map(loan => 
@@ -404,7 +214,7 @@ export default function CommercialLoansTable() {
       setUpdatedStatus("")
       setCommentText("")
       
-      // Refresh the loans data
+      // Refresh the loans data to ensure we have the latest state
       fetchLoans()
     } catch (error) {
       console.error("Failed to update loan:", error)

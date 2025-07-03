@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useMemo } from "react"
 import { Search, Filter, Edit, Trash2, Eye, MoreHorizontal, UserPlus, DollarSign, Building, Calendar, Mail, Phone, MapPin, Star, Heart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw } from 'lucide-react'
+import { ClientsApi } from '@/lib/apis/adminDashboardApis/clientsApi'
 
 // Define Role enum to match with SignUpForm
 enum Role {
@@ -61,28 +62,10 @@ export default function EnhancedClientsTable() {
     const fetchClients = async () => {
       setIsLoading(true)
       try {
-        // First try direct connection to backend, if CORS issues use proxy
-        let response;
-        try {
-          // Try direct connection to the Heroku backend using the correct /user endpoint with role=user
-          response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/user?role=${Role.USER}`);
-        } catch (corsError) {
-          console.log("Falling back to proxy due to potential CORS issues:", corsError);
-          // Fall back to our proxy API route
-          response = await fetch(`/api/proxy/users?role=${Role.USER}`);
-        }
-        
-        if (!response.ok) {
-          throw new Error(`Error fetching clients: ${response.status}`)
-        }
-        const data = await response.json()
-        
-        // Log the data received from the API for debugging
-        console.log("Data received from API for clients:", data);
+        const clientsData = await ClientsApi.fetchClients();
         
         // Transform the API response to match our display needs
-        const clientsList = Array.isArray(data) ? data : (data.users || []);
-        const clientsData: Client[] = clientsList.map((client: any) => {
+        const enrichedClients = clientsData.map(client => {
           // Convert createdAt to readable date format
           const createdDate = client.createdAt ? new Date(client.createdAt) : new Date();
           const joinDate = createdDate.toLocaleDateString('en-US', {

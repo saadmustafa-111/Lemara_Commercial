@@ -1,0 +1,258 @@
+export enum LoanStatus {
+  IN_PROGRESS = 'in progress',
+  SUBMITTED = 'submitted',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
+interface User {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  twitter: string;
+  facebook: string;
+  linkedIn: string;
+  instagram: string;
+  nmls: string;
+  dre: string;
+  role: string;
+}
+
+export interface CommercialLoan {
+  id: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  firstName: string;
+  lastName: string;
+  ssn: number;
+  details: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  houseNumber: string;
+  businessNumber: string;
+  email: string;
+  comments: string;
+  annualIncome: number;
+  monthlyExpenses: number;
+  creditScore: number | null;
+  existingDebt: number;
+  businessName: string;
+  businesstype: string;
+  businessAddress: string;
+  annualBusinessRevenue: number;
+  loanAmount: number;
+  status: LoanStatus;
+  source: string;
+  submittedDate: string;
+  user: User;
+  avatar?: string;
+}
+
+interface ApiLoan {
+  id: string | number;
+  userId: string | number;
+  propertyAddress?: string;
+  loanAmount: number;
+  status: string;
+  createdAt: string;
+  updatedAt?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  propertyType?: string;
+  loanType?: string;
+  loanPurpose?: string;
+  loanTerm?: string;
+  creditScore?: string | number;
+  comments?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  houseNumber?: string;
+  businessNumber?: string;
+  annualIncome?: number;
+  monthlyExpenses?: number;
+  existingDebt?: number;
+  businessName?: string;
+  businesstype?: string;
+  businessAddress?: string;
+  annualBusinessRevenue?: number;
+  source?: string;
+}
+
+const BASE_URL = 'https://lemara-9829c937fd90.herokuapp.com';
+
+export class LoansApi {
+  static async fetchLoans(): Promise<CommercialLoan[]> {
+    try {
+      const response = await fetch(`${BASE_URL}/loan`);
+      if (!response.ok) {
+        throw new Error(`Error fetching loans: ${response.status}`);
+      }
+      const data = await response.json();
+      return (Array.isArray(data) ? data : data.loans || []);
+    } catch (error) {
+      console.error('Error in fetchLoans:', error);
+      throw error;
+    }
+  }
+
+  static async fetchLoanById(id: number): Promise<CommercialLoan> {
+    try {
+      const response = await fetch(`${BASE_URL}/loan/${id}`);
+      if (!response.ok) {
+        throw new Error(`Error fetching loan: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error in fetchLoanById(${id}):`, error);
+      throw error;
+    }
+  }
+
+  static async updateLoan(id: number, updates: Partial<CommercialLoan>): Promise<CommercialLoan> {
+    try {
+      const response = await fetch(`${BASE_URL}/loan/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        throw new Error(`Error updating loan: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error in updateLoan(${id}):`, error);
+      throw error;
+    }
+  }
+      isActive: true,
+      createdAt: loan.createdAt,
+      updatedAt: loan.updatedAt || loan.createdAt,
+      firstName: loan.firstName || "Unknown",
+      lastName: loan.lastName || "User",
+      ssn: 0,
+      details: "",
+      address: loan.address || loan.propertyAddress || "",
+      city: loan.city || "Unknown_City",
+      state: loan.state || "",
+      zip: loan.zip || "",
+      houseNumber: loan.phone || loan.houseNumber || "",
+      businessNumber: loan.businessNumber || "",
+      email: loan.email || "",
+      comments: loan.comments || "",
+      annualIncome: loan.annualIncome || 0,
+      monthlyExpenses: loan.monthlyExpenses || 0,
+      creditScore: typeof loan.creditScore === 'string' ? Number(loan.creditScore) : (loan.creditScore || null),
+      existingDebt: loan.existingDebt || 0,
+      businessName: loan.businessName || "",
+      businesstype: loan.businesstype || loan.propertyType || "Commercial",
+      businessAddress: loan.businessAddress || loan.propertyAddress || "",
+      annualBusinessRevenue: loan.annualBusinessRevenue || 0,
+      loanAmount: loan.loanAmount,
+      status: ((status) => {
+        const lowerStatus = status?.toLowerCase();
+        if (lowerStatus === LoanStatus.IN_PROGRESS) return LoanStatus.IN_PROGRESS;
+        if (lowerStatus === LoanStatus.SUBMITTED) return LoanStatus.SUBMITTED;
+        if (lowerStatus === LoanStatus.APPROVED) return LoanStatus.APPROVED;
+        if (lowerStatus === LoanStatus.REJECTED) return LoanStatus.REJECTED;
+        return LoanStatus.SUBMITTED;
+      })(loan.status),
+      source: loan.source || "Web",
+      submittedDate: new Date(loan.createdAt).toLocaleDateString(),
+      user: {
+        id: Number(loan.userId) || 0,
+        isActive: true,
+        createdAt: loan.createdAt,
+        updatedAt: loan.updatedAt || loan.createdAt,
+        firstName: loan.firstName || "Unknown",
+        lastName: loan.lastName || "User",
+        password: "",
+        email: loan.email || "",
+        phone: loan.phone || loan.houseNumber || "",
+        whatsapp: "",
+        twitter: "",
+        facebook: "",
+        linkedIn: "",
+        instagram: "",
+        nmls: "",
+        dre: "",
+        role: "user"
+      },
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent((loan.firstName || '') + ' ' + (loan.lastName || ''))}&background=0D8ABC&color=fff`
+    };
+  }
+
+  static async fetchLoans(): Promise<CommercialLoan[]> {
+    try {
+      let response;
+      try {
+        response = await fetch(`${BASE_URL}/loan`);
+      } catch (corsError) {
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        response = await fetch(`/api/proxy/loans`);
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error fetching loans: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Data received from loan API:", data);
+      
+      const loansData = Array.isArray(data) ? data : (data.loans || []);
+      const commercialLoans = loansData.map((loan: ApiLoan) => this.mapToCommercialLoan(loan));
+      
+      return commercialLoans;
+    } catch (error) {
+      console.error("Failed to fetch loans:", error);
+      throw error;
+    }
+  }
+
+  static async updateLoan(loanId: number, updateData: Partial<CommercialLoan>): Promise<void> {
+    try {
+      let response;
+      try {
+        response = await fetch(`${BASE_URL}/loan/${loanId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        });
+      } catch (corsError) {
+        response = await fetch(`/api/proxy/loans/${loanId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        });
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error updating loan: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Failed to update loan:", error);
+      throw error;
+    }
+  }
+}
