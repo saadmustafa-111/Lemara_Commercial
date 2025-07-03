@@ -1,3 +1,5 @@
+import axiosInstance from '@/lib/axios';
+
 export enum LoanStatus {
   PENDING = 'pending',
   IN_PROGRESS = 'in progress',
@@ -100,17 +102,13 @@ export class LoansApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/loan`);
+        response = await axiosInstance.get(`${BASE_URL}/loan`);
       } catch (corsError) {
         console.log("Falling back to proxy due to potential CORS issues:", corsError);
-        response = await fetch(`/api/proxy/loans`);
+        response = await axiosInstance.get(`/api/proxy/loans`);
       }
       
-      if (!response.ok) {
-        throw new Error(`Error fetching loans: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       console.log("Data received from loan API:", data);
       
       const loansData = Array.isArray(data) ? data : (data.loans || []);
@@ -127,16 +125,13 @@ export class LoansApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/loan/${id}`);
+        response = await axiosInstance.get(`${BASE_URL}/loan/${id}`);
       } catch (corsError) {
         console.log("Falling back to proxy due to potential CORS issues:", corsError);
-        response = await fetch(`/api/proxy/loans/${id}`);
+        response = await axiosInstance.get(`/api/proxy/loans/${id}`);
       }
 
-      if (!response.ok) {
-        throw new Error(`Error fetching loan: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = response.data;
       return this.mapToCommercialLoan(data);
     } catch (error) {
       console.error(`Error in fetchLoanById(${id}):`, error);
@@ -148,25 +143,10 @@ export class LoansApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/loan/${loanId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updateData)
-        });
+        response = await axiosInstance.patch(`${BASE_URL}/loan/${loanId}`, updateData);
       } catch (corsError) {
-        response = await fetch(`/api/proxy/loans/${loanId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updateData)
-        });
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Error updating loan: ${response.status}`);
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        response = await axiosInstance.patch(`/api/proxy/loans/${loanId}`, updateData);
       }
     } catch (error) {
       console.error("Failed to update loan:", error);
