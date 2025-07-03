@@ -23,11 +23,8 @@ interface LoanApplicationData {
   loanAmount: number;
 }
 
-const API_BASE_URL = 'https://lemara-9829c937fd90.herokuapp.com';
-
 export async function submitLoanApplication(loanData: LoanApplicationData, authToken?: string | null) {
   try {
-    // First try with axios
     const response = await axiosInstance.post('/loan', loanData, {
       headers: {
         'Content-Type': 'application/json',
@@ -39,29 +36,23 @@ export async function submitLoanApplication(loanData: LoanApplicationData, authT
     
     return { success: true, data: response.data };
   } catch (error) {
-    console.error('Axios request failed, attempting fetch fallback...', error);
+    console.error('Direct API request failed:', error);
     
-    // Fallback to fetch if axios fails
+    // Try fallback to proxy endpoint
     try {
-      const fetchResponse = await fetch(`${API_BASE_URL}/loan`, {
-        method: 'POST',
+      const response = await axiosInstance.post('/api/proxy/loan', loanData, {
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           ...(authToken && { Authorization: `Bearer ${authToken}` }),
         },
-        body: JSON.stringify(loanData)
+        timeout: 30000
       });
-
-      if (!fetchResponse.ok) {
-        const errorText = await fetchResponse.text();
-        throw new Error(`HTTP error! status: ${fetchResponse.status}, message: ${errorText}`);
-      }
-
-      const data = await fetchResponse.json();
-      return { success: true, data };
-    } catch (fetchError) {
-      console.error('Fetch fallback also failed:', fetchError);
-      throw fetchError;
+      
+      return { success: true, data: response.data };
+    } catch (proxyError) {
+      console.error('Proxy request also failed:', proxyError);
+      throw proxyError;
     }
   }
 }

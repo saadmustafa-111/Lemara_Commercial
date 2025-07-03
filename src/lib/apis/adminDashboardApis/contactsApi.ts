@@ -1,3 +1,5 @@
+import axiosInstance from '@/lib/axios';
+
 interface Contact {
   id: number;
   firstName: string;
@@ -23,18 +25,8 @@ export class ContactsApi {
   static async fetchContacts(): Promise<Contact[]> {
     try {
       // Fetch from the actual backend API
-      const response = await fetch(`${BASE_URL}/contacts/admin/all`, { 
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error fetching contacts: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const response = await axiosInstance.get(`${BASE_URL}/contacts/admin/all`);
+      const data = response.data;
       
       // Add avatar field for UI if missing and ensure all required fields have default values
       const contactsWithAvatars = data.map((contact: any) => ({
@@ -65,19 +57,8 @@ export class ContactsApi {
 
   static async createContact(contact: Partial<Contact>): Promise<Contact> {
     try {
-      const response = await fetch(`${BASE_URL}/contacts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(contact)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error creating contact: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await axiosInstance.post(`${BASE_URL}/contacts`, contact);
+      return response.data;
     } catch (error) {
       console.error("Failed to create contact:", error);
       throw error;
@@ -86,19 +67,8 @@ export class ContactsApi {
 
   static async updateContact(id: number, contact: Partial<Contact>): Promise<Contact> {
     try {
-      const response = await fetch(`${BASE_URL}/contacts/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(contact)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error updating contact: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await axiosInstance.patch(`${BASE_URL}/contacts/${id}`, contact);
+      return response.data;
     } catch (error) {
       console.error("Failed to update contact:", error);
       throw error;
@@ -107,13 +77,7 @@ export class ContactsApi {
 
   static async deleteContact(id: number): Promise<void> {
     try {
-      const response = await fetch(`${BASE_URL}/contacts/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error deleting contact: ${response.status}`);
-      }
+      await axiosInstance.delete(`${BASE_URL}/contacts/${id}`);
     } catch (error) {
       console.error("Failed to delete contact:", error);
       throw error;

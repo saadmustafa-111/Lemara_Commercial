@@ -1,43 +1,41 @@
+import axiosInstance from '@/lib/axios';
+
 // API for commercial loans in admin dashboard
 export class AdminLoansApi {
   static async fetchLoans() {
-    let response;
     try {
-      response = await fetch('https://lemara-9829c937fd90.herokuapp.com/loan');
+      const response = await axiosInstance.get('/loan');
+      return response.data;
     } catch (corsError) {
-      response = await fetch('/api/loans');
+      console.log("Falling back to proxy due to potential CORS issues:", corsError);
+      const response = await axiosInstance.get('/api/loans');
+      return response.data;
     }
-    if (!response.ok) throw new Error(`Error fetching loans: ${response.status}`);
-    return response.json();
   }
 
   static async fetchLoanById(loanId: number) {
-    let response;
     try {
-      response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan/${loanId}`);
+      const response = await axiosInstance.get(`/loan/${loanId}`);
+      return response.data;
     } catch (corsError) {
-      response = await fetch(`/api/loans?id=${loanId}`);
+      console.log("Falling back to proxy due to potential CORS issues:", corsError);
+      const response = await axiosInstance.get(`/api/loans?id=${loanId}`);
+      return response.data;
     }
-    if (!response.ok) throw new Error(`Error fetching loan: ${response.status}`);
-    return response.json();
   }
 
   static async updateLoanComment(loanId: number, comment: string) {
-    let response;
     try {
-      response = await fetch(`https://lemara-9829c937fd90.herokuapp.com/loan/${loanId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comments: comment })
+      const response = await axiosInstance.patch(`/loan/${loanId}`, {
+        comments: comment
       });
+      return response.data;
     } catch (corsError) {
-      response = await fetch(`/api/proxy/loans/${loanId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comments: comment })
+      console.log("Falling back to proxy due to potential CORS issues:", corsError);
+      const response = await axiosInstance.patch(`/api/proxy/loans/${loanId}`, {
+        comments: comment
       });
+      return response.data;
     }
-    if (!response.ok) throw new Error(`Error updating comment: ${response.status}`);
-    return response.json();
   }
 }
