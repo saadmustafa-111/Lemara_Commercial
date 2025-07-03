@@ -1,3 +1,5 @@
+import axiosInstance from '@/lib/axios';
+
 // API for commercial loans management
 export interface User {
   id: number;
@@ -65,38 +67,27 @@ const CommercialLoansApi = {
   async fetchLoans(): Promise<CommercialLoan[]> {
     try {
       // Try direct connection to the Heroku backend 
-      const response = await fetch(`${BACKEND_URL}/loan`);
-      const data = await response.json();
-      return this.processLoansData(data);
+      const response = await axiosInstance.get(`${BACKEND_URL}/loan`);
+      return this.processLoansData(response.data);
     } catch (corsError) {
       console.log("Falling back to proxy due to potential CORS issues:", corsError);
       // Fall back to our proxy API route
-      const response = await fetch('/api/loans');
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
-      return this.processLoansData(data);
+      const response = await axiosInstance.get('/api/loans');
+      return this.processLoansData(response.data);
     }
   },
 
   async fetchLoanById(loanId: number): Promise<CommercialLoan> {
     try {
       // Try direct connection to the Heroku backend for specific loan
-      const response = await fetch(`${BACKEND_URL}/loan/${loanId}`);
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      const loanData = await response.json();
+      const response = await axiosInstance.get(`${BACKEND_URL}/loan/${loanId}`);
+      const loanData = response.data;
       
       // If the loan has a userId but no detailed user info, fetch user details
       if (loanData && loanData.userId && (!loanData.user || Object.keys(loanData.user).length === 0)) {
         try {
-          const userResponse = await fetch(`${BACKEND_URL}/user/${loanData.userId}`);
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            loanData.user = userData;
-          }
+          const userResponse = await axiosInstance.get(`${BACKEND_URL}/user/${loanData.userId}`);
+          loanData.user = userResponse.data;
         } catch (userError) {
           console.error("Failed to fetch user details:", userError);
         }
@@ -106,45 +97,21 @@ const CommercialLoansApi = {
     } catch (corsError) {
       console.log("Falling back to proxy due to potential CORS issues:", corsError);
       // Fall back to our proxy API route
-      const response = await fetch(`/api/loans?id=${loanId}`);
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      const loanData = await response.json();
-      return this.processLoanData(loanData);
+      const response = await axiosInstance.get(`/api/loans?id=${loanId}`);
+      return this.processLoanData(response.data);
     }
   },
 
   async updateLoanStatus(loanId: number, updateData: { status: string, comments: string }): Promise<CommercialLoan> {
     try {
       // Try direct connection to the Heroku backend
-      const response = await fetch(`${BACKEND_URL}/loan/${loanId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
-      if (!response.ok) {
-        throw new Error(`Error updating loan: ${response.status}`);
-      }
-      const data = await response.json();
-      return this.processLoanData(data);
+      const response = await axiosInstance.patch(`${BACKEND_URL}/loan/${loanId}`, updateData);
+      return this.processLoanData(response.data);
     } catch (corsError) {
       console.log("Falling back to proxy due to potential CORS issues:", corsError);
       // Fall back to our proxy API route
-      const response = await fetch(`/api/proxy/loans/${loanId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
-      if (!response.ok) {
-        throw new Error(`Error updating loan: ${response.status}`);
-      }
-      const data = await response.json();
-      return this.processLoanData(data);
+      const response = await axiosInstance.patch(`/api/proxy/loans/${loanId}`, updateData);
+      return this.processLoanData(response.data);
     }
   },
 

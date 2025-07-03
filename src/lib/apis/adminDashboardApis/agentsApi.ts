@@ -1,3 +1,5 @@
+import axiosInstance from '@/lib/axios';
+
 interface Agent {
   id: number;
   firstName: string;
@@ -35,17 +37,13 @@ export class AgentsApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/user?role=broker`);
+        response = await axiosInstance.get(`${BASE_URL}/user?role=broker`);
       } catch (corsError) {
         console.log("Falling back to proxy due to potential CORS issues:", corsError);
-        response = await fetch(`/api/proxy/users?role=broker`);
+        response = await axiosInstance.get(`/api/proxy/users?role=broker`);
       }
       
-      if (!response.ok) {
-        throw new Error(`Error fetching agents: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       console.log("Data received from API:", data);
       
       // Transform the API response to match our display needs
