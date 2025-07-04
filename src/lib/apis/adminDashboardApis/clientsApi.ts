@@ -1,3 +1,5 @@
+import axiosInstance from '@/lib/axios';
+
 enum Role {
   ADMIN = "admin",
   USER = "user",
@@ -43,17 +45,13 @@ export class ClientsApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/user?role=${Role.USER}`);
+        response = await axiosInstance.get(`${BASE_URL}/user?role=${Role.USER}`);
       } catch (corsError) {
         console.log("Falling back to proxy due to potential CORS issues:", corsError);
-        response = await fetch(`/api/proxy/users?role=${Role.USER}`);
+        response = await axiosInstance.get(`/api/proxy/users?role=${Role.USER}`);
       }
       
-      if (!response.ok) {
-        throw new Error(`Error fetching clients: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       console.log("Data received from API for clients:", data);
       
       const clientsList = Array.isArray(data) ? data : (data.users || []);
@@ -102,28 +100,13 @@ export class ClientsApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/user`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ...clientData, role: Role.USER }),
-        });
+        response = await axiosInstance.post(`${BASE_URL}/user`, { ...clientData, role: Role.USER });
       } catch (corsError) {
-        response = await fetch(`/api/proxy/users`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ...clientData, role: Role.USER }),
-        });
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        response = await axiosInstance.post(`/api/proxy/users`, { ...clientData, role: Role.USER });
       }
       
-      if (!response.ok) {
-        throw new Error(`Error creating client: ${response.status}`);
-      }
-      
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error("Failed to create client:", error);
       throw error;
@@ -134,28 +117,13 @@ export class ClientsApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/user/${clientId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(clientData),
-        });
+        response = await axiosInstance.patch(`${BASE_URL}/user/${clientId}`, clientData);
       } catch (corsError) {
-        response = await fetch(`/api/proxy/users/${clientId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(clientData),
-        });
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        response = await axiosInstance.patch(`/api/proxy/users/${clientId}`, clientData);
       }
       
-      if (!response.ok) {
-        throw new Error(`Error updating client: ${response.status}`);
-      }
-      
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error("Failed to update client:", error);
       throw error;
@@ -166,17 +134,10 @@ export class ClientsApi {
     try {
       let response;
       try {
-        response = await fetch(`${BASE_URL}/user/${clientId}`, {
-          method: 'DELETE',
-        });
+        response = await axiosInstance.delete(`${BASE_URL}/user/${clientId}`);
       } catch (corsError) {
-        response = await fetch(`/api/proxy/users/${clientId}`, {
-          method: 'DELETE',
-        });
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Error deleting client: ${response.status}`);
+        console.log("Falling back to proxy due to potential CORS issues:", corsError);
+        response = await axiosInstance.delete(`/api/proxy/users/${clientId}`);
       }
     } catch (error) {
       console.error("Failed to delete client:", error);
