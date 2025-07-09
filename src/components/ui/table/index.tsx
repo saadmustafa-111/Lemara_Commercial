@@ -12,6 +12,12 @@ interface TableHeaderProps {
   className?: string; // Optional className for styling
 }
 
+// Props for TableHead
+interface TableHeadProps {
+  children: ReactNode; // Header cell content
+  className?: string; // Optional className for styling
+}
+
 // Props for TableBody
 interface TableBodyProps {
   children: ReactNode; // Body row(s)
@@ -61,4 +67,12 @@ const TableCell: React.FC<TableCellProps> = ({
   return <CellTag className={` ${className}`}>{children}</CellTag>;
 };
 
-export { Table, TableHeader, TableBody, TableRow, TableCell };
+// TableHead Component
+const TableHead: React.FC<TableHeadProps> = ({
+  children,
+  className,
+}) => {
+  return <th className={`px-3 py-2 text-left font-medium ${className || ""}`}>{children}</th>;
+};
+
+export { Table, TableHeader, TableBody, TableRow, TableCell, TableHead };

@@ -21,6 +21,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
+  PieChart,
+  BarChart3,
+  Target,
+  Home,
 } from "lucide-react"
 import {
   ChevronDownIcon,
@@ -99,6 +103,54 @@ const adminNavItems: NavItem[] = [
     path: "/dashboard/admin/team",
   },
 ]
+// Commission Dashboard navigation items (default)
+const commissionNavItems: NavItem[] = [
+  {
+    name: "Dashboard",
+    icon: <Home size={20} />,
+    path: "/dashboard/agent/commission-dashboard",
+  },
+  {
+    name: "Pipeline",
+    icon: <Target size={20} />,
+    path: "/pipeline",
+  },
+  {
+    name: "Commissions",
+    icon: <Wallet size={20} />,
+    path: "/commisions",
+  },
+  {
+    name: "Analytics",
+    icon: <BarChart3 size={20} />,
+    path: "/analytics",
+  },
+  {
+    name: "Reports",
+    icon: <PieChart size={20} />,
+    path: "/reports",
+  },
+  {
+    name: "Team",
+    icon: <Users size={20} />,
+    path: "/team",
+  },
+  {
+    name: "Billing",
+    icon: <Banknote size={20} />,
+    path: "/billing",
+  },
+  {
+    name: "Company",
+    icon: <FileText size={20} />,
+    path: "/company",
+  },
+  {
+    name: "Settings",
+    icon: <Settings size={20} />,
+    path: "/settings",
+  },
+]
 
 // User-specific navigation items (regular users)
 const userNavItems: NavItem[] = [
@@ -125,6 +177,11 @@ const agentNavItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/dashboard/agent",
+  },
+  {
+    name: "Commission Dashboard",
+    icon: <Wallet size={20} />,
+    path: "/dashboard/agent/commission-dashboard",
   },
   {
     name: "My Listings",
@@ -169,33 +226,53 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname()
   const [navItems, setNavItems] = useState<NavItem[]>([])
 
+  // Check if current path is the commission dashboard
+  const isCommissionDashboard =
+    pathname === "/dashboard/agent/commission-dashboard" ||
+    pathname?.startsWith("/pipeline") ||
+    pathname?.startsWith("/commisions") ||
+    pathname?.startsWith("/analytics") ||
+    pathname?.startsWith("/reports") ||
+    pathname?.startsWith("/team") ||
+    pathname?.startsWith("/billing") ||
+    pathname?.startsWith("/company") ||
+    pathname?.startsWith("/settings")
+    
+  // Log for debugging
+  console.log("Current path:", pathname)
+  console.log("Is Commission Dashboard:", isCommissionDashboard)
+
   // Determine which navigation items to show based on user role
   useEffect(() => {
     if (user) {
       const role = user.role.toLowerCase()
       console.log("User role:", role) // Debug log
 
-      switch (role) {
-        case "admin":
-          setNavItems(adminNavItems)
-          break
-        case "user":
-          setNavItems(userNavItems)
-          break
-        case "agent":
-        case "broker":
-          setNavItems(agentNavItems)
-          break
-        default:
-          // Default to user items if role is not recognized
-          setNavItems(userNavItems)
-          console.warn(`Unknown role: ${role}, defaulting to user navigation`)
+      // Show commission nav items if on commission dashboard, otherwise use role-based nav
+      if (isCommissionDashboard && (role === "agent" || role === "broker")) {
+        setNavItems(commissionNavItems)
+      } else {
+        switch (role) {
+          case "admin":
+            setNavItems(adminNavItems)
+            break
+          case "user":
+            setNavItems(userNavItems)
+            break
+          case "agent":
+          case "broker":
+            setNavItems(agentNavItems)
+            break
+          case "commission":
+          default:
+            setNavItems(commissionNavItems)
+            break
+        }
       }
     } else {
-      // No user logged in, show empty items
-      setNavItems([])
+      setNavItems(commissionNavItems)
     }
-  }, [user])
+  }, [user, isCommissionDashboard, pathname])
 
   const renderMenuItems = (navItems: NavItem[], menuType: "main" | "others") => (
     <ul className="flex flex-col gap-2">

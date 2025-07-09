@@ -1,6 +1,6 @@
 import React from "react";
 
-type BadgeVariant = "light" | "solid";
+type BadgeVariant = "light" | "solid" | "outline";
 type BadgeSize = "sm" | "md";
 type BadgeColor =
   | "primary"
@@ -62,6 +62,15 @@ const Badge: React.FC<BadgeProps> = ({
       info: "bg-blue-light-500 text-white dark:text-white",
       light: "bg-gray-400 dark:bg-white/5 text-white dark:text-white/80",
       dark: "bg-gray-700 text-white dark:text-white",
+    },
+    outline: {
+      primary: "border border-brand-500 text-brand-500 dark:text-brand-400 dark:border-brand-400",
+      success: "border border-success-500 text-success-600 dark:text-success-500 dark:border-success-500",
+      error: "border border-error-500 text-error-600 dark:text-error-500 dark:border-error-500",
+      warning: "border border-warning-500 text-warning-600 dark:text-orange-400 dark:border-orange-400",
+      info: "border border-blue-light-500 text-blue-light-500 dark:text-blue-light-500 dark:border-blue-light-500",
+      light: "border border-gray-300 text-gray-700 dark:text-white/80 dark:border-white/20",
+      dark: "border border-gray-700 text-gray-700 dark:text-white dark:border-white/50",
     },
   };
 
