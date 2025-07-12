@@ -12,8 +12,12 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   
-  // Calculate sidebar width based on sidebar state
-  const sidebarWidth = isMobileOpen ? 0 : isExpanded || isHovered ? 290 : 90;
+  // Dynamic class for main content margin based on sidebar state
+  const mainContentMargin = isMobileOpen
+    ? "ml-0"
+    : isExpanded || isHovered
+    ? "lg:ml-[290px]"
+    : "lg:ml-[90px]";
   
   return (
     <>
@@ -32,11 +36,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         
         {/* Main content area */}
         <div 
-          className="flex flex-col flex-1 transition-all duration-300 ease-in-out"
-          style={{
-            marginLeft: `${sidebarWidth}px`,
-            width: `calc(100% - ${sidebarWidth}px)`,
-          }}
+          className={`flex flex-col flex-1 transition-all duration-300 ease-in-out ${
+            isMobileOpen
+              ? "ml-0"
+              : isExpanded || isHovered
+              ? "lg:ml-[90px]"
+              : "lg:ml-[90px]"
+          }`}
         >
           <DashboardHeader />
           <main className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 w-full">{children}</main>

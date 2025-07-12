@@ -69,29 +69,29 @@ export function SettingsView() {
   })
 
   return (
-    <div className="space-y-6 min-h-screen">
+    <div className="space-y-6 min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 ml-50">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Settings</h1>
         <p className="text-muted-foreground">Manage your account settings and preferences</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 h-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="company">Company</TabsTrigger>
-          <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6 bg-blue-50/50 p-1 rounded-xl">
+          <TabsTrigger value="profile" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white">Profile</TabsTrigger>
+          <TabsTrigger value="company" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white">Company</TabsTrigger>
+          <TabsTrigger value="pipeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white">Pipeline</TabsTrigger>
+          <TabsTrigger value="notifications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white">Notifications</TabsTrigger>
+          <TabsTrigger value="billing" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white">Billing</TabsTrigger>
+          <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white">Security</TabsTrigger>
         </TabsList>
 
         {/* Profile Settings */}
         <TabsContent value="profile" className="space-y-6 h-full overflow-y-auto">
-          <Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <User className="h-5 w-5 text-blue-600" />
                 Profile Information
               </CardTitle>
               <CardDescription>Update your personal information and profile settings</CardDescription>
@@ -144,7 +144,7 @@ export function SettingsView() {
                 />
               </div>
 
-              <Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
                 <Save className="h-4 w-4 mr-2" />
                 Save Changes
               </Button>
@@ -154,10 +154,10 @@ export function SettingsView() {
 
         {/* Company Settings */}
         <TabsContent value="company" className="space-y-6 h-full overflow-y-auto">
-          <Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <Building2 className="h-5 w-5 text-blue-600" />
                 Company Information
               </CardTitle>
               <CardDescription>Configure your company details and industry settings</CardDescription>
@@ -202,10 +202,10 @@ export function SettingsView() {
                 />
               </div>
 
-              <Separator />
+              <Separator className="border-blue-100" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Commission Structure</h3>
+                <h3 className="text-lg font-medium text-blue-700">Commission Structure</h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="defaultRate">Default Commission Rate (%)</Label>
@@ -218,7 +218,7 @@ export function SettingsView() {
                 </div>
               </div>
 
-              <Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
                 <Save className="h-4 w-4 mr-2" />
                 Save Company Settings
               </Button>
@@ -228,9 +228,9 @@ export function SettingsView() {
 
         {/* Pipeline Settings */}
         <TabsContent value="pipeline" className="space-y-6 h-full overflow-y-auto">
-          <Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
-              <CardTitle>Pipeline Configuration</CardTitle>
+              <CardTitle className="text-blue-800">Pipeline Configuration</CardTitle>
               <CardDescription>Customize your sales pipeline stages and workflow</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -249,28 +249,26 @@ export function SettingsView() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>              <div className="space-y-4">
+                <Label className="text-blue-700">Pipeline Stages</Label>
+                <div className="space-y-2">
+                  {pipelineTemplates[0].stages.map((stage, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input defaultValue={stage} className="focus:border-blue-500 focus:ring-blue-500" />
+                      <Button variant="outline" size="sm" className="border-blue-200 hover:bg-blue-50">
+                        <Trash2 className="h-4 w-4 text-blue-600" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-
-                <div className="space-y-4">
-                  <Label>Pipeline Stages</Label>
-                  <div className="space-y-2">
-                    {pipelineTemplates[0].stages.map((stage, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Input defaultValue={stage} />
-                        <Button variant="outline" size="sm">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                  <Button variant="outline">Add Stage</Button>
-                </div>
+                <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">Add Stage</Button>
+              </div>
               </div>
 
-              <Separator />
+              <Separator className="border-blue-100" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Automation Settings</h3>
+                <h3 className="text-lg font-medium text-blue-700">Automation Settings</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
@@ -291,7 +289,7 @@ export function SettingsView() {
                 </div>
               </div>
 
-              <Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
                 <Save className="h-4 w-4 mr-2" />
                 Save Pipeline Settings
               </Button>
@@ -301,17 +299,17 @@ export function SettingsView() {
 
         {/* Notifications */}
         <TabsContent value="notifications" className="space-y-6 h-full overflow-y-auto">
-          <Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <Bell className="h-5 w-5 text-blue-600" />
                 Notification Preferences
               </CardTitle>
               <CardDescription>Choose how you want to be notified about important events</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Notification Methods</h3>
+                <h3 className="text-lg font-medium text-blue-700">Notification Methods</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
@@ -336,10 +334,10 @@ export function SettingsView() {
                 </div>
               </div>
 
-              <Separator />
+              <Separator className="border-blue-100" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Notification Types</h3>
+                <h3 className="text-lg font-medium text-blue-700">Notification Types</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
@@ -374,7 +372,7 @@ export function SettingsView() {
                 </div>
               </div>
 
-              <Button>
+              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
                 <Save className="h-4 w-4 mr-2" />
                 Save Notification Settings
               </Button>
@@ -384,25 +382,25 @@ export function SettingsView() {
 
         {/* Billing */}
         <TabsContent value="billing" className="space-y-6 h-full overflow-y-auto">
-          <Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <CreditCard className="h-5 w-5 text-blue-600" />
                 Subscription & Billing
               </CardTitle>
               <CardDescription>Manage your subscription plan and billing information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div className="flex items-center justify-between p-4 border-blue-200 border rounded-lg bg-gradient-to-br from-blue-50 to-white">
                 <div className="flex items-center gap-3">
-                  <Crown className="h-8 w-8 text-yellow-600" />
+                  <Crown className="h-8 w-8 text-blue-600" />
                   <div>
-                    <h3 className="font-medium">Professional Plan</h3>
+                    <h3 className="font-medium text-blue-800">Professional Plan</h3>
                     <p className="text-sm text-muted-foreground">Advanced features for growing teams</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold">$49</p>
+                  <p className="text-2xl font-bold text-blue-700">$49</p>
                   <p className="text-sm text-muted-foreground">per month</p>
                 </div>
               </div>
@@ -428,13 +426,13 @@ export function SettingsView() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-primary">
+                <Card className="border-2 border-blue-500 shadow-xl bg-gradient-to-br from-blue-50 to-white">
                   <CardHeader className="text-center">
-                    <CardTitle className="text-lg">Professional</CardTitle>
-                    <div className="text-2xl font-bold">
+                    <CardTitle className="text-lg text-blue-800">Professional</CardTitle>
+                    <div className="text-2xl font-bold text-blue-700">
                       $49<span className="text-sm font-normal">/mo</span>
                     </div>
-                    <Badge>Most Popular</Badge>
+                    <Badge className="bg-blue-100 text-blue-800 border border-blue-200">Most Popular</Badge>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <ul className="text-sm space-y-1">
@@ -444,7 +442,7 @@ export function SettingsView() {
                       <li>• Priority Support</li>
                       <li>• Custom Pipeline</li>
                     </ul>
-                    <Button className="w-full">Upgrade</Button>
+                    <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">Upgrade</Button>
                   </CardContent>
                 </Card>
 
@@ -470,22 +468,22 @@ export function SettingsView() {
                 </Card>
               </div>
 
-              <Separator />
+              <Separator className="border-blue-100" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Payment Method</h3>
-                <div className="flex items-center gap-4 p-4 border rounded-lg">
-                  <CreditCard className="h-8 w-8" />
+                <h3 className="text-lg font-medium text-blue-700">Payment Method</h3>
+                <div className="flex items-center gap-4 p-4 border-blue-200 border rounded-lg bg-gradient-to-br from-blue-50 to-white">
+                  <CreditCard className="h-8 w-8 text-blue-600" />
                   <div className="flex-1">
-                    <p className="font-medium">•••• •••• •••• 4242</p>
+                    <p className="font-medium text-blue-800">•••• •••• •••• 4242</p>
                     <p className="text-sm text-muted-foreground">Expires 12/2025</p>
                   </div>
-                  <Button variant="outline">Update</Button>
+                  <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">Update</Button>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Billing History</h3>
+                <h3 className="text-lg font-medium text-blue-700">Billing History</h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between p-3 border rounded">
                     <div>
@@ -519,17 +517,17 @@ export function SettingsView() {
 
         {/* Security */}
         <TabsContent value="security" className="space-y-6 h-full overflow-y-auto">
-          <Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-white">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <Shield className="h-5 w-5 text-blue-600" />
                 Security Settings
               </CardTitle>
               <CardDescription>Manage your account security and authentication methods</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Password</h3>
+                <h3 className="text-lg font-medium text-blue-700">Password</h3>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="currentPassword">Current Password</Label>
@@ -543,30 +541,30 @@ export function SettingsView() {
                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
                     <Input id="confirmPassword" type="password" />
                   </div>
-                  <Button>Update Password</Button>
+                  <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">Update Password</Button>
                 </div>
               </div>
 
-              <Separator />
+              <Separator className="border-blue-100" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
-                <div className="flex items-center justify-between p-4 border rounded-lg">
+                <h3 className="text-lg font-medium text-blue-700">Two-Factor Authentication</h3>
+                <div className="flex items-center justify-between p-4 border-blue-200 border rounded-lg bg-gradient-to-br from-blue-50 to-white">
                   <div>
-                    <p className="font-medium">Authenticator App</p>
+                    <p className="font-medium text-blue-800">Authenticator App</p>
                     <p className="text-sm text-muted-foreground">
                       Use an authenticator app to generate verification codes
                     </p>
                   </div>
                   <Badge className="bg-green-100 text-green-800">Enabled</Badge>
                 </div>
-                <Button variant="outline">Manage 2FA</Button>
+                <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">Manage 2FA</Button>
               </div>
 
-              <Separator />
+              <Separator className="border-blue-100" />
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Active Sessions</h3>
+                <h3 className="text-lg font-medium text-blue-700">Active Sessions</h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between p-3 border rounded">
                     <div>
@@ -580,7 +578,7 @@ export function SettingsView() {
                       <p className="font-medium">Mobile App</p>
                       <p className="text-sm text-muted-foreground">iPhone • Last seen 2 hours ago</p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-blue-200 hover:bg-blue-50">
                       Revoke
                     </Button>
                   </div>

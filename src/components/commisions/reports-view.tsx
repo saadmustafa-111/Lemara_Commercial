@@ -117,7 +117,7 @@ export function ReportsView() {
   const [activeTab, setActiveTab] = useState("templates")
 
   return (
-    <div className="space-y-6 min-h-screen">
+    <div className="space-y-6 min-h-screen ml-50">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
