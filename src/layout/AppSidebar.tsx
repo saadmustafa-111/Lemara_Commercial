@@ -118,7 +118,7 @@ const commissionNavItems: NavItem[] = [
   {
     name: "Commissions",
     icon: <Wallet size={20} />,
-    path: "/commisions",
+    path: "/commissions",
   },
   {
     name: "Analytics",
@@ -230,7 +230,7 @@ const AppSidebar: React.FC = () => {
   const isCommissionDashboard =
     pathname === "/dashboard/agent/commission-dashboard" ||
     pathname?.startsWith("/pipeline") ||
-    pathname?.startsWith("/commisions") ||
+    pathname?.startsWith("/commissions") ||
     pathname?.startsWith("/analytics") ||
     pathname?.startsWith("/reports") ||
     pathname?.startsWith("/team") ||
